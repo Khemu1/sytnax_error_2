@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { CustomError, errorHandler } from "./middleware/CustomError";
-import { Ratelimit } from "@upstash/ratelimit";
-import { kv } from "@vercel/kv";
+import {  errorHandler } from "./middleware/CustomError";
+// import { Ratelimit } from "@upstash/ratelimit";
+// import { kv } from "@vercel/kv";
 import {
   authenticateUser,
   checkAdminData,
@@ -22,38 +22,38 @@ import {
 } from "@/middleware/courseMiddleware";
 
 // Initialize rate limiter for general requests
-const rateLimit = new Ratelimit({
-  redis: kv,
-  limiter: Ratelimit.slidingWindow(60, "1s"), // 60 requests per minute for general API calls
-});
+// const rateLimit = new Ratelimit({
+//   redis: kv,
+//   limiter: Ratelimit.slidingWindow(60, "1s"), // 60 requests per minute for general API calls
+// });
 
-// Initialize rate limiter for login attempts
-const loginRateLimit = new Ratelimit({
-  redis: kv,
-  limiter: Ratelimit.slidingWindow(5, "60s"), // 5 login attempts per minute
-});
+// // Initialize rate limiter for login attempts
+// const loginRateLimit = new Ratelimit({
+//   redis: kv,
+//   limiter: Ratelimit.slidingWindow(5, "60s"), // 5 login attempts per minute
+// });
 
-// Helper function to check rate limits for general requests
-const checkRateLimit = async (req: NextRequest) => {
-  const ip = req.ip ?? "127.0.0.1";
-  const { remaining } = await rateLimit.limit(ip);
-  if (remaining === 0) {
-    throw new CustomError("Too many requests", 429, "", true, "", {
-      message: "Too many requests, try again later",
-    });
-  }
-};
+// // Helper function to check rate limits for general requests
+// const checkRateLimit = async (req: NextRequest) => {
+//   const ip = req.ip ?? "127.0.0.1";
+//   const { remaining } = await rateLimit.limit(ip);
+//   if (remaining === 0) {
+//     throw new CustomError("Too many requests", 429, "", true, "", {
+//       message: "Too many requests, try again later",
+//     });
+//   }
+// };
 
 // Helper function to check rate limits for login attempts
-const checkLoginRateLimit = async (req: NextRequest) => {
-  const ip = req.ip ?? "127.0.0.1";
-  const { remaining } = await loginRateLimit.limit(ip);
-  if (remaining === 0) {
-    throw new CustomError("Too many login attempts", 429, "", true, "", {
-      message: "Too many login attempts, please try again later.",
-    });
-  }
-};
+// const checkLoginRateLimit = async (req: NextRequest) => {
+//   const ip = req.ip ?? "127.0.0.1";
+//   const { remaining } = await loginRateLimit.limit(ip);
+//   if (remaining === 0) {
+//     throw new CustomError("Too many login attempts", 429, "", true, "", {
+//       message: "Too many login attempts, please try again later.",
+//     });
+//   }
+// };
 
 // Handle /api/courses routes
 const handleCoursesRoute = async (req: NextRequest) => {
@@ -90,7 +90,7 @@ const handleAuthRoutes = async (req: NextRequest) => {
     return NextResponse.next();
   }
   if (pathname === "/api/auth/signin") {
-    await checkLoginRateLimit(req);
+    // await checkLoginRateLimit(req);
     return signIn(req);
   } else if (pathname === "/api/auth/send-email") {
     return await validateEmail(req);
@@ -133,7 +133,7 @@ const handleDashboardRoutes = async (req: NextRequest) => {
 
 export async function middleware(req: NextRequest) {
   try {
-    await checkRateLimit(req); // Check general rate limits
+    // await checkRateLimit(req); // Check general rate limits
     const { pathname } = req.nextUrl;
 
     if (pathname.startsWith("/api/courses")) {
