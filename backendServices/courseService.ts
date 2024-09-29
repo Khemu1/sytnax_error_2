@@ -245,7 +245,7 @@ export const registerToCourseService = async (
 
     const range = "A2";
 
-    const request:any = {
+    const request: any = {
       spreadsheetId: spreadsheetId,
       range: range,
       valueInputOption: "RAW",
@@ -263,14 +263,7 @@ export const registerToCourseService = async (
   } catch (error) {
     // Detailed logging for development
     if (process.env.NODE_ENV === "development") {
-      console.error("Error details:", {
-        message: error.message,
-        stack: error.stack,
-        requestData: {
-          data,
-          googleCredentials, // Do not log sensitive data like private_key in production
-        },
-      });
+      console.error(error);
     } else {
       // Simple logging for production
       console.error("Error writing to Google Sheets");
@@ -285,4 +278,3 @@ export const registerToCourseService = async (
     );
   }
 };
-
