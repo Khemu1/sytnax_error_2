@@ -1,7 +1,6 @@
 import { NewCourseProps, RegisterCourseFormProps } from "@/types";
 import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
-
 import { CustomError } from "@/middleware/CustomError";
 import { uploadToImgur } from "./imgurServices";
 import { google } from "googleapis";
@@ -206,7 +205,10 @@ export const registerToCourseService = async (
   try {
     const sheets = google.sheets("v4");
     const auth = new google.auth.GoogleAuth({
-      keyFile: `${process.cwd()}/config/syntaxerror-437019-1cad177bb001.json`, // Path to your service account JSON file
+      keyFile: new URL(
+        "@/config/syntaxerror-437019-1cad177bb001.json",
+        import.meta.url
+      ).toString(), // Path to your service account JSON file
       scopes: ["https://www.googleapis.com/auth/spreadsheets"],
     });
 
