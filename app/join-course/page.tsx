@@ -48,6 +48,7 @@ const JoinCourse: React.FC = () => {
       setIsSubmitting(false);
     } catch (err) {
       setErrors(validateWithSchema(err));
+      setIsSubmitting(false);
     }
   };
 
