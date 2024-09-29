@@ -1,7 +1,6 @@
 import { NewCourseProps, RegisterCourseFormProps } from "@/types";
 import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
-
 import { CustomError } from "@/middleware/CustomError";
 import { uploadToImgur } from "./imgurServices";
 import { google } from "googleapis";
@@ -203,10 +202,24 @@ export const deleteCourseService = async (ids: number[]) => {
 export const registerToCourseService = async (
   data: RegisterCourseFormProps
 ) => {
+  const googleCredentials = {
+    type: process.env.GOOGLE_TYPE,
+    project_id: process.env.GOOGLE_PROJECT_ID,
+    private_key_id: process.env.GOOGLE_PRIVATE_KEY_ID,
+    private_key: process.env.GOOGLE_PRIVATE_KEY!.replace(/\\n/g, "\n"),
+    client_email: process.env.GOOGLE_CLIENT_EMAIL,
+    client_id: process.env.GOOGLE_CLIENT_ID,
+    auth_uri: process.env.GOOGLE_AUTH_URI,
+    token_uri: process.env.GOOGLE_TOKEN_URI,
+    auth_provider_x509_cert_url: process.env.GOOGLE_AUTH_PROVIDER_CERT_URL,
+    client_x509_cert_url: process.env.GOOGLE_CLIENT_CERT_URL,
+  };
+
   try {
     const sheets = google.sheets("v4");
     const auth = new google.auth.GoogleAuth({
-      keyFile: `${process.cwd()}/config/syntaxerror-437019-1cad177bb001.json`, // Path to your service account JSON file
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      credentials: googleCredentials,
       scopes: ["https://www.googleapis.com/auth/spreadsheets"],
     });
 
