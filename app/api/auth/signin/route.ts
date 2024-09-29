@@ -26,8 +26,9 @@ export const POST = async (req: NextRequest) => {
 
     const response = NextResponse.json(
       {
-        message: "logged in",
-        user: { id: user.id, role: user.role, username: user.username },
+        userId: user.id,
+        role: user.role,
+        username: user.username,
       },
       { status: 200 }
     );
