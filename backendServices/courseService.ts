@@ -257,7 +257,8 @@ export const registerToCourseService = async (
     };
 
     // Use update to write the data
-    sheets.spreadsheets.values.append(request);
+    const re = sheets.spreadsheets.values.append(request);
+    console.log(re);
     return true;
   } catch (error) {
     console.error("Error writing to sheet:", error);
