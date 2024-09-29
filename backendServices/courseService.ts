@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NewCourseProps, RegisterCourseFormProps } from "@/types";
 import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
@@ -218,13 +219,12 @@ export const registerToCourseService = async (
   try {
     const sheets = google.sheets("v4");
     const auth = new google.auth.GoogleAuth({
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       credentials: googleCredentials,
       scopes: ["https://www.googleapis.com/auth/spreadsheets"],
     });
 
     const client = await auth.getClient();
-    const spreadsheetId = "1GX85BYfFIb6oBByH15MPN70rIf3k9f7rgmvwkndb_3U";
+    const spreadsheetId = "136EwS2aFf6p79fkd2Er3PTLLv1frpdc5_0jC07KXSH0";
 
     const staticData = [
       formatDateToCustomString(new Date()), // Column A: Date
@@ -245,8 +245,7 @@ export const registerToCourseService = async (
 
     const range = "A2";
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const request: any = {
+    const request:any = {
       spreadsheetId: spreadsheetId,
       range: range,
       valueInputOption: "RAW",
@@ -256,17 +255,34 @@ export const registerToCourseService = async (
       auth: client,
     };
 
-    // Use update to write the data
-    const re = sheets.spreadsheets.values.append(request);
-    console.log(re);
+    // Await the append request to catch potential issues
+    const response = await sheets.spreadsheets.values.append(request);
+    console.log("Google Sheets API response:", response);
+
     return true;
   } catch (error) {
-    console.error("Error writing to sheet:", error);
+    // Detailed logging for development
+    if (process.env.NODE_ENV === "development") {
+      console.error("Error details:", {
+        message: error.message,
+        stack: error.stack,
+        requestData: {
+          data,
+          googleCredentials, // Do not log sensitive data like private_key in production
+        },
+      });
+    } else {
+      // Simple logging for production
+      console.error("Error writing to Google Sheets");
+    }
+
+    // Throw a custom error
     throw new CustomError(
-      "Failed to write data to Google Sheet",
+      "Failed to write data to Google Sheets",
       500,
       "data insertion",
       true
     );
   }
 };
+
