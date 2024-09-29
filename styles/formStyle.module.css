@@ -1,0 +1,68 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 90%;
+  max-width: 100%;
+  gap: 25px;
+}
+.form input ,.form select {
+  padding: 9px;
+  border-radius: 7px;
+  width: 100%;
+  transition: 100ms ease-in-out;
+}
+
+.form label {
+  color: white;
+  font-weight: 700;
+}
+.form button {
+  margin-top: 5px;
+  padding: 9;
+  border-radius: 7px;
+  background-color: rgb(3, 121, 231);
+  flex-basis: 45px;
+  transition: 250ms ease-in-out;
+  font-weight: 700;
+}
+.form .button_success {
+  background-color: #0c1425;
+  color: white;
+}
+.form button:hover:not(.button_success) {
+  background-color: rgb(6, 111, 209);
+  color: white;
+}
+.form button:active:not(.button_success) {
+  background-color: rgb(6, 111, 209);
+  color: white;
+}
+.form input:focus-within {
+  outline: none;
+  box-shadow: 0 0 0 2px rgb(25, 106, 238);
+}
+.form .input_container {
+  display: flex;
+  align-items: start;
+  flex-direction: column;
+  gap: 5px;
+}
+.form label {
+  flex: 1;
+}
+form .edit_course_input {
+  padding: 9px;
+  border-radius: 7px;
+  border-bottom: 3px solid gray;
+  width: 250px;
+  transition: 250ms ease-in-out;
+}
+
+form .edit_course_input:focus-within {
+  outline: none;
+  border-bottom-color: #10669c;
+}
+form .input_error {
+  border-bottom-color: rgb(203, 16, 16);
+}

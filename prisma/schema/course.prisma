@@ -1,0 +1,16 @@
+model Course {
+  id                      Int       @id @default(autoincrement())
+  userId                  Int
+  title                   String
+  instructorAndMentorInfo String
+  courseInfo              String
+  price                   Int
+  totalSessions           Int
+  totalSessionPerWeek     Int
+  totalTasks              Int
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime?
+  deletedAt               DateTime?
+  user                    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  urlData                 UrlData[]
+}

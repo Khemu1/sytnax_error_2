@@ -1,0 +1,12 @@
+model UrlData {
+  id         Int       @id @default(autoincrement())
+  courseId   Int
+  url        String
+  imgurId    String
+  deleteHash String
+  type       String
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime?
+  deletedAt  DateTime?
+  course     Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+}
