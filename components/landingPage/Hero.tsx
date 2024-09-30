@@ -6,14 +6,13 @@ import { courses } from "@/constants";
 export const Hero = () => {
   return (
     <div className="flex flex-col w-full">
-      <div className="relative w-full overflow-hidden">
+      <div className="relative w-full h-[1000px] overflow-hidden">
         <Image
-          className="rounded-lg shadow-lg object-cover"
+          className="rounded-lg shadow-lg object-fill w-full h-full" // Use w-full and h-full
           src="/assets/imgs/cover.png"
           alt="Cover"
           priority={true}
-          width={1920}
-          height={1080}
+          fill={true}
           sizes="100vw"
         />
         <div className="absolute inset-0 bg-black opacity-50"></div>
