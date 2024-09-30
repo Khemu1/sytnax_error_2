@@ -165,9 +165,7 @@ const Course: React.FC<Props> = ({ params: { id } }) => {
       {/* Join Button */}
       <div className="flex w-full justify-center mt-8">
         <Link
-          href={
-            "https://docs.google.com/forms/d/136mdYWd4RPKqxDI32Q0rjfZ0-maD3RrlsT-Ym7-wcts/viewform?edit_requested=true#response=ACYDBNgoSmkZIYokCyaxkxnN_14x9_Ak21ShSq8xMSAMEHFOfrwPWWX_em_-jKciR0jndhA"
-          }
+          href={"/join-course"}
           className="bg-blue-700 text-center hover:bg-blue-800 transition duration-300 w-[250px] py-2 text-white font-semibold text-xl rounded-lg shadow-md"
         >
           Join Now
