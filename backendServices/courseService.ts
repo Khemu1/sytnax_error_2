@@ -6,6 +6,7 @@ import { CustomError } from "@/middleware/CustomError";
 import { uploadToImgur } from "./imgurServices";
 import { google } from "googleapis";
 import { formatDateToCustomString } from "@/utils";
+import { sendRegistrationNotification } from "./emailService";
 const prisma = new PrismaClient().$extends(withAccelerate());
 
 export const addCourseService = async (
@@ -256,9 +257,8 @@ export const registerToCourseService = async (
     };
 
     // Await the append request to catch potential issues
-    const response = await sheets.spreadsheets.values.append(request);
-    console.log("Google Sheets API response:", response);
-
+    await sheets.spreadsheets.values.append(request);
+    await sendRegistrationNotification(data);
     return true;
   } catch (error) {
     // Detailed logging for development

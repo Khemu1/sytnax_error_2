@@ -3,7 +3,7 @@ import { PrismaClient } from "@prisma/client";
 import { withAccelerate } from "@prisma/extension-accelerate";
 import bcrypt from "bcrypt";
 import { CustomError } from "@/middleware/CustomError";
-import { sendEmail } from "./emailService";
+import { sendResetPasswordEmail } from "./emailService";
 import { generatePasswordResetTokenForEmail } from "./jwtService";
 import { calculateExpirationDate } from "@/utils";
 import {
@@ -73,7 +73,6 @@ export const sendEmailService = async (email: string) => {
 
     await addSecretTokenService(token, findUser.id, expiresAt);
 
-    const subject = "Password Reset Request";
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
     const resetLink = `${baseUrl}/check-token?token=${token}`;
 
@@ -92,7 +91,7 @@ export const sendEmailService = async (email: string) => {
     <p>Best Regards,<br>Syntax Error Team</p>
   </div>
 `;
-    await sendEmail(email, subject, html);
+    await sendResetPasswordEmail(email, html);
   } catch (error) {
     console.error("Error sending email:", error);
     throw new CustomError(
