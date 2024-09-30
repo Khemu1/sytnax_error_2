@@ -46,7 +46,8 @@ const JoinCourse: React.FC = () => {
     setIsSubmitting(true);
     setErrors({});
     try {
-      joinCourseFieldsschema.parse(formData);
+      const scehma = joinCourseFieldsschema();
+      scehma.parse(formData);
       handleRegisterCourse(formData);
       setIsSubmitting(false);
     } catch (err) {
@@ -100,7 +101,7 @@ const JoinCourse: React.FC = () => {
                   inputProps={{
                     name: field.name,
                     required: true,
-                    className: "input_field", // This applies the class to the input
+                    className: "phone-input", // Apply the input class here
                   }}
                   onlyCountries={["eg"]}
                   country={"eg"}
@@ -113,20 +114,9 @@ const JoinCourse: React.FC = () => {
                       countryCode: countryData.countryCode.toUpperCase(),
                     });
                   }}
-                  inputStyle={{
-                    width: "100%",
-                  }}
-                  containerStyle={{
-                    width: "100%",
-                  }}
-                  buttonStyle={{
-                    backgroundColor: "#2B2A33",
-                    border: "1px solid #383740",
-                  }}
-                  searchStyle={{
-                    backgroundColor: "#2B2A33",
-                  }}
-                  inputClass="input_field"
+                  containerClass="phone-input-container"
+                  buttonClass="phone-input-button"
+                  inputClass="phone-input"
                   disableDropdown={true}
                   disableSearchIcon={true}
                 />

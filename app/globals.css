@@ -337,3 +337,53 @@ footer {
 .selected-flag:focus-within {
   background-color: transparent !important;
 }
+
+/* .phone-input {
+  width: 100%;
+  background-color: #2b2a33;
+  padding: 20px;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  letter-spacing: 0.01rem;
+  line-height: 25px;
+  transition: border-color 0.3s ease;
+}
+
+.phone-input:hover {
+  border-color: rgb(6, 111, 209);
+}
+
+.phone-input:focus {
+  outline: none; 
+  box-shadow: 0 0 0 2px rgb(25, 106, 238); 
+} */
+
+.phone-input-container {
+  width: 100%;
+  position: relative;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  margin-left: 0;
+}
+.phone-input {
+  padding-left: 44px !important;
+}
+.phone-input-container:hover {
+  border-color: rgb(6, 111, 209);
+}
+
+.phone-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 1px rgb(6, 111, 209) !important;
+}
+.phone-input-button {
+  background-color: #2b2a33 !important;
+  border: 0 !important;
+  border-radius: 8px 0px 0px 8px !important ;
+  border-right: 2px solid #17161b !important;
+}
+
+.phone-input-search {
+  background-color: #2b2a33;
+}

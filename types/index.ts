@@ -1,6 +1,4 @@
 import { CustomError } from "@/middleware/CustomError";
-import { joinCourseFieldsschema } from "@/utils/validations";
-import { z } from "zod";
 
 export interface SignInProps {
   usernameOrEmail: string;
@@ -214,10 +212,20 @@ export interface CourseModel {
   urlData: UrlDataModel[];
 }
 
-export type RegisterCourseFormProps = z.infer<typeof joinCourseFieldsschema>;
+export interface RegisterCourseFormProps {
+  name: string;
+  gpa: string;
+  university: string;
+  branch: string;
+  course: string;
+  whatsapp: string;
+  email: string;
+  promoCode: string;
+  questions: string;
+  countryCode: string;
+}
 
 export type Errors = Partial<Record<keyof RegisterCourseFormProps, string>>;
-
 
 export interface CountryProps {
   countryCode: string;

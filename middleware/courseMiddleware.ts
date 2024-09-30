@@ -118,7 +118,8 @@ export const validateCourseForEdit = async (req: NextRequest) => {
 export const vlidateCourseRegister = async (req: NextRequest) => {
   try {
     const data = await req.json();
-    joinCourseFieldsschema.parse(data);
+    const schema = joinCourseFieldsschema();
+    schema.parse(data);
   } catch (error) {
     if (error instanceof ZodError) {
       const zodErros = validateWithSchema(error);

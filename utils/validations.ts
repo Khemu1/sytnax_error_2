@@ -1,6 +1,6 @@
 import { CustomError } from "@/middleware/CustomError";
 import { object, string, ZodError, number, ZodIssueCode } from "zod";
-import { PhoneNumberUtil, PhoneNumber } from "google-libphonenumber";
+import { parsePhoneNumberFromString,CountryCode } from "libphonenumber-js";
 
 export const validateWithSchema = (error: CustomError | ZodError | unknown) => {
   console.log("got error schema", error instanceof CustomError);
@@ -24,7 +24,6 @@ export const validateWithSchema = (error: CustomError | ZodError | unknown) => {
   };
 };
 
-const phoneUtil = PhoneNumberUtil.getInstance();
 
 const errorMessages = {
   email: {
@@ -500,51 +499,53 @@ export const validatePasswordSchema = () => {
 
 const validatePhoneNumber = (value: string, countryCode: string): boolean => {
   try {
-    const phoneNumber: PhoneNumber = phoneUtil.parseAndKeepRawInput(
+    const phoneNumber = parsePhoneNumberFromString(
       value,
-      countryCode
+      countryCode as CountryCode
     );
-    return phoneUtil.isValidNumber(phoneNumber);
+    return phoneNumber ? phoneNumber.isValid() : false;
   } catch (error) {
     return false;
   }
 };
 
-export const joinCourseFieldsschema = object({
-  name: string({ required_error: "Name is required" }).min(
-    3,
-    "Name must be at least 3 characters long"
-  ),
-  gpa: string({ required_error: "GPA is required" }).refine(
-    (value) => {
-      const gpaValue = parseFloat(value);
-      return gpaValue >= 1.0 && gpaValue <= 4.0;
-    },
-    {
-      message: "GPA must be between 1.0 and 4.0",
+export const joinCourseFieldsschema = () => {
+  return object({
+    name: string({ required_error: "Name is required" })
+      .min(3, "Name must be at least 3 characters long")
+      .max(30, "Name cannot exceed 30 characters")
+      .regex(/^[a-zA-Z ]+$/, "Name must only contain English letters"),
+    gpa: string({ required_error: "GPA is required" }).refine(
+      (value) => {
+        const gpaValue = parseFloat(value);
+        return gpaValue >= 1.0 && gpaValue <= 4.0;
+      },
+      {
+        message: "GPA must be between 1.0 and 4.0",
+      }
+    ),
+    university: string({ required_error: "University is" }).min(
+      2,
+      "University must be at least 2 characters long"
+    ),
+    branch: string({ required_error: "Branch is required" }).min(
+      3,
+      "Branch must be at least 3 characters long"
+    ),
+    course: string().min(1, "Please select a course"),
+    whatsapp: string().min(1, "WhatsApp number is required"),
+    email: string().email("Invalid email address"),
+    promoCode: string().optional(),
+    questions: string().optional(),
+    countryCode: string().min(1, "Country code is required"),
+  }).superRefine((val, ctx) => {
+    const { whatsapp, countryCode } = val;
+    if (!validatePhoneNumber(whatsapp, countryCode)) {
+      ctx.addIssue({
+        code: ZodIssueCode.custom,
+        message: "Invalid WhatsApp number",
+        path: ["whatsapp"],
+      });
     }
-  ),
-  university: string({ required_error: "University is" }).min(
-    2,
-    "University must be at least 2 characters long"
-  ),
-  branch: string({ required_error: "Branch is required" }).min(
-    3,
-    "Branch must be at least 3 characters long"
-  ),
-  course: string().min(1, "Please select a course"),
-  whatsapp: string().min(1, "WhatsApp number is required"),
-  email: string().email("Invalid email address"),
-  promoCode: string().optional(),
-  questions: string().optional(),
-  countryCode: string().min(1, "Country code is required"),
-}).superRefine((val, ctx) => {
-  const { whatsapp, countryCode } = val;
-  if (!validatePhoneNumber(whatsapp, countryCode)) {
-    ctx.addIssue({
-      code: ZodIssueCode.custom,
-      message: "Invalid WhatsApp number",
-      path: ["whatsapp"],
-    });
-  }
-});
+  });
+};
