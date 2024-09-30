@@ -27,7 +27,9 @@ const CourseCard: React.FC<Props> = ({ course }) => {
         <div className="flex flex-col justify-between flex-grow w-full">
           <h3 className="m-[0] py-2 text-lg font-semibold text-white text-center  relative">
             <span className="absolute inset-0 bg-gradient-to-r from-teal-400 to-cyan-500 opacity-60 transition-opacity duration-300 hover:opacity-80"></span>{" "}
-            <span className="relative z-10 text-shadow">{course.title}</span>
+            <span className="relative z-10 text-shadow overflow-hidden text-ellipsis block px-2">
+              {course.title}
+            </span>
           </h3>
 
           <div
