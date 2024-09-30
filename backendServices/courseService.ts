@@ -120,7 +120,7 @@ export const getCourseService = async (id: number) => {
     if (isNaN(id) || id === 0) {
       throw new CustomError("invalid course id", 404, "", true);
     }
-    const course = await prisma.course.findUnique({
+    const course = await prisma.course.findFirst({
       where: { id: +id, deletedAt: null },
       relationLoadStrategy: "join",
       include: { urlData: true },
@@ -168,7 +168,7 @@ export const getCourseService = async (id: number) => {
 export const deleteCourseService = async (ids: number[]) => {
   try {
     const deletionPromises = ids.map(async (id) => {
-      const findCourse = await prisma.course.findUnique({
+      const findCourse = await prisma.course.findFirst({
         where: { id },
         include: {
           urlData: true, // Fetch associated urlData

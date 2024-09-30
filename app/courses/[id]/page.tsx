@@ -20,157 +20,123 @@ const Course: React.FC<Props> = ({ params: { id } }) => {
     }
   }, [id]);
 
-  // Handle loading and errors
   if (loading) {
     return (
-      <div className="flex flex-grow justify-center items-center ">
-        <span className="loading loading-infinity w-[100px]"></span>
+      <div className="flex justify-center items-center h-screen bg-[#0C1425]">
+        <span className="loading loading-infinity w-[80px] h-[80px]"></span>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="text-center text-red-500 my-10">
+      <div className="text-center text-red-400 my-10">
         Error: {error.message}
       </div>
     );
   }
 
   return (
-    <div className="flex flex-1 flex-col gap-8 my-10 px-6 md:px-12 lg:px-44">
-      <h1 className="text-3xl md:text-4xl font-bold text-gray-100 bg-gradient-to-r min-w-[250px] mb-7 from-blue-800 to-blue-600 text-center mx-auto p-2 px-4 shadow-md rounded-2xl">
+    <div className="flex flex-col gap-10 py-10 px-6 md:px-20 lg:px-40 bg-[#0C1425] text-white">
+      {/* Course Header */}
+      <h1 className="text-5xl font-bold text-white text-center">
         {data?.title || "Course Title"}
       </h1>
 
-      <div className="flex flex-wrap text-sm">
-        {/* Total Sessions */}
-        <div className="m-2 flex w-[200px] gap-2 items-center bg-blue-600 rounded-xl px-2 py-1 font-semibold text-white">
-          <div>
-            <Image
-              priority={true}
-              src={"/assets/icons/sessionIcon.svg"}
-              width={32}
-              height={32}
-              alt="total sessions"
-            />
-          </div>
-          <span>
-            {data?.totalSessions && data.totalSessions > 1
-              ? `${data?.totalSessions} Total Sessions`
-              : `${data?.totalSessions || "No"} Session`}
-          </span>
-        </div>
-
-        {/* Sessions Per Week */}
-        <div className="m-2 flex w-[200px] gap-2 items-center bg-blue-600 rounded-xl px-2 py-1 font-semibold text-white">
-          <div>
-            <Image
-              priority={true}
-              src={"/assets/icons/calendar-mark.svg"}
-              width={32}
-              height={32}
-              alt="sessions per week"
-            />
-          </div>
-          <span>
-            {data?.totalSessionPerWeek && data?.totalSessionPerWeek > 1
-              ? `${data?.totalSessionPerWeek} Sessions Per Week`
-              : `${data?.totalSessionPerWeek || "No"} Session Per Week`}
-          </span>
-        </div>
-
-        {/* Total Quizzes */}
-        <div className="m-2 flex w-[200px] gap-2 items-center bg-blue-600 rounded-xl px-2 py-1 font-semibold text-white">
-          <div>
-            <Image
-              priority={true}
-              src={"/assets/icons/quiz.svg"}
-              width={32}
-              height={32}
-              alt="total tasks/quizzes"
-            />
-          </div>
-          <span>
-            {data?.totalTasks && data?.totalTasks > 1
-              ? `${data?.totalTasks} Quizzes`
-              : `${data?.totalTasks || "No"} Quiz`}
-          </span>
-        </div>
-
-        {/* Price */}
-        <div
-          className={`m-2 flex gap-2 items-center w-[150px] rounded-xl px-2 py-1 text-center font-light text-sm  ${
-            data?.price === 0
-              ? "bg-gradient-to-r from-green-400 to-blue-500 text-white"
-              : "bg-blue-600 text-white"
-          }`}
-        >
-          <div>
-            <Image
-              priority={true}
-              src={"/assets/icons/price-tag.svg"}
-              width={32}
-              height={32}
-              alt="price tag"
-            />
-          </div>
-          <span className="font-semibold">
-            {data?.price === 0 ? "Free" : `E£${data?.price}`}
-          </span>
-        </div>
+      {/* Course Details */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <CourseDetail
+          iconSrc="/assets/icons/sessionIcon.svg"
+          label={`${data?.totalSessions || "0"} Sessions`}
+        />
+        <CourseDetail
+          iconSrc="/assets/icons/calendar-mark.svg"
+          label={`${data?.totalSessionPerWeek || "0"} Sessions/Week`}
+        />
+        <CourseDetail
+          iconSrc="/assets/icons/quiz.svg"
+          label={`${data?.totalTasks || "0"} Quizzes`}
+        />
+        <CourseDetail
+          iconSrc="/assets/icons/price-tag.svg"
+          label={data?.price === 0 ? "Free" : `E£${data?.price}`}
+          customStyle="bg-green-500 text-white"
+        />
       </div>
+
+      {/* Instructor Info */}
+      <CourseInfo
+        title="Instructor & Mentor"
+        content={
+          data?.instructorAndMentorInfo ||
+          "No instructor information available."
+        }
+      />
 
       {/* Course Info */}
-      <div className="text-white bg-base-300 p-3 rounded-lg shadow-md transition-all hover:scale-105">
-        <h2 className="text-xl font-semibold mb-2">Who Will Be Teaching</h2>
-        <div
-          className="prose prose-lg mb-6"
-          dangerouslySetInnerHTML={{
-            __html:
-              data?.instructorAndMentorInfo ||
-              "<p>No instructor information available.</p>",
-          }}
-        />
-      </div>
+      <CourseInfo
+        title="About the Course"
+        content={data?.courseInfo || "No additional course information."}
+      />
 
-      <div className="text-white bg-base-300 p-3 rounded-lg shadow-md transition-all hover:scale-105">
-        <h2 className="text-xl font-semibold mb-2">More About the Course</h2>
-        <div
-          className="prose prose-lg mb-6"
-          dangerouslySetInnerHTML={{
-            __html:
-              data?.courseInfo || "<p>No course information available.</p>",
-          }}
-        />
-      </div>
-
-      {/* Mindmap Image */}
+      {/* Mindmap Section */}
       {data?.mindmapImage && (
-        <div className="text-white bg-base-300 rounded-lg shadow-md p-3">
-          <h2 className="text-xl font-semibold mb-2">Course Mind Map</h2>
-          <div className="flex mx-auto max-w-[75dvw]  justify-center mt-2 overflow-hidden relative rounded-2xl transition-all shadow-lg active:scale-105">
+        <div className="bg-[#1E2A38] rounded-lg shadow-lg p-6 text-white">
+          <h2 className="text-3xl font-semibold mb-4">Course Mind Map</h2>
+          <div className="flex justify-center">
             <Image
               src={data.mindmapImage}
               alt="Mindmap"
-              width={500}
-              height={300}
-              className="rounded-2xl max-w-full max-h-full object-contain"
+              width={600}
+              height={400}
+              className="rounded-lg shadow-lg"
               priority={true}
             />
           </div>
         </div>
       )}
 
-      {/* Join Button */}
-      <div className="flex w-full justify-center mt-8">
+      {/* Join Now Button */}
+      <div className="flex justify-center mt-12">
         <Link
           href={"/join-course"}
-          className="bg-blue-700 text-center hover:bg-blue-800 transition duration-300 w-[250px] py-2 text-white font-semibold text-xl rounded-lg shadow-md"
+          className="transition-all bg-gradient-to-r from-blue-700 via-teal-600 to-purple-800 hover:from-purple-800 hover:via-teal-600 hover:to-blue-700 text-white text-xl font-medium py-3 px-10 rounded-lg shadow-md hover:shadow-lg transition-transform transform hover:scale-105"
         >
           Join Now
         </Link>
       </div>
+    </div>
+  );
+};
+
+const CourseDetail: React.FC<{
+  iconSrc: string;
+  label: string;
+  customStyle?: string;
+}> = ({ iconSrc, label, customStyle = "" }) => {
+  return (
+    <div
+      className={`flex items-center gap-4 bg-[#1E2A38] text-white rounded-lg p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 ${customStyle}`}
+    >
+      <Image src={iconSrc} width={40} height={40} alt="icon" />
+      <span className="font-semibold text-lg">{label}</span>
+    </div>
+  );
+};
+
+const CourseInfo: React.FC<{ title: string; content: string }> = ({
+  title,
+  content,
+}) => {
+  return (
+    <div className="bg-[#1E2A38] p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+      <h2 className="text-3xl font-semibold mb-4">{title}</h2>
+      <p
+        className="text-gray-300 text-lg leading-relaxed"
+        dangerouslySetInnerHTML={{
+          __html: content || "<p>No course information available.</p>",
+        }}
+      ></p>
     </div>
   );
 };
