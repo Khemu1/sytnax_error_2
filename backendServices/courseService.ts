@@ -224,7 +224,7 @@ export const registerToCourseService = async (
     });
 
     const client = await auth.getClient();
-    const spreadsheetId = "136EwS2aFf6p79fkd2Er3PTLLv1frpdc5_0jC07KXSH0";
+    const spreadsheetId = process.env.GOOGLE_SPREADSHEET_ID;
 
     const staticData = [
       formatDateToCustomString(new Date()), // Column A: Date

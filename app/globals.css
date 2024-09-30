@@ -329,3 +329,11 @@ footer {
 .feat:active {
   transform: scale(1.03);
 }
+
+.selected-flag {
+  background-color: transparent !important;
+}
+.selected-flag:hover,
+.selected-flag:focus-within {
+  background-color: transparent !important;
+}

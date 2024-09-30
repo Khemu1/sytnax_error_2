@@ -65,7 +65,7 @@ export const joinCourseFields = [
       { value: "All Courses (500 LE)", label: "All Courses (500 LE)" },
     ],
   },
-  { name: "whatsapp", label: "WhatsApp number *", type: "text" },
+  { name: "whatsapp", label: "WhatsApp number *", type: "phone" },
   { name: "email", label: "Email *", type: "email" },
   { name: "promoCode", label: "Promo Code (if found)", type: "text" },
   { name: "questions", label: "Any questions", type: "textarea" },

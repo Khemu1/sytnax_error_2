@@ -6,7 +6,9 @@
   max-width: 100%;
   gap: 25px;
 }
-.form input ,.form select {
+.form input,
+.form select,
+.form textarea {
   padding: 9px;
   border-radius: 7px;
   width: 100%;

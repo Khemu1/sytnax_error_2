@@ -1,14 +1,16 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { joinCourseFields } from "@/constants";
+import Image from "next/image";
+import formStyle from "@/styles/formStyle.module.css";
+import { CountryProps, Errors, RegisterCourseFormProps } from "@/types";
+import { useRegisterCourse } from "@/hooks/course";
+import ReactPhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
 import {
   joinCourseFieldsschema,
   validateWithSchema,
 } from "@/utils/validations";
-import Image from "next/image";
-import formStyle from "@/styles/formStyle.module.css";
-import { Errors, RegisterCourseFormProps } from "@/types";
-import { useRegisterCourse } from "@/hooks/course";
 
 const JoinCourse: React.FC = () => {
   const initialState: RegisterCourseFormProps = {
@@ -21,6 +23,7 @@ const JoinCourse: React.FC = () => {
     email: "",
     promoCode: "",
     questions: "",
+    countryCode: "EG",
   };
 
   const [formData, setFormData] =
@@ -29,9 +32,10 @@ const JoinCourse: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { loading, error, success, handleRegisterCourse } = useRegisterCourse();
-
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
   ) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -43,7 +47,6 @@ const JoinCourse: React.FC = () => {
     setErrors({});
     try {
       joinCourseFieldsschema.parse(formData);
-      console.log("Form Submitted", formData);
       handleRegisterCourse(formData);
       setIsSubmitting(false);
     } catch (err) {
@@ -57,6 +60,7 @@ const JoinCourse: React.FC = () => {
       setErrors(error);
     }
   }, [error]);
+
   return (
     <div className="my-8 flex flex-1 flex-col w-full h-full bg-base-200 justify-center items-center gap-6">
       <div className="flex flex-col items-center bg-base-100 shadow-xl rounded-lg p-6 w-[85dvw] sm:w-full sm:max-w-screen-sm">
@@ -76,7 +80,7 @@ const JoinCourse: React.FC = () => {
         </div>
         <form onSubmit={handleSubmit} className={formStyle.form}>
           {joinCourseFields.map((field) => (
-            <div key={field.name}>
+            <div key={field.name} className="form-group">
               <label htmlFor={field.name}>{field.label}</label>
               {field.type === "select" ? (
                 <select
@@ -91,6 +95,47 @@ const JoinCourse: React.FC = () => {
                     </option>
                   ))}
                 </select>
+              ) : field.type === "phone" ? (
+                <ReactPhoneInput
+                  inputProps={{
+                    name: field.name,
+                    required: true,
+                    className: "input_field", // This applies the class to the input
+                  }}
+                  onlyCountries={["eg"]}
+                  country={"eg"}
+                  value={formData.whatsapp}
+                  countryCodeEditable={false}
+                  onChange={(phoneValue, countryData: CountryProps) => {
+                    setFormData({
+                      ...formData,
+                      whatsapp: phoneValue,
+                      countryCode: countryData.countryCode.toUpperCase(),
+                    });
+                  }}
+                  inputStyle={{
+                    width: "100%",
+                  }}
+                  containerStyle={{
+                    width: "100%",
+                  }}
+                  buttonStyle={{
+                    backgroundColor: "#2B2A33",
+                    border: "1px solid #383740",
+                  }}
+                  searchStyle={{
+                    backgroundColor: "#2B2A33",
+                  }}
+                  inputClass="input_field"
+                  disableDropdown={true}
+                  disableSearchIcon={true}
+                />
+              ) : field.type === "textarea" ? (
+                <textarea
+                  name={field.name}
+                  value={formData[field.name as keyof RegisterCourseFormProps]}
+                  onChange={handleChange}
+                />
               ) : (
                 <input
                   type={field.type}
@@ -99,16 +144,17 @@ const JoinCourse: React.FC = () => {
                   onChange={handleChange}
                 />
               )}
-              {errors[field.name as keyof FormData] && (
+              {errors[field.name as keyof RegisterCourseFormProps] && (
                 <div className="text-red-600 font-semibold">
-                  {errors[field.name as keyof FormData]}
+                  {errors[field.name as keyof RegisterCourseFormProps]}
                 </div>
               )}
             </div>
           ))}
+
           <button
             type={isSubmitting ? "button" : "submit"}
-            className={`flex items-center justify-center  ${
+            className={`flex items-center justify-center ${
               isSubmitting || loading ? formStyle.button_success : ""
             }`}
             disabled={isSubmitting}
@@ -119,6 +165,7 @@ const JoinCourse: React.FC = () => {
               "Submit"
             )}
           </button>
+
           {success && (
             <p className="text-green-600 font-semibold mx-auto text-center">
               Your data has been registered; we will contact you soon.{" "}

@@ -1,5 +1,6 @@
 import { CustomError } from "@/middleware/CustomError";
-import { object, string, ZodError, number } from "zod";
+import { object, string, ZodError, number, ZodIssueCode } from "zod";
+import { PhoneNumberUtil, PhoneNumber } from "google-libphonenumber";
 
 export const validateWithSchema = (error: CustomError | ZodError | unknown) => {
   console.log("got error schema", error instanceof CustomError);
@@ -22,6 +23,8 @@ export const validateWithSchema = (error: CustomError | ZodError | unknown) => {
     message: "An unknown error occurred",
   };
 };
+
+const phoneUtil = PhoneNumberUtil.getInstance();
 
 const errorMessages = {
   email: {
@@ -495,14 +498,53 @@ export const validatePasswordSchema = () => {
   });
 };
 
+const validatePhoneNumber = (value: string, countryCode: string): boolean => {
+  try {
+    const phoneNumber: PhoneNumber = phoneUtil.parseAndKeepRawInput(
+      value,
+      countryCode
+    );
+    return phoneUtil.isValidNumber(phoneNumber);
+  } catch (error) {
+    return false;
+  }
+};
+
 export const joinCourseFieldsschema = object({
-  name: string().min(1, "Name is required"),
-  gpa: string().min(1, "GPA is required"),
-  university: string().min(1, "University is required"),
-  branch: string().min(1, "Branch is required"),
+  name: string({ required_error: "Name is required" }).min(
+    3,
+    "Name must be at least 3 characters long"
+  ),
+  gpa: string({ required_error: "GPA is required" }).refine(
+    (value) => {
+      const gpaValue = parseFloat(value);
+      return gpaValue >= 1.0 && gpaValue <= 4.0;
+    },
+    {
+      message: "GPA must be between 1.0 and 4.0",
+    }
+  ),
+  university: string({ required_error: "University is" }).min(
+    2,
+    "University must be at least 2 characters long"
+  ),
+  branch: string({ required_error: "Branch is required" }).min(
+    3,
+    "Branch must be at least 3 characters long"
+  ),
   course: string().min(1, "Please select a course"),
   whatsapp: string().min(1, "WhatsApp number is required"),
   email: string().email("Invalid email address"),
   promoCode: string().optional(),
   questions: string().optional(),
+  countryCode: string().min(1, "Country code is required"),
+}).superRefine((val, ctx) => {
+  const { whatsapp, countryCode } = val;
+  if (!validatePhoneNumber(whatsapp, countryCode)) {
+    ctx.addIssue({
+      code: ZodIssueCode.custom,
+      message: "Invalid WhatsApp number",
+      path: ["whatsapp"],
+    });
+  }
 });

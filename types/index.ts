@@ -216,4 +216,12 @@ export interface CourseModel {
 
 export type RegisterCourseFormProps = z.infer<typeof joinCourseFieldsschema>;
 
-export type Errors = Partial<Record<keyof FormData, string>>;
+export type Errors = Partial<Record<keyof RegisterCourseFormProps, string>>;
+
+
+export interface CountryProps {
+  countryCode: string;
+  dialCode: string;
+  format: string;
+  name: string;
+}
