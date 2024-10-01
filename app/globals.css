@@ -63,7 +63,7 @@ body {
 }
 
 nav {
-  @apply mx-auto p-2 flex w-[100vw] justify-between items-center sticky top-0 z-[15] bg-base-100;
+  @apply mx-auto p-2 flex w-[100%] justify-between items-center sticky top-0 z-[15] bg-base-100;
   transition: 400ms ease-in-out;
 }
 
