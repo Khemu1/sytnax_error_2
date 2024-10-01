@@ -41,7 +41,7 @@ export const Hero = () => {
       </div>
 
       {/* Team Introduction Section */}
-      <div className="flex justify-center items-center py-10 bg-base-200">
+      <div className="px-2 flex justify-center items-center py-10 bg-base-200">
         <div className="flex flex-col sm:flex-row items-center gap-8 my-8">
           {/* Team Logo */}
           <div className="relative rounded-full overflow-hidden h-[100px] w-[100px] md:w-[150px] md:h-[150px] hero_logo">
@@ -50,7 +50,9 @@ export const Hero = () => {
 
           {/* Team Information */}
           <div className="flex flex-col items-center text-center">
-            <h1 className="text-4xl font-bold text-white">Who Are We</h1>
+            <h1 className="text-4xl font-bold text-white text-wrap text-center ">
+              Who Are We
+            </h1>
             <p className="text-lg mt-2 px-4 max-w-2xl text-white">
               Syntax Error is a team of passionate developers and educators
               committed to helping individuals master the world of coding
@@ -61,9 +63,9 @@ export const Hero = () => {
       </div>
 
       {/* Team Mission Section */}
-      <div className="flex justify-center items-center py-10 bg-base-100">
+      <div className="px-2 flex justify-center items-center py-10 bg-base-100">
         <div className="max-w-4xl text-center">
-          <h2 className="text-3xl font-semibold mb-4 text-blue-500">
+          <h2 className="text-3xl font-semibold mb-4 text-blue-500 text-wrap text-center ">
             Our Mission
           </h2>
           <p className="text-lg px-4 text-white">
@@ -78,9 +80,9 @@ export const Hero = () => {
       </div>
 
       {/* Team Expertise Section */}
-      <div className="flex justify-center items-center py-10 bg-base-200">
+      <div className="px-2 flex justify-center items-center py-10 bg-base-200">
         <div className="max-w-4xl text-center">
-          <h2 className="text-3xl font-semibold mb-4 text-green-500">
+          <h2 className="text-3xl font-semibold mb-4 text-green-500 text-wrap text-center ">
             Our Expertise
           </h2>
           <p className="text-lg px-4 text-white">
@@ -94,9 +96,9 @@ export const Hero = () => {
       </div>
 
       {/* Team Values Section */}
-      <div className="flex justify-center items-center py-10 bg-base-100">
+      <div className="px-2 flex justify-center items-center py-10 bg-base-100">
         <div className="max-w-4xl text-center">
-          <h2 className="text-3xl font-semibold mb-4 text-[#FFD700]">
+          <h2 className="text-3xl font-semibold mb-4 text-[#FFD700] text-wrap text-center ">
             Our Values
           </h2>
           <p className="text-lg px-4 text-white">
@@ -108,8 +110,8 @@ export const Hero = () => {
           </p>
         </div>
       </div>
-      <div className="flex flex-col w-full items-center gap-8 py-8 bg-base-200">
-        <h2 className="text-3xl font-semibold text-[#FFD700]">
+      <div className="px-2 flex flex-col w-full items-center gap-8 py-8 bg-base-200">
+        <h2 className="text-3xl font-semibold text-[#FFD700] text-wrap text-center ">
           Courses We Specializes At
         </h2>
         <div className="flex flex-col gap-4">
