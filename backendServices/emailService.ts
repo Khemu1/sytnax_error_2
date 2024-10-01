@@ -46,7 +46,6 @@ const sendEmail = async (to: string, subject: string, html: string) => {
 
   try {
     await transporter.sendMail(mailOptions);
-    console.log("Email sent: " + to);
   } catch (error) {
     console.error("Error sending email:", error);
     throw new CustomError(
@@ -77,15 +76,8 @@ export const sendRegistrationNotification = async (
   await sendEmail(process.env.NOTIFICATION_TO as string, subject, html);
 };
 
-export const sendResetPasswordEmail = async (
-  email: string,
-  resetLink: string
-) => {
+export const sendResetPasswordEmail = async (email: string, html: string) => {
   const subject = "Password Reset Request";
-  const html = `
-    <p>You requested a password reset. Click the link below to reset your password:</p>
-    <p><a href="${resetLink}">${resetLink}</a></p>
-  `;
 
   await sendEmail(email, subject, html);
 };

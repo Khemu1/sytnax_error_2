@@ -157,8 +157,6 @@ export const generatePasswordResetTokenForEmail = async (user: {
 }) => {
   try {
     const expirationTime = process.env.PASSWORD_RESET_TIME?.toString();
-    console.error(expirationTime);
-
     if (!expirationTime) {
       throw new CustomError("Expiration time is not set", 500, "token", true);
     }
