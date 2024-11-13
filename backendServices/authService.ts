@@ -1,6 +1,6 @@
 import { SignInProps } from "@/types";
 import { PrismaClient } from "@prisma/client";
-import { withAccelerate } from "@prisma/extension-accelerate";
+// import { withAccelerate } from "@prisma/extension-accelerate";
 import bcrypt from "bcrypt";
 import { CustomError } from "@/middleware/CustomError";
 import { sendResetPasswordEmail } from "./emailService";
@@ -12,7 +12,9 @@ import {
   setTokenToUsed,
 } from "./tokenService";
 
-const prisma = new PrismaClient().$extends(withAccelerate());
+const prisma = new PrismaClient();
+
+// const prisma = new PrismaClient().$extends(withAccelerate());
 
 export const signInService = async (data: SignInProps) => {
   try {
@@ -35,7 +37,6 @@ export const signInService = async (data: SignInProps) => {
       throw new CustomError("Invalid Credentials", 404, "Sign in Error", true);
     }
 
-    //Invalid Credentials
     return {
       id: user.id,
       role: user.userRole!.roleId,

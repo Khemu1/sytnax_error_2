@@ -1,6 +1,8 @@
-import { PrismaClient } from "@prisma/client/edge";
+// import { PrismaClient } from "@prisma/client/edge";
+import { PrismaClient } from "@prisma/client";
+
 import { CustomError } from "@/middleware/CustomError";
-import { withAccelerate } from "@prisma/extension-accelerate";
+// import { withAccelerate } from "@prisma/extension-accelerate";
 import {
   CourseModel,
   EditAdminProps,
@@ -10,13 +12,15 @@ import {
 import bcrypt from "bcrypt";
 import { deleteImgur, uploadToImgur } from "./imgurServices";
 
-const prisma = new PrismaClient().$extends(withAccelerate());
+// const prisma = new PrismaClient().$extends(withAccelerate());
+const prisma = new PrismaClient();
+
 
 export const dashboardCoursesService = async () => {
   try {
     const courses = await prisma.course.findMany({
       relationLoadStrategy: "join",
-      cacheStrategy:{ttl:60},
+      //cacheStrategy:{ttl:60},
       where: {
         deletedAt: null,
       },
@@ -53,7 +57,7 @@ export const dashboardAllCourseDataService = async (id: number) => {
       where: { id: +id, deletedAt: null },
       include: { urlData: true },
       relationLoadStrategy: "join",
-      cacheStrategy: { ttl: 60 },
+      // cacheStrategy: { ttl: 60 },
     });
 
     if (!course.urlData) {
@@ -241,7 +245,7 @@ export const dashboardAdminsService = async () => {
       },
       select: { id: true },
       relationLoadStrategy: "join",
-      cacheStrategy: { ttl: 60 },
+      // cacheStrategy: { ttl: 60 },
     });
     if (!adminRole) {
       throw new CustomError("Admin role not found", 404, "role lookup", true);

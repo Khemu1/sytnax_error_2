@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "prisma generate --no-engine && next dev",
+    "dev": "prisma generate && next dev",
     "build": "prisma generate --no-engine && next build",
     "start": "next start",
     "lint": "next lint",
@@ -16,7 +16,7 @@
     "seed": "bunx ./prisma/seed.ts"
   },
   "dependencies": {
-    "@prisma/client": "^5.20.0",
+    "@prisma/client": "^5.22.0",
     "@prisma/extension-accelerate": "^1.2.0",
     "@reduxjs/toolkit": "^2.2.7",
     "@supabase/supabase-js": "^2.45.4",
@@ -45,7 +45,7 @@
     "next-cloudinary": "^6.13.0",
     "node-cron": "^3.0.3",
     "nodemailer": "^6.9.15",
-    "prisma": "^5.20.0",
+    "prisma": "^5.22.0",
     "react": "^18",
     "react-dom": "^18",
     "react-filepond": "^7.1.2",

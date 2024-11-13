@@ -1,13 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NewCourseProps, RegisterCourseFormProps } from "@/types";
-import { PrismaClient } from "@prisma/client/edge";
-import { withAccelerate } from "@prisma/extension-accelerate";
+// import { PrismaClient } from "@prisma/client/edge";
+import { PrismaClient } from "@prisma/client";
+
+// import { withAccelerate } from "@prisma/extension-accelerate";
 import { CustomError } from "@/middleware/CustomError";
 import { uploadToImgur } from "./imgurServices";
 import { google } from "googleapis";
 import { formatDateToCustomString } from "@/utils";
 import { sendRegistrationNotification } from "./emailService";
-const prisma = new PrismaClient().$extends(withAccelerate());
+// const prisma = new PrismaClient().$extends(withAccelerate());
+const prisma = new PrismaClient();
 
 export const addCourseService = async (
   data: NewCourseProps,
@@ -82,7 +85,7 @@ export const getAllCoursesService = async () => {
       where: { deletedAt: null },
       include: { urlData: true },
       relationLoadStrategy: "join",
-      cacheStrategy: { ttl: 60 },
+      // cacheStrategy: { ttl: 60 },
     });
 
     const modifiedCourses = courses.map((course) => {
@@ -124,7 +127,7 @@ export const getCourseService = async (id: number) => {
       where: { id: +id, deletedAt: null },
       relationLoadStrategy: "join",
       include: { urlData: true },
-      cacheStrategy: { ttl: 60 },
+      // cacheStrategy: { ttl: 60 },
     });
 
     if (!course?.urlData) {

@@ -9,6 +9,7 @@ import NewCourse from "@/components/dashboard/course/NewCourse";
 import Courses from "@/components/dashboard/course/Courses";
 import Admins from "@/components/dashboard/admin/Admins";
 import Owners from "@/components/dashboard/owner/Owners";
+import Surveys from "@/components/dashboard/surveys/Surveys";
 import { logout } from "@/store/slices/authSlice";
 
 const Admin = () => {
@@ -64,6 +65,16 @@ const Admin = () => {
         </button>
       </div>
       <aside className={`bg-base-100 `}>
+        <button
+          className={`${
+            section === "surveys"
+              ? "bg-gray-800"
+              : "transition-all hover:bg-gray-700"
+          }`}
+          onClick={() => setSection("surveys")}
+        >
+          My Surveys
+        </button>
         {authState.isAuthenticated && authState.role === 1 && (
           <>
             <button
@@ -107,6 +118,16 @@ const Admin = () => {
           onClick={() => setSection("newCourse")}
         >
           New Course
+        </button>
+        <button
+          className={`${
+            section === "myaccount"
+              ? "bg-gray-800"
+              : "transition-all hover:bg-gray-700"
+          }`}
+          onClick={() => setSection("surveys")}
+        >
+          My Surveys
         </button>
         <button
           className={`${
@@ -135,6 +156,16 @@ const Admin = () => {
           <>
             <button
               className={`${
+                section === "surveys"
+                  ? "bg-gray-800"
+                  : "transition-all hover:bg-gray-700"
+              }`}
+              onClick={() => setSection("surveys")}
+            >
+              My Surveys
+            </button>
+            <button
+              className={`${
                 section === "courses"
                   ? "bg-gray-800"
                   : "transition-all hover:bg-gray-700"
@@ -177,6 +208,16 @@ const Admin = () => {
         </button>
         <button
           className={`${
+            section === "surveys"
+              ? "bg-gray-800"
+              : "transition-all hover:bg-gray-700"
+          }`}
+          onClick={() => setSection("surveys")}
+        >
+          My Surveys
+        </button>
+        <button
+          className={`${
             section === "myaccount"
               ? "bg-gray-800"
               : "transition-all hover:bg-gray-700"
@@ -192,6 +233,7 @@ const Admin = () => {
         {section === "admins" && <Admins />}
         {section === "owners" && <Owners />}
         {section === "myaccount" && <MyAccount />}
+        {section === "surveys" && <Surveys />}
       </section>
     </div>
   );

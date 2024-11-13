@@ -5,6 +5,6 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  url       = env("DATABASE_URL_ACC")
-  directUrl = env("POSTGRES_URL_NON_POOLING")
+  url       = env("SUBA")
+  // directUrl = env("SUB_DIRECT")
 }

@@ -33,12 +33,11 @@ export const POST = async (req: NextRequest) => {
       { status: 200 }
     );
 
-    // Set cookies
     response.cookies.set("access_token", token, accessCookieOptions);
     response.cookies.set("refresh_token", refreshToken, refreshCookieOptions);
     return response;
   } catch (error) {
-    console.error(error); // Log the error if something goes wrong
+    console.error(error);
     return errorHandler(error);
   }
 };
