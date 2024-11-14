@@ -1,17 +1,42 @@
-// Importing the necessary functions from Redux Toolkit
 import { configureStore } from "@reduxjs/toolkit";
 
-// Importing reducers
-import authReducer from "./slices/authSlice"; // authSlice correctly imported
-import dashboardReducer from "./slices/dashboardSlice"; // Fixing the import error
-import dialogReducer from "./slices/dialogSlice"; // Adding the dialogSlice
+import authReducer from "./slices/authSlice"; 
+import dashboardReducer from "./slices/dashboardSlice"; 
+import dialogReducer from "./slices/dialogSlice";
+import surveyReducer from "./slices/survey/surveySlice";
+import workspaceReducer from "./slices/survey/workspaceSlice";
+import currentWorkspaceReducer from "./slices/survey/currentWorkspaceSlice";
+import currentSurveyReducer from "./slices/survey/currentSurveySlice";
+import sharedFormReducer from "./slices/survey/sharedFormSlice";
+import welcomePageReducer from "./slices/survey/welcomePageSlice";
+import genericTextReducer from "./slices/survey/genericTextSlice";
+import defaultEndingReducer from "./slices/survey/defaultEnding";
+import redirectEndingReducer from "./slices/survey/redirectEnding";
+import welcomePartReducer from "./slices/survey/welcomePartSlice";
+import questionsReducer from "./slices/survey/questionsSlice";
+import endingsReducer from "./slices/survey/endingsSlice";
+import userGroupReducer from "./slices/survey/userGroup";
 
-// Configure the store with the reducers
+
 export const store = configureStore({
   reducer: {
     auth: authReducer,
     dashboard: dashboardReducer,
     dialog: dialogReducer,
+
+    survey: surveyReducer,
+    workspace: workspaceReducer,
+    currentWorkspace: currentWorkspaceReducer,
+    currentSurvey: currentSurveyReducer,
+    sharedForm: sharedFormReducer,
+    welcomePage: welcomePageReducer,
+    genericText: genericTextReducer,
+    defaultEnding: defaultEndingReducer,
+    redirectEnding: redirectEndingReducer,
+    welcomePart: welcomePartReducer,
+    genericTexts: questionsReducer,
+    endings: endingsReducer,
+    userGroup: userGroupReducer,
   },
 });
 

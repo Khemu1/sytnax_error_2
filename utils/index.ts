@@ -1,4 +1,7 @@
+import { resetGenericTextSliceFields } from "@/store/slices/survey/genericTextSlice";
+import { resetSharedFormSliceFields } from "@/store/slices/survey/sharedFormSlice";
 import { PublicCardCourseProps } from "@/types";
+import { Dispatch } from "@reduxjs/toolkit";
 
 export const calculateExpirationDate = (duration: string): Date => {
   const match = duration.match(/^(\d+)([smhd])$/); // Matches the format "15m", "1h", etc.
@@ -105,4 +108,10 @@ export function formatDateToCustomString(date: Date): string {
 
   // Combine time and date in the desired format
   return `${timeString} ${dateString}`;
+}
+
+
+export function clearSlices(dispatch: Dispatch) {
+  dispatch(resetSharedFormSliceFields());
+  dispatch(resetGenericTextSliceFields());
 }

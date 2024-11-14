@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import MyAccount from "@/components/dashboard/myAccount/MyAccount";
 import { RootState } from "@/store/store";
@@ -9,7 +10,6 @@ import NewCourse from "@/components/dashboard/course/NewCourse";
 import Courses from "@/components/dashboard/course/Courses";
 import Admins from "@/components/dashboard/admin/Admins";
 import Owners from "@/components/dashboard/owner/Owners";
-import Surveys from "@/components/dashboard/surveys/Surveys";
 import { logout } from "@/store/slices/authSlice";
 
 const Admin = () => {
@@ -65,16 +65,6 @@ const Admin = () => {
         </button>
       </div>
       <aside className={`bg-base-100 `}>
-        <button
-          className={`${
-            section === "surveys"
-              ? "bg-gray-800"
-              : "transition-all hover:bg-gray-700"
-          }`}
-          onClick={() => setSection("surveys")}
-        >
-          My Surveys
-        </button>
         {authState.isAuthenticated && authState.role === 1 && (
           <>
             <button
@@ -119,16 +109,17 @@ const Admin = () => {
         >
           New Course
         </button>
-        <button
-          className={`${
-            section === "myaccount"
+        <Link
+          href={"/dashboard/surveyBuilder"}
+          className={` text-center ${
+            section === "surveys"
               ? "bg-gray-800"
               : "transition-all hover:bg-gray-700"
           }`}
-          onClick={() => setSection("surveys")}
+          onClick={() => setSection("surveyBuilder")}
         >
-          My Surveys
-        </button>
+          Survey Builder
+        </Link>
         <button
           className={`${
             section === "myaccount"
@@ -154,16 +145,17 @@ const Admin = () => {
         </button>
         {authState.isAuthenticated && authState.role === 1 && (
           <>
-            <button
-              className={`${
+            <Link
+              href={"/dashboard/surveyBuilder"}
+              className={` text-center ${
                 section === "surveys"
                   ? "bg-gray-800"
                   : "transition-all hover:bg-gray-700"
               }`}
-              onClick={() => setSection("surveys")}
+              onClick={() => setSection("surveyBuilder")}
             >
-              My Surveys
-            </button>
+              Survey Builder
+            </Link>
             <button
               className={`${
                 section === "courses"
@@ -206,16 +198,17 @@ const Admin = () => {
         >
           New Course
         </button>
-        <button
-          className={`${
+        <Link
+          href={"/dashboard/surveyBuilder"}
+          className={` text-center ${
             section === "surveys"
               ? "bg-gray-800"
               : "transition-all hover:bg-gray-700"
           }`}
-          onClick={() => setSection("surveys")}
+          onClick={() => setSection("surveyBuilder")}
         >
-          My Surveys
-        </button>
+          Survey Builder
+        </Link>
         <button
           className={`${
             section === "myaccount"
@@ -233,7 +226,6 @@ const Admin = () => {
         {section === "admins" && <Admins />}
         {section === "owners" && <Owners />}
         {section === "myaccount" && <MyAccount />}
-        {section === "surveys" && <Surveys />}
       </section>
     </div>
   );

@@ -387,3 +387,7 @@ footer {
 .phone-input-search {
   background-color: #2b2a33;
 }
+
+.survey_builder {
+  @apply flex-1;
+}
