@@ -1,10 +1,11 @@
+import { useDuplicateSurvey } from "@/hooks/survey_builder/survey";
+import { RootState } from "@/store/store";
+import { newSurveySchema } from "@/utils/validations/survey";
+import { validateWithSchema } from "@/utils/validations/validations";
 import { Dialog } from "@headlessui/react";
-import { useLanguage } from "../../lang/LanguageProvider";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { RootState } from "../../../store/store";
-import { useDuplicateSurvey } from "../../../hooks/survey";
-import { newSurveySchema, validateWithSchema } from "../../../utils/survey";
 
 interface DuplicateSurveyDialogProps {
   isOpen: boolean;
@@ -15,8 +16,6 @@ const DuplicateSurveyDialog: React.FC<DuplicateSurveyDialogProps> = ({
   isOpen,
   onClose,
 }) => {
-  const { t, getCurrentLanguageTranslations, getCurrentLanguage } =
-    useLanguage();
   const workspaces = useSelector(
     (state: RootState) => state.workspace.workspaces
   );
@@ -40,21 +39,18 @@ const DuplicateSurveyDialog: React.FC<DuplicateSurveyDialogProps> = ({
     try {
       newSurveySchema().parse({ title: surveyTitle });
       if (!workspaceId || typeof workspaceId !== "number" || workspaceId < 1) {
-        setErrors({ chooseWorkspace: t("chooseWorkspace") });
+        setErrors({ chooseWorkspace: "Please Choose a Workspace" });
         return;
       }
-      const lang = getCurrentLanguageTranslations();
 
       await handleDuplicateSurvey({
         title: surveyTitle,
         workspaceId: currentWorkspace!.id,
         surveyId: currentSurvey!.id,
         targetWorkspaceId: workspaceId,
-        getCurrentLanguageTranslations: () => lang,
-        currentLang: getCurrentLanguage(),
       });
     } catch (error) {
-      setErrors(validateWithSchema(error, getCurrentLanguage()));
+      setErrors(validateWithSchema(error));
       console.error("Failed to duplicate survey", error);
     }
   };
@@ -76,14 +72,15 @@ const DuplicateSurveyDialog: React.FC<DuplicateSurveyDialogProps> = ({
           <form onSubmit={handleSave}>
             <div className="flex w-full items-center border-b border-b-gray-500 pb-2 px-2">
               <button type="button" onClick={onClose}>
-                <img
+                <Image
                   src="/assets/icons/close.svg"
                   alt="close"
-                  className="w-[20px] h-[20px]"
+                  width={20}
+                  height={20}
                 />
               </button>
               <span className="flex flex-1 justify-center text-white">
-                {t("duplicate")}
+                Duplicate Survey
               </span>
             </div>
 
@@ -91,13 +88,13 @@ const DuplicateSurveyDialog: React.FC<DuplicateSurveyDialogProps> = ({
               <input
                 type="text"
                 value={surveyTitle}
-                placeholder={t("enterName")}
+                placeholder="Enter Name"
                 onChange={(e) => setSurveyTitle(e.target.value)}
                 className="w-full bg-[#2a2a2a] text-white border-none outline-none p-2 rounded-md"
               />
               {((isError && errorState?.title) || (errors && errors.title)) && (
                 <div className="text-red-600 text-sm mt-2 px-4 text-center">
-                  {errorState?.title || errors?.title || t("unknownError")}
+                  {errorState?.title || errors?.title}
                 </div>
               )}
             </div>
@@ -109,7 +106,7 @@ const DuplicateSurveyDialog: React.FC<DuplicateSurveyDialogProps> = ({
                 className="w-full bg-[#2a2a2a] text-white border-none outline-none p-2 rounded-md"
               >
                 <option value="" disabled>
-                  {t("selectWorkSpace")}
+                  Select Workspace
                 </option>
                 {workspaces.map((workspace) => (
                   <option key={workspace.id} value={workspace.id}>
@@ -120,16 +117,14 @@ const DuplicateSurveyDialog: React.FC<DuplicateSurveyDialogProps> = ({
               {((isError && errorState) ||
                 (errors && errors.chooseWorkspace)) && (
                 <div className="text-red-600 text-sm mt-2 px-4 text-center">
-                  {errorState?.message ||
-                    errors?.chooseWorkspace ||
-                    t("unknownError")}
+                  {errorState?.message || errors?.chooseWorkspace}
                 </div>
               )}
             </div>
 
             {isError && errorState && (
               <div className="text-red-600 text-sm mt-2 px-4">
-                {errorState.message || t("unknownError")}
+                {errorState.message}
               </div>
             )}
 
@@ -139,13 +134,13 @@ const DuplicateSurveyDialog: React.FC<DuplicateSurveyDialogProps> = ({
                 type="button"
                 onClick={onClose}
               >
-                {t("cancel")}
+                Cancel
               </button>
               <button
                 className="bg-[#2c2f31] transition-all py-2 px-4 rounded"
                 type="submit"
               >
-                {t("duplicate")}
+                Duplicate
               </button>
             </div>
           </form>

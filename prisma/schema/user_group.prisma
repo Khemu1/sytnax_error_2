@@ -1,0 +1,9 @@
+model UserGroup {
+  id        String @id @default(cuid())
+  ownerId   Int
+  groupId   String
+  group     Group  @relation(fields: [groupId], references: [id])
+  user      User   @relation(fields: [ownerId], references: [id])
+
+  @@unique([groupId, ownerId])
+}

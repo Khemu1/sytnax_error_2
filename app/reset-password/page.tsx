@@ -6,7 +6,7 @@ import { useResetPassword } from "@/hooks/auth";
 import {
   validatePasswordSchema,
   validateWithSchema,
-} from "@/utils/validations";
+} from "@/utils/validations/validations";
 import { useRouter } from "next/navigation";
 
 const ResetPasswordForm: React.FC = () => {

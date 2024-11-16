@@ -1,10 +1,11 @@
+import { useUpdateWorkspaceTitle } from "@/hooks/survey_builder/workspace";
+import { RootState } from "@/store/store";
+import { newSurveySchema } from "@/utils/validations/survey";
+import { validateWithSchema } from "@/utils/validations/validations";
 import { Dialog, DialogPanel } from "@headlessui/react";
-import { useLanguage } from "../../lang/LanguageProvider";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { RootState } from "../../../store/store";
-import { newSurveySchema, validateWithSchema } from "../../../utils/survey";
-import { useUpdateWorkspaceTitle } from "../../../hooks/workspace";
 
 interface UpdateSurveyWorkspaceTitleDialog {
   isOpen: boolean;
@@ -15,8 +16,6 @@ const UpdateWorkspaceTitleDialog: React.FC<
   UpdateSurveyWorkspaceTitleDialog
 > = ({ isOpen, onClose }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { t, getCurrentLanguageTranslations, getCurrentLanguage } =
-    useLanguage();
 
   const currentWorkspaceState = useSelector(
     (state: RootState) => state.currentWorkspace
@@ -45,11 +44,9 @@ const UpdateWorkspaceTitleDialog: React.FC<
       await handleUpdateWorkspaceTitle({
         title,
         workspaceId: workspaceId,
-        getCurrentLanguageTranslations,
-        currentLang: getCurrentLanguage(),
       });
     } catch (error) {
-      setErros(validateWithSchema(error, getCurrentLanguage()));
+      setErros(validateWithSchema(error));
       console.error("Failed to update workspace", error);
     } finally {
       setIsSubmitting(false);
@@ -85,14 +82,15 @@ const UpdateWorkspaceTitleDialog: React.FC<
             <form onSubmit={handleSave} className="">
               <div className="flex w-full items-center border-b border-b-gray-500 pb-2 px-2">
                 <button type="button" className="" onClick={onClose}>
-                  <img
+                  <Image
                     src="/assets/icons/close.svg"
                     alt="close"
-                    className="w-[20px] h-[20px]"
+                    width={20}
+                    height={20}
                   />
                 </button>
                 <span className="flex flex-1 justify-center text-white">
-                  {t("renameWorkspace")}
+                  Rename Workspace
                 </span>
               </div>
 
@@ -101,7 +99,7 @@ const UpdateWorkspaceTitleDialog: React.FC<
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder={t("enterWorkspaceTitle")}
+                  placeholder="Enter Workspace Title"
                   className="w-full bg-[#2a2a2a] text-white border-none outline-none p-2 rounded-md"
                   disabled={isSubmitting}
                 />
@@ -109,7 +107,7 @@ const UpdateWorkspaceTitleDialog: React.FC<
 
               {((isError && errorState) || (errors && errors.title)) && (
                 <div className="text-red-600 text-sm mt-2 px-4 text-center">
-                  {errorState?.message || errors?.title || t("unknownError")}
+                  {errorState?.message || errors?.title}
                 </div>
               )}
 
@@ -119,13 +117,13 @@ const UpdateWorkspaceTitleDialog: React.FC<
                   type="button"
                   onClick={onClose}
                 >
-                  {t("cancel")}
+                  Cancel
                 </button>
                 <button
                   className=" bg-[#2c2f31] transition-all  py-2 px-4 rounded"
                   type="submit"
                 >
-                  {t("save")}
+                  Save
                 </button>
               </div>
             </form>

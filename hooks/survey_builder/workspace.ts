@@ -53,7 +53,6 @@ export const useUpdateWorkspaceTitle = () => {
     {
       title: string;
       workspaceId: number;
-      currentLang: "en" | "de";
     }
   >({
     mutationFn: async ({
@@ -62,7 +61,6 @@ export const useUpdateWorkspaceTitle = () => {
     }: {
       title: string;
       workspaceId: number;
-      currentLang: "en" | "de";
     }) => {
       setErrorState(null);
 
@@ -107,14 +105,10 @@ export const useDeleteWorkspace = () => {
       workspaceId: number;
     }
   >({
-    mutationFn: async ({
-      workspaceId,
-    }) => {
+    mutationFn: async ({ workspaceId }) => {
       setErrorState(null);
 
-      await deleteWorkspace(
-        workspaceId,
-      );
+      await deleteWorkspace(workspaceId);
     },
     onError: (err: CustomError | unknown) => {
       const message =
@@ -154,14 +148,10 @@ export const useCreateWorkspace = () => {
       title: string;
     }
   >({
-    mutationFn: async ({
-      title,
-    }) => {
+    mutationFn: async ({ title }) => {
       setErrorState(null);
 
-      const response = await createNewWorkspace(
-        title,
-      );
+      const response = await createNewWorkspace(title);
       return response;
     },
     onError: (err: CustomError | unknown) => {

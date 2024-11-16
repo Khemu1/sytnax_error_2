@@ -1,13 +1,12 @@
+import { clearCurrentSurvey } from "@/store/slices/survey/currentSurveySlice";
+import { setCurrentWorkspace } from "@/store/slices/survey/currentWorkspaceSlice";
+import { setSurveys } from "@/store/slices/survey/surveySlice";
+import { RootState } from "@/store/store";
+import { retrunSearchData } from "@/utils/survey_builder/workspace";
 import { Dialog, DialogPanel } from "@headlessui/react";
-import { useLanguage } from "../../lang/LanguageProvider";
+import Link from "next/link";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../../store/store";
-import { retrunSearchData } from "../../../utils";
-import { setCurrentWorkspace } from "../../../store/slices/currentWorkspaceSlice";
-import { setSurveys } from "../../../store/slices/surveySlice";
-import { clearCurrentSurvey } from "../../../store/slices/currentSurveySlice";
-import { Link } from "react-router-dom";
 
 interface SearchDialogProps {
   isOpen: boolean;
@@ -15,7 +14,6 @@ interface SearchDialogProps {
 }
 
 const SearchDialog: React.FC<SearchDialogProps> = ({ isOpen, onClose }) => {
-  const { t } = useLanguage();
   const allWorkspaces = useSelector(
     (state: RootState) => state.workspace.workspaces
   );
@@ -51,12 +49,11 @@ const SearchDialog: React.FC<SearchDialogProps> = ({ isOpen, onClose }) => {
           <div>
             <form className="">
               <div className="flex gap-5 border-b border-b-gray-500 p-[2rem]">
-                {/* Search bar input */}
                 <input
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder={t("search")}
+                  placeholder="Search"
                   className="w-full bg-[#2a2a2a] text-white border-none outline-none p-2 rounded-md"
                 />
                 <button
@@ -67,7 +64,7 @@ const SearchDialog: React.FC<SearchDialogProps> = ({ isOpen, onClose }) => {
                     setTitle("");
                   }}
                 >
-                  {t("cancel")}
+                  Cancel
                 </button>
               </div>
 
@@ -75,7 +72,7 @@ const SearchDialog: React.FC<SearchDialogProps> = ({ isOpen, onClose }) => {
                 <div className="mt-4  overflow-y-auto px-4 h-full">
                   <div className="flex flex-col border-b border-b-gray-500 pb-3 h-full">
                     <h3 className="text-lg font-semibold text-white mb-2">
-                      {t("workspaces")}
+                      Workspaces
                     </h3>
                     {workspaces.length ? (
                       workspaces.map((workspace, index) => (
@@ -93,19 +90,19 @@ const SearchDialog: React.FC<SearchDialogProps> = ({ isOpen, onClose }) => {
                       ))
                     ) : (
                       <div className="text-sm text-gray-400">
-                        {t("noWorkspacesFound")}
+                        No workspace Found
                       </div>
                     )}
                   </div>
 
                   <div className="mt-4 h-full">
                     <h3 className="text-lg font-semibold text-white mb-2">
-                      {t("surveys")}
+                      Surveys
                     </h3>
                     {surveys.length ? (
                       surveys.map((survey, index) => (
                         <Link
-                          to={`/survey/${survey.workspace}/${survey.id}/build`}
+                          href={`/survey/${survey.workspace}/${survey.id}/build`}
                           key={index}
                           className="p-2 cursor-pointer hover:bg-gray-700 rounded-md"
                           onClick={() => setTitle(survey.title)}
@@ -115,7 +112,7 @@ const SearchDialog: React.FC<SearchDialogProps> = ({ isOpen, onClose }) => {
                       ))
                     ) : (
                       <div className="text-sm text-gray-400">
-                        {t("noSurveysFound")}
+                        No Survey Found
                       </div>
                     )}
                   </div>

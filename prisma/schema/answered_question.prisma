@@ -1,0 +1,11 @@
+model AnsweredQuestion {
+  id           String           @id @default(cuid())
+  questionId   String
+  submissionId String
+  answer       String
+  point        Int              @default(0)
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  submission   SurveySubmission @relation(fields: [submissionId], references: [id])
+  question     Question         @relation(fields: [questionId], references: [id])
+}

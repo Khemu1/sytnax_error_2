@@ -132,6 +132,7 @@ const Admin = () => {
         </button>
       </aside>
 
+      {/* Mobile Sidebar */}
       <aside
         className={`bg-base-100 aside_mobile ${
           !isSideBarOpen ? "aside_mobile_closed" : ""
@@ -145,17 +146,6 @@ const Admin = () => {
         </button>
         {authState.isAuthenticated && authState.role === 1 && (
           <>
-            <Link
-              href={"/dashboard/surveyBuilder"}
-              className={` text-center ${
-                section === "surveys"
-                  ? "bg-gray-800"
-                  : "transition-all hover:bg-gray-700"
-              }`}
-              onClick={() => setSection("surveyBuilder")}
-            >
-              Survey Builder
-            </Link>
             <button
               className={`${
                 section === "courses"

@@ -4,7 +4,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { useEditMyInfo } from "@/hooks/admin";
 import { EditMyAccountProps } from "@/types";
-import { updateMyAccount, validateWithSchema } from "@/utils/validations";
+import {
+  updateMyAccount,
+  validateWithSchema,
+} from "@/utils/validations/validations";
 import formStyle from "@/styles/formStyle.module.css";
 import { closeDialog } from "@/store/slices/dialogSlice";
 import Toast from "../../skeletons/Toast";

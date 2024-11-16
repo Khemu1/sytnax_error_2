@@ -103,7 +103,6 @@ export interface UpdateSurveyTitleProps {
   title: string;
   workspaceId: number;
   surveyId: number;
-  currentLang: "en" | "de";
 }
 
 export interface UpdateSurveyTitleResponse {

@@ -10,7 +10,7 @@ import "react-phone-input-2/lib/style.css";
 import {
   joinCourseFieldsschema,
   validateWithSchema,
-} from "@/utils/validations";
+} from "@/utils/validations/validations";
 
 const JoinCourse: React.FC = () => {
   const initialState: RegisterCourseFormProps = {

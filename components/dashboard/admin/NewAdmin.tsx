@@ -3,7 +3,10 @@ import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import formStyle from "@/styles/formStyle.module.css";
 import { SignUpProps } from "@/types";
-import { signUpSchema, validateWithSchema } from "@/utils/validations";
+import {
+  signUpSchema,
+  validateWithSchema,
+} from "@/utils/validations/validations";
 import { useCreateAdmin } from "@/hooks/admin";
 import { RootState } from "@/store/store";
 import { useDispatch, useSelector } from "react-redux";

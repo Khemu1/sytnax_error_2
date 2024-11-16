@@ -1,20 +1,16 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setCurrentWorkspace } from "../../store/slices/currentWorkspaceSlice";
-import { RootState } from "../../store/store";
 import Workspace from "./Workspace";
-import { WorkSpaceModel } from "../../types";
-import { setSurveys } from "../../store/slices/surveySlice";
-import { useSocket } from "../socket/userSocket";
-import {
-  addNewWorkspaceF,
-  deleteWorkspaceF,
-  updateWorkspaceF,
-} from "../../utils";
+import { RootState } from "@/store/store";
+import { setCurrentWorkspace } from "@/store/slices/survey/currentWorkspaceSlice";
+import { setSurveys } from "@/store/slices/survey/surveySlice";
+import { WorkSpaceModel } from "@/types/survey";
+
 
 const Workspaces = () => {
   const dispatch = useDispatch();
   const workspaces = useSelector(
+  //todo : call the selector once
     (state: RootState) => state.workspace.workspaces
   );
   const currentWorkspace = useSelector(
@@ -38,51 +34,6 @@ const Workspaces = () => {
     dispatch(setCurrentWorkspace(workspace));
     dispatch(setSurveys(workspace.surveys || []));
   };
-
-  const socket = useSocket();
-  useEffect(() => {
-    const handleNewWorkspace = async (data: { workspace: WorkSpaceModel }) => {
-      try {
-        await addNewWorkspaceF(data.workspace, dispatch);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    const handleEditWorkspace = async (data: {
-      workspace: WorkSpaceModel;
-      workspaceId: number;
-    }) => {
-      try {
-        await updateWorkspaceF(+data.workspaceId, data.workspace, dispatch);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    const handleDeleteWorkspace = async (data: { workspaceId: number }) => {
-      try {
-        await deleteWorkspaceF(
-          +data.workspaceId,
-          +currentWorkspace!.id,
-          workspaces,
-          dispatch
-        );
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    socket.on("WORKSPACE_ADDED", handleNewWorkspace);
-    socket.on("WORKSPACE_EDITED", handleEditWorkspace);
-    socket.on("WORKSPACE_DELETED", handleDeleteWorkspace);
-
-    return () => {
-      socket.off("WORKSPACE_ADDED", handleNewWorkspace);
-      socket.off("WORKSPACE_EDITED", handleEditWorkspace);
-      socket.off("WORKSPACE_DELETED", handleDeleteWorkspace);
-    };
-  }, [socket, workspaces, currentWorkspace, dispatch]);
 
   return (
     <div className="flex flex-col w-full gap-2">

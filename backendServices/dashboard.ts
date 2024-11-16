@@ -15,7 +15,6 @@ import { deleteImgur, uploadToImgur } from "./imgurServices";
 // const prisma = new PrismaClient().$extends(withAccelerate());
 const prisma = new PrismaClient();
 
-
 export const dashboardCoursesService = async () => {
   try {
     const courses = await prisma.course.findMany({
@@ -326,6 +325,21 @@ export const dashboardNewAdminsService = async (adminData: SignUpProps) => {
         roleId: role.id,
       },
     });
+
+    const group = await prisma.group.create({
+      data: {
+        name: `${newAdmin.username}'s group`,
+        ownerId: newAdmin.id,
+      },
+    });
+    
+    // will use this when inviting users to groups instead
+    // await prisma.userGroup.create({
+    //   data: {
+    //     ownerId: newAdmin.id,
+    //     groupId: group.id,
+    //   },
+    // });
 
     return {
       username: newAdmin.username,

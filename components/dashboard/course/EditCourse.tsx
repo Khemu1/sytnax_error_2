@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { validateWithSchema, editCourseSchema } from "@/utils/validations";
+import {
+  validateWithSchema,
+  editCourseSchema,
+} from "@/utils/validations/validations";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { useEditDashboardCourse, useGetCourseForEdit } from "@/hooks/admin";

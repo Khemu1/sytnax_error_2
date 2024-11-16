@@ -4,7 +4,7 @@ import {
   dashboardEditCourseService,
 } from "@/backendServices/dashboard";
 import { processFormData } from "@/utils";
-import {} from "@/utils/validations";
+import {} from "@/utils/validations/validations";
 import { NextRequest, NextResponse } from "next/server";
 interface Props {
   params: { id: number };

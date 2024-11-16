@@ -1,3 +1,5 @@
+"use client";
+
 import { setWorkspaces } from "@/store/slices/survey/workspaceSlice";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
@@ -7,7 +9,10 @@ import CreateWorkspaceDialog from "@/components/survey_builder/Dialog/workspaces
 import UpdateWorkspaceTitleDialog from "@/components/survey_builder/Dialog/workspaces/UpdateWorkspaceTitleDialog";
 import SearchDialog from "@/components/survey_builder/Dialog/workspaces/searchDialog";
 import { useDispatch, useSelector } from "react-redux";
-import { useDeleteWorkspace, useGetWorkspaces } from "@/hooks/survey_builder/workspace";
+import {
+  useDeleteWorkspace,
+  useGetWorkspaces,
+} from "@/hooks/survey_builder/workspace";
 import { RootState } from "@/store/store";
 
 const SurveyBuilder = () => {

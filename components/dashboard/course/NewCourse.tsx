@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useAddCourse } from "@/hooks/course";
-import { validateWithSchema, newCourseSchema } from "@/utils/validations";
+import {
+  validateWithSchema,
+  newCourseSchema,
+} from "@/utils/validations/validations";
 import { CourseDashboard } from "@/types";
 import { setCourses } from "@/store/slices/dashboardSlice";
 import { useDispatch, useSelector } from "react-redux";

@@ -1,18 +1,19 @@
-import { SurveyProps } from "../../types";
+import {
+  useChangeSurveyStatus,
+  useDeleteSurvey,
+} from "@/hooks/survey_builder/survey";
+import { setCurrentSurvey } from "@/store/slices/survey/currentSurveySlice";
+import { RootState } from "@/store/store";
+import { SurveyProps } from "@/types/survey";
+import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { useLanguage } from "../lang/LanguageProvider";
+import { useDispatch, useSelector } from "react-redux";
 import UpdateSurveyTitleDialog from "../Dialog/survey/UpdateSurveyTitleDialog";
 import MoveSurveyDialog from "../Dialog/survey/MoveSurveyDialog";
 import DuplicateSurveyDialog from "../Dialog/survey/DuplicateSurveyDialog";
-import { useChangeSurveyStatus, useDeleteSurvey } from "../../hooks/survey";
-import { setCurrentSurvey } from "../../store/slices/currentSurveySlice";
-import { Link } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../store/store";
 
 const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
-  const { t, getCurrentLanguageTranslations, getCurrentLanguage } =
-    useLanguage();
   const dispatch = useDispatch();
   const [menuOpen, setMenuOpen] = useState(false);
   const [isUpdateDialogOpen, setUpdateDialogOpen] = useState(false);
@@ -33,8 +34,6 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
       await handleUpdateSurveyStatus({
         surveyId: survey.id,
         workspaceId: survey.workspace,
-        getCurrentLanguageTranslations,
-        currentLang: getCurrentLanguage(),
       });
     } catch (error) {
       console.error("Error toggling survey status:", error);
@@ -66,8 +65,6 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
     handleDeleteSurvey({
       surveyId: survey.id,
       workspaceId: survey.workspace,
-      getCurrentLanguageTranslations,
-      currentLang: getCurrentLanguage(),
     });
   };
   const toggleMenu = async () => {
@@ -96,7 +93,7 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
       <div className="survey">
         <div className="flex w-full h-full">
           <Link
-            to={`/survey/${currentWorkspace?.id}/${survey.id}/build`}
+            href={`/survey/${currentWorkspace?.id}/${survey.id}/build`}
             className="flex item h-full pl-2 border-r cursor-pointer border-r-gray-500 w-[60%]"
           >
             <p className="m-auto text-[#859fd1] font-semibold text-ellipsis overflow-hidden px-2 text-nowrap whitespace-nowrap">
@@ -105,8 +102,11 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
           </Link>
           <div className="flex flex-col justify-end h-full w-[40%] bg-[#1b1b1b] p-2 gap-1">
             <div className="flex flex-col h-full w-full relative">
-              <Link to={`/survey/${survey.url}`} className="survey_card_buttons">
-                {t("preview")}
+              <Link
+                href={`/survey/${survey.url}`}
+                className="survey_card_buttons"
+              >
+                Preview
               </Link>
               <button
                 onClick={toggleSurveyStatus}
@@ -114,7 +114,7 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
                   survey.isActive ? "text-red-600" : "text-green-600"
                 }`}
               >
-                {survey.isActive ? t("deactivate") : t("activate")}
+                {survey.isActive ? "Deactivate" : "Activate"}
               </button>
               <div
                 className={`status flex absolute inset-0 bg-[#1b1b1b] transition-opacity duration-250`}
@@ -124,7 +124,7 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
                     survey.isActive ? "text-green-600" : "text-red-600"
                   }`}
                 >
-                  {survey.isActive ? t("active") : t("inactive")}
+                  {survey.isActive ? "Active" : "Inactive"}
                 </button>
               </div>
             </div>
@@ -137,10 +137,11 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
                 onSelect(survey);
               }}
             >
-              <img
+              <Image
                 src="/assets/icons/dots.svg"
                 alt="options"
-                className="w-[27px] h-[27px]"
+                width={27}
+                height={27}
               />
             </button>
 
@@ -153,25 +154,25 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
                   className="survey_card_buttons"
                   onClick={handleOpenUpdateTitleDialog}
                 >
-                  {t("rename")}
+                  Rename
                 </span>
                 <span
                   className="survey_card_buttons"
                   onClick={handleOpenMoveDialog}
                 >
-                  {t("move")}
+                  Move
                 </span>
                 <span
                   className="survey_card_buttons"
                   onClick={handleOpenDuplicateDialog}
                 >
-                  {t("duplicate")}
+                  Duplicate
                 </span>
                 <span
                   className="survey_card_buttons text-red-600"
                   onClick={handleDelete}
                 >
-                  {t("delete")}
+                  Delete
                 </span>
               </div>
             )}

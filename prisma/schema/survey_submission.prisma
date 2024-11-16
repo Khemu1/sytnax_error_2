@@ -1,0 +1,10 @@
+model SurveySubmission {
+  id          String             @id @default(cuid())
+  workspaceId String             @unique
+  surveyId    String
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  totalPoints Int                @default(0)
+  survey      Survey             @relation(fields: [surveyId], references: [id])
+  answers     AnsweredQuestion[]
+}

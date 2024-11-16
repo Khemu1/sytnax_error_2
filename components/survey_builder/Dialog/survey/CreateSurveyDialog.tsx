@@ -1,10 +1,11 @@
+import { useCreateSurvey } from "@/hooks/survey_builder/survey";
+import { RootState } from "@/store/store";
+import { newSurveySchema } from "@/utils/validations/survey";
+import { validateWithSchema } from "@/utils/validations/validations";
 import { Dialog, DialogPanel } from "@headlessui/react";
-import { useLanguage } from "../../lang/LanguageProvider";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { RootState } from "../../../store/store";
-import { useCreateSurvey } from "../../../hooks/survey"; // Assuming you have this hook
-import { newSurveySchema, validateWithSchema } from "../../../utils/survey";
 
 interface CreateSurveyDialogProps {
   isOpen: boolean;
@@ -15,9 +16,6 @@ const CreateSurveyDialog: React.FC<CreateSurveyDialogProps> = ({
   isOpen,
   onClose,
 }) => {
-  const { t, getCurrentLanguageTranslations, getCurrentLanguage } =
-    useLanguage();
-
   const currentWorkspace = useSelector(
     (state: RootState) => state.currentWorkspace.currentWorkspace
   );
@@ -35,20 +33,16 @@ const CreateSurveyDialog: React.FC<CreateSurveyDialogProps> = ({
       newSurveySchema().parse({ title: surveyTitle });
 
       if (!currentWorkspace?.id) {
-        setErrors({ chooseWorkspace: t("unknownError") });
+        setErrors({ chooseWorkspace: "an Unkown Error Occured" });
         return;
       }
-
-      const lang = getCurrentLanguageTranslations();
 
       await handleCreateSurvey({
         title: surveyTitle,
         workspaceId: currentWorkspace?.id,
-        getCurrentLanguageTranslations: () => lang,
-        currentLang: getCurrentLanguage(),
       });
     } catch (error) {
-      setErrors(validateWithSchema(error, getCurrentLanguage()));
+      setErrors(validateWithSchema(error));
       console.error("Failed to create survey", error);
     }
   };
@@ -71,14 +65,16 @@ const CreateSurveyDialog: React.FC<CreateSurveyDialogProps> = ({
           <form onSubmit={handleSave}>
             <div className="flex w-full items-center border-b border-b-gray-500 pb-2 px-2">
               <button type="button" onClick={onClose}>
-                <img
+                <Image
                   src="/assets/icons/close.svg"
                   alt="close"
                   className="w-[20px] h-[20px]"
+                  width={20}
+                  height={20}
                 />
               </button>
               <span className="flex flex-1 justify-center text-white">
-                {t("createSurvey")}
+                Create Survey
               </span>
             </div>
 
@@ -86,20 +82,20 @@ const CreateSurveyDialog: React.FC<CreateSurveyDialogProps> = ({
               <input
                 type="text"
                 value={surveyTitle}
-                placeholder={t("enterTitle")}
+                placeholder="Enter Title"
                 onChange={(e) => setSurveyTitle(e.target.value)}
                 className="w-full bg-[#2a2a2a] text-white border-none outline-none p-2 rounded-md"
               />
               {((isError && errorState?.title) || (errors && errors.title)) && (
                 <div className="text-red-600 text-sm mt-2 px-4 text-center">
-                  {errorState?.title || errors?.title || t("unknownError")}
+                  {errorState?.title || errors?.title}
                 </div>
               )}
             </div>
 
             {isError && errorState && (
               <div className="text-red-600 text-sm mt-2 px-4">
-                {errorState.message || t("unknownError")}
+                {errorState.message}
               </div>
             )}
 
@@ -109,13 +105,13 @@ const CreateSurveyDialog: React.FC<CreateSurveyDialogProps> = ({
                 type="button"
                 onClick={onClose}
               >
-                {t("cancel")}
+                Cancel
               </button>
               <button
                 className="bg-[#2c2f31] transition-all py-2 px-4 rounded"
                 type="submit"
               >
-                {t("save")}
+                Save
               </button>
             </div>
           </form>

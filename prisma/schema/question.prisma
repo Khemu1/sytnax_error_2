@@ -1,0 +1,13 @@
+model Question {
+  id             String             @id @default(cuid())
+  surveyId       String
+  label          String
+  description    String?
+  required       Boolean            @default(false)
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  points         Int                @default(0)
+  survey         Survey             @relation(fields: [surveyId], references: [id])
+  correctAnswers CorrectAnswer[]
+  answers        AnsweredQuestion[]
+}

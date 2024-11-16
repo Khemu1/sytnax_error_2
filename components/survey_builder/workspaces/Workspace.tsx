@@ -1,6 +1,7 @@
 // Workspace.jsx
 import React from "react";
-import { WorkspaceProps } from "../../types";
+import Image from "next/image";
+import { WorkspaceProps } from "@/types/survey";
 
 const Workspace: React.FC<WorkspaceProps> = ({
   selected,
@@ -15,10 +16,11 @@ const Workspace: React.FC<WorkspaceProps> = ({
     >
       <div className="flex items-center gap-2">
         <div>
-          <img
+          <Image
             src="/assets/icons/folder.svg"
             alt="Folder icon"
-            className="w-[20px]"
+            width={20}
+            height={20}
           />
         </div>
         <p className="font-semibold text-ellipsis overflow-hidden px-2 text-nowrap whitespace-nowrap">

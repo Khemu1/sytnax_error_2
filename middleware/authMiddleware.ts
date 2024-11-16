@@ -9,11 +9,16 @@ import {
   validatePasswordSchema,
   validateRestTokenSchema,
   validateWithSchema,
-} from "@/utils/validations";
+} from "@/utils/validations/validations";
 import { EditAdminProps, EditMyAccountProps } from "@/types";
 import { ZodError } from "zod";
 import { CustomError } from "./CustomError";
-import { accessCookieOptions, generateAccessTokens, verifyAccessToken, verifyRefreshToken } from "@/backendServices/jwtService";
+import {
+  accessCookieOptions,
+  generateAccessTokens,
+  verifyAccessToken,
+  verifyRefreshToken,
+} from "@/backendServices/jwtService";
 
 export const authenticateUser = async () => {
   try {
@@ -318,4 +323,3 @@ export const validateResetToken = async (req: NextRequest) => {
     );
   }
 };
-

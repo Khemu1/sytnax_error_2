@@ -4,7 +4,10 @@ import React, { useState } from "react";
 import formStyle from "@/styles/formStyle.module.css";
 import { SignInProps } from "@/types";
 import { useSignIn } from "@/hooks/auth";
-import { signInSchema, validateWithSchema } from "@/utils/validations";
+import {
+  signInSchema,
+  validateWithSchema,
+} from "@/utils/validations/validations";
 
 interface Props {
   changeTabTo: (newTab: "signin" | "sendemail") => void;

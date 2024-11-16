@@ -5,7 +5,10 @@ import Image from "next/image";
 import formStyle from "@/styles/formStyle.module.css";
 
 import { EditAdminProps } from "@/types";
-import { updatedAdminSchema, validateWithSchema } from "@/utils/validations";
+import {
+  updatedAdminSchema,
+  validateWithSchema,
+} from "@/utils/validations/validations";
 import { closeDialog } from "@/store/slices/dialogSlice";
 import { setAdmins } from "@/store/slices/dashboardSlice";
 import { useEditAdmin } from "@/hooks/admin";

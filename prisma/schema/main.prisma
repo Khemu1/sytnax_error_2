@@ -1,10 +1,10 @@
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["prismaSchemaFolder","relationJoins"]
+  previewFeatures = ["prismaSchemaFolder", "relationJoins"]
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("SUBA")
+  provider = "postgresql"
+  url      = env("SUBA")
   // directUrl = env("SUB_DIRECT")
 }

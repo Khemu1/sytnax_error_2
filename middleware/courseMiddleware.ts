@@ -4,7 +4,7 @@ import {
   joinCourseFieldsschema,
   newCourseSchema,
   validateWithSchema,
-} from "@/utils/validations";
+} from "@/utils/validations/validations";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { CustomError } from "./CustomError";

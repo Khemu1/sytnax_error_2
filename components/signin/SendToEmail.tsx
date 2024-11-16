@@ -2,7 +2,10 @@ import React, { useState } from "react";
 import Image from "next/image";
 import formStyle from "@/styles/formStyle.module.css";
 import { useSendEmail } from "@/hooks/auth";
-import { validateEmailSchema, validateWithSchema } from "@/utils/validations";
+import {
+  validateEmailSchema,
+  validateWithSchema,
+} from "@/utils/validations/validations";
 interface Props {
   changeTabTo: (newTab: "signin" | "sendemail") => void;
 }
