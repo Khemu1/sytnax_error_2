@@ -24,7 +24,7 @@ const Workspace: React.FC<WorkspaceProps> = ({
           />
         </div>
         <p className="font-semibold text-ellipsis overflow-hidden px-2 text-nowrap whitespace-nowrap">
-          {workspace.title}
+          {workspace.name}
         </p>
       </div>
 

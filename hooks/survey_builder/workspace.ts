@@ -52,7 +52,7 @@ export const useUpdateWorkspaceTitle = () => {
     CustomError | unknown,
     {
       title: string;
-      workspaceId: number;
+      workspaceId: string;
     }
   >({
     mutationFn: async ({
@@ -60,7 +60,7 @@ export const useUpdateWorkspaceTitle = () => {
       workspaceId,
     }: {
       title: string;
-      workspaceId: number;
+      workspaceId: string;
     }) => {
       setErrorState(null);
 
@@ -102,7 +102,7 @@ export const useDeleteWorkspace = () => {
     void,
     CustomError | unknown,
     {
-      workspaceId: number;
+      workspaceId: string;
     }
   >({
     mutationFn: async ({ workspaceId }) => {

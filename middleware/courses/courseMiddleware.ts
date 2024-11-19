@@ -7,9 +7,9 @@ import {
 } from "@/utils/validations/validations";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { CustomError } from "./CustomError";
 import { processFormData } from "@/utils";
 import { ZodError } from "zod";
+import { CustomError } from "../CustomError";
 
 export const validateNewCourse = async (
   req: NextRequest,

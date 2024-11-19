@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import {  errorHandler } from "./middleware/CustomError";
-// import { Ratelimit } from "@upstash/ratelimit";
-// import { kv } from "@vercel/kv";
+import { errorHandler } from "./middleware/CustomError";
 import {
   authenticateUser,
   checkAdminData,
@@ -13,47 +11,15 @@ import {
   validateEmail,
   validatePassword,
   validateResetToken,
-} from "@/middleware/authMiddleware";
+} from "@/middleware/auth/authMiddleware";
 import {
   checkDeletionIds,
   validateCourseForEdit,
   validateNewCourse,
   vlidateCourseRegister,
-} from "@/middleware/courseMiddleware";
-
-// Initialize rate limiter for general requests
-// const rateLimit = new Ratelimit({
-//   redis: kv,
-//   limiter: Ratelimit.slidingWindow(60, "1s"), // 60 requests per minute for general API calls
-// });
-
-// // Initialize rate limiter for login attempts
-// const loginRateLimit = new Ratelimit({
-//   redis: kv,
-//   limiter: Ratelimit.slidingWindow(5, "60s"), // 5 login attempts per minute
-// });
-
-// // Helper function to check rate limits for general requests
-// const checkRateLimit = async (req: NextRequest) => {
-//   const ip = req.ip ?? "127.0.0.1";
-//   const { remaining } = await rateLimit.limit(ip);
-//   if (remaining === 0) {
-//     throw new CustomError("Too many requests", 429, "", true, "", {
-//       message: "Too many requests, try again later",
-//     });
-//   }
-// };
-
-// Helper function to check rate limits for login attempts
-// const checkLoginRateLimit = async (req: NextRequest) => {
-//   const ip = req.ip ?? "127.0.0.1";
-//   const { remaining } = await loginRateLimit.limit(ip);
-//   if (remaining === 0) {
-//     throw new CustomError("Too many login attempts", 429, "", true, "", {
-//       message: "Too many login attempts, please try again later.",
-//     });
-//   }
-// };
+} from "@/middleware/courses/courseMiddleware";
+import { surveyBuilderRoutes } from "./middleware/survey_builder";
+import { CustomNextRequest } from "./types";
 
 // Handle /api/courses routes
 const handleCoursesRoute = async (req: NextRequest) => {
@@ -131,7 +97,7 @@ const handleDashboardRoutes = async (req: NextRequest) => {
   }
 };
 
-export async function middleware(req: NextRequest) {
+export async function middleware(req: CustomNextRequest) {
   try {
     // await checkRateLimit(req); // Check general rate limits
     const { pathname } = req.nextUrl;
@@ -142,6 +108,8 @@ export async function middleware(req: NextRequest) {
       return await handleAuthRoutes(req);
     } else if (pathname.startsWith("/api/dashboard")) {
       return await handleDashboardRoutes(req);
+    } else if (pathname.startsWith("/api/survey_builder")) {
+      return await surveyBuilderRoutes(req);
     }
 
     return NextResponse.next();
@@ -151,5 +119,10 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/api/courses/:path*", "/api/auth/:path*", "/api/dashboard/:path*"],
+  matcher: [
+    "/api/courses/:path*",
+    "/api/auth/:path*",
+    "/api/dashboard/:path*",
+    "/api/survey_builder/:path*",
+  ],
 };

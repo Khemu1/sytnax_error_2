@@ -60,9 +60,9 @@ const CreateWorkspaceDialog: React.FC<CreateWorkspaceDialogProps> = ({
         aria-hidden="true"
       />
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <DialogPanel className="bg-[#1e1e1e] rounded-md py-5 w-[300px]">
+        <DialogPanel className="bg-base-100 rounded-md py-5 w-[300px]">
           <form onSubmit={handleSave}>
-            <div className="flex w-full items-center border-b border-b-gray-500 pb-2 px-2">
+            <div className="flex w-full items-center pb-2 px-2">
               <button
                 type="button"
                 onClick={() => {
@@ -78,12 +78,12 @@ const CreateWorkspaceDialog: React.FC<CreateWorkspaceDialogProps> = ({
                   height={20}
                 />
               </button>
-              <span className="flex flex-1 justify-center text-white">
+              <span className="flex flex-1 justify-center text-white font-semibold">
                 Create Workspace
               </span>
             </div>
 
-            <div className="border-b border-b-gray-500 p-[2rem]">
+            <div className="border-b border-b-[#0000004f] p-[2rem]">
               <input
                 type="text"
                 value={workspaceTitle}
@@ -104,9 +104,9 @@ const CreateWorkspaceDialog: React.FC<CreateWorkspaceDialogProps> = ({
               </div>
             )}
 
-            <div className="flex justify-end gap-5 mt-4 px-4">
+            <div className="flex justify-end gap-5 mt-4 px-4 font-semibold text-white">
               <button
-                className="bg-[#2f2b7226] py-2 px-4 rounded"
+                className="bg-red-700 py-2 px-4 rounded"
                 type="button"
                 onClick={() => {
                   setWorkspaceTitle("");
@@ -116,7 +116,7 @@ const CreateWorkspaceDialog: React.FC<CreateWorkspaceDialogProps> = ({
                 Cancel
               </button>
               <button
-                className="bg-[#2c2f31] transition-all py-2 px-4 rounded"
+                className="bg-blue-600 transition-all py-2 px-4 rounded"
                 type="submit"
               >
                 Save

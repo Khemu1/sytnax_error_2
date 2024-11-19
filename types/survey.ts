@@ -6,18 +6,12 @@ export interface AuthSliceProps {
 }
 
 export interface SurveyModel {
-  id: number;
-  title: string;
-  isActive: boolean;
-  url: string;
-  workspace: number;
+  id: string;
+  workspaceId: string;
+  name: string;
   createdAt?: Date;
   updatedAt?: Date;
-  welcomePart?: WelcomePartModel;
-  questions: GenericTextModel[];
-  defaultEndings: DefaultEndingModel[];
-  customEndings: CustomEndingModel[];
-  itsWorkspace?: WorkSpaceModel;
+  workspace?: WorkSpaceModel;
 }
 
 export interface SurveyPreviewModel {
@@ -64,9 +58,9 @@ export interface UserGroupModel {
   username: string;
 }
 export interface WorkSpaceModel {
-  id: number;
-  maker: number;
-  title: string;
+  id: string;
+  userId: number;
+  name: string;
   createdAt: Date;
   updatedAt: Date;
   surveys: SurveyModel[];

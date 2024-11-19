@@ -6,11 +6,10 @@ import { setCurrentWorkspace } from "@/store/slices/survey/currentWorkspaceSlice
 import { setSurveys } from "@/store/slices/survey/surveySlice";
 import { WorkSpaceModel } from "@/types/survey";
 
-
 const Workspaces = () => {
   const dispatch = useDispatch();
   const workspaces = useSelector(
-  //todo : call the selector once
+    //todo : call the selector once
     (state: RootState) => state.workspace.workspaces
   );
   const currentWorkspace = useSelector(
@@ -39,9 +38,7 @@ const Workspaces = () => {
     <div className="flex flex-col w-full gap-2">
       {workspaces.map((workspace) => (
         <Workspace
-          key={
-            workspace.id * Math.random() * Date.now() * Math.ceil(Math.random())
-          }
+          key={workspace.id}
           selected={currentWorkspace?.id === workspace.id}
           workspace={workspace}
           length={workspace.surveys?.length || 0}

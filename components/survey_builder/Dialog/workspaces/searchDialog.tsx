@@ -28,7 +28,7 @@ const SearchDialog: React.FC<SearchDialogProps> = ({ isOpen, onClose }) => {
 
   const setWorksapceAsCurrent = (title: string) => {
     const workspace = allWorkspaces.find(
-      (workspace) => workspace.title === title
+      (workspace) => workspace.name === title
     );
     const surveys = workspace!.surveys || [];
     dispatch(setCurrentWorkspace(workspace!));
@@ -45,7 +45,7 @@ const SearchDialog: React.FC<SearchDialogProps> = ({ isOpen, onClose }) => {
         aria-hidden="true"
       />
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <DialogPanel className="bg-[#1e1e1e] rounded-md py-5 w-full h-full">
+        <DialogPanel className="bg-base-100 rounded-md py-5 w-full h-full">
           <div>
             <form className="">
               <div className="flex gap-5 border-b border-b-gray-500 p-[2rem]">
@@ -57,7 +57,7 @@ const SearchDialog: React.FC<SearchDialogProps> = ({ isOpen, onClose }) => {
                   className="w-full bg-[#2a2a2a] text-white border-none outline-none p-2 rounded-md"
                 />
                 <button
-                  className="bg-[#2f2b7226] py-2 px-4 rounded"
+                  className="bg-red-700 py-2 px-4 rounded text-white"
                   type="button"
                   onClick={() => {
                     onClose();
@@ -105,9 +105,9 @@ const SearchDialog: React.FC<SearchDialogProps> = ({ isOpen, onClose }) => {
                           href={`/survey/${survey.workspace}/${survey.id}/build`}
                           key={index}
                           className="p-2 cursor-pointer hover:bg-gray-700 rounded-md"
-                          onClick={() => setTitle(survey.title)}
+                          onClick={() => setTitle(survey.name)}
                         >
-                          {survey.title}
+                          {survey.name}
                         </Link>
                       ))
                     ) : (

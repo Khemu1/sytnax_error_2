@@ -1,5 +1,5 @@
-import { resetGenericTextSliceFields } from "@/store/slices/survey/genericTextSlice";
-import { resetSharedFormSliceFields } from "@/store/slices/survey/sharedFormSlice";
+// import { resetGenericTextSliceFields } from "@/store/slices/survey/genericTextSlice";
+// import { resetSharedFormSliceFields } from "@/store/slices/survey/sharedFormSlice";
 import { PublicCardCourseProps } from "@/types";
 import { Dispatch } from "@reduxjs/toolkit";
 
@@ -111,7 +111,7 @@ export function formatDateToCustomString(date: Date): string {
 }
 
 
-export function clearSlices(dispatch: Dispatch) {
-  dispatch(resetSharedFormSliceFields());
-  dispatch(resetGenericTextSliceFields());
-}
+// export function clearSlices(dispatch: Dispatch) {
+//   dispatch(resetSharedFormSliceFields());
+//   dispatch(resetGenericTextSliceFields());
+// }

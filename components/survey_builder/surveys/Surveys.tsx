@@ -36,7 +36,7 @@ const Surveys = () => {
   return (
     <>
       <div className="flex w-full flex-wrap gap-5 overflow-scroll">
-        <div className="flex items-center justify-center gap-5 w-[292px] h-[212px] bg-[#1d2022] rounded-lg">
+        <div className="flex items-center justify-center gap-5 w-[292px] h-[212px] bg-[#1e2a38a1] rounded-lg">
           <button
             className="w-max h-max p-1 bg-[#859fd1] rounded-md"
             onClick={() => setIsCreateSurveyOpen(true)}
@@ -50,7 +50,7 @@ const Surveys = () => {
           </button>
           <p className="text-[#859fd1] font-semibold">Create Survey</p>
         </div>
-
+        
         {surveys.map((survey) => (
           <Survey
             key={

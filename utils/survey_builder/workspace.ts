@@ -51,12 +51,12 @@ export const retrunSearchData = (
   searchTerm: string
 ) => {
   const allSurveys = allWorkspaces.map((workspace) => workspace.surveys).flat();
-  const workspaceList = allWorkspaces.map((workspace) => workspace.title);
+  const workspaceList = allWorkspaces.map((workspace) => workspace.name);
   const filteredWorkspaces = workspaceList.filter((workspace) =>
     workspace.toLowerCase().includes(searchTerm.toLowerCase())
   );
   const filteredSurveys = allSurveys.filter((survey) =>
-    survey.title.toLowerCase().includes(searchTerm.toLowerCase())
+    survey.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return {

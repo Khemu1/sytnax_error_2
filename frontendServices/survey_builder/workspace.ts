@@ -3,12 +3,15 @@ import { CustomError } from "@/middleware/CustomError";
 
 export const getWorkspaces = async (): Promise<WorkSpaceModel[]> => {
   try {
-    const response = await fetch("/api/workspace/get-workspaces", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await fetch(
+      "/api/survey_builder/workspace/get-workspaces",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     if (!response.ok) {
       const errorData: CustomError = await response.json();
@@ -37,7 +40,7 @@ export const createNewWorkspace = async (
   title: string,
 ): Promise<WorkSpaceModel> => {
   try {
-    const response = await fetch(`/api/workspace/add-workspace`, {
+    const response = await fetch(`/api/survey_builder/workspace/add-workspace`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -70,15 +73,18 @@ export const createNewWorkspace = async (
 };
 
 export const updateWorkspaceTitle = async (
-  WorkspaceId: number,
+  WorkspaceId: string,
   title: string
 ): Promise<{ title: string }> => {
   try {
-    const response = await fetch(`/api/workspace/${WorkspaceId}/update-title`, {
-      method: "PATCH",
+    const response = await fetch(
+      `/api/survey_builder/workspace/${WorkspaceId}/update-title`,
+      {
+        method: "PATCH",
 
-      body: JSON.stringify({ title }),
-    });
+        body: JSON.stringify({ title }),
+      }
+    );
 
     if (!response.ok) {
       const errorData: CustomError = await response.json();
@@ -105,12 +111,15 @@ export const updateWorkspaceTitle = async (
 };
 
 export const deleteWorkspace = async (
-  WorkspaceId: number,
+  WorkspaceId: string,
 ): Promise<void> => {
   try {
-    const response = await fetch(`/api/workspace/${WorkspaceId}/delete`, {
-      method: "DELETE",
-    });
+    const response = await fetch(
+      `/api/survey_builder/workspace/${WorkspaceId}/delete`,
+      {
+        method: "DELETE",
+      }
+    );
 
     if (!response.ok) {
       const errorData: CustomError = await response.json();

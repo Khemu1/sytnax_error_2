@@ -12,7 +12,7 @@ import {
 } from "@/utils/validations/validations";
 import { EditAdminProps, EditMyAccountProps } from "@/types";
 import { ZodError } from "zod";
-import { CustomError } from "./CustomError";
+import { CustomError } from "../CustomError";
 import {
   accessCookieOptions,
   generateAccessTokens,

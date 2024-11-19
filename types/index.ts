@@ -1,5 +1,10 @@
 import { CustomError } from "@/middleware/CustomError";
+import { NextRequest } from "next/server";
 
+
+export interface CustomNextRequest extends NextRequest {
+  context?: Record<string, unknown>; // Add custom context field
+}
 export interface SignInProps {
   usernameOrEmail: string;
   password: string;

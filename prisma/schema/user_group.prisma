@@ -1,9 +1,9 @@
 model UserGroup {
   id        String @id @default(cuid())
-  ownerId   Int
+  userId   Int
   groupId   String
   group     Group  @relation(fields: [groupId], references: [id])
-  user      User   @relation(fields: [ownerId], references: [id])
+  user      User   @relation(fields: [userId], references: [id])
 
-  @@unique([groupId, ownerId])
+  @@unique([groupId, userId])
 }
