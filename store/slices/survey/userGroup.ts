@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { GroupModel, UserGroupModel } from "../../../types/survey";
 
 const initialState: GroupModel = {
-  id: 0,
+  id: "",
   maker: 0,
   name: "",
   description: "",

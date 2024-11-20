@@ -42,7 +42,7 @@ const currentWorkspaceSlice = createSlice({
         surveys: updatedSurveys,
       };
     },
-    deleteCurrnetWorkspaceSurvey: (state, action: PayloadAction<number>) => {
+    deleteCurrnetWorkspaceSurvey: (state, action: PayloadAction<string>) => {
       const updatedSurveys =
         state.currentWorkspace?.surveys.filter(
           (survey) => survey.id !== action.payload

@@ -53,7 +53,7 @@ const workspaceSlice = createSlice({
     },
     addSurveyToWorkspace: (state, action: PayloadAction<SurveyModel>) => {
       state.workspaces = state.workspaces.map((workspace) =>
-        workspace.id === action.payload.workspace
+        workspace.id === action.payload.workspaceId
           ? {
               ...workspace,
               surveys: [...(workspace.surveys || []), action.payload],
@@ -83,7 +83,7 @@ const workspaceSlice = createSlice({
     },
     updateWorkspaceSurvey: (state, action: PayloadAction<SurveyModel>) => {
       const workspace = state.workspaces.find(
-        (ws) => ws.id === action.payload.workspace
+        (ws) => ws.id === action.payload.workspaceId
       );
 
       if (workspace && workspace.surveys) {
