@@ -1,5 +1,5 @@
 "use client";
-
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 import { usePathname } from "next/navigation";
 import Footer from "./Footer";
@@ -20,9 +20,10 @@ const Holder: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   return (
     <CustomProvider>
-        {!shouldHideNav && <Nav />}
-        {children}
-        {!shouldHideFooter && <Footer />}
+      {!shouldHideNav && <Nav />}
+      {children}
+      {!shouldHideFooter && <Footer />}
+      <SpeedInsights />
     </CustomProvider>
   );
 };

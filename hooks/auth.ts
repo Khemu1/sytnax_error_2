@@ -99,7 +99,7 @@ export const useAuthUser = () => {
     if (isAuthPage && (!user.isAuthenticated || !user.userId)) {
       handleSignIn();
     }
-  }, [handleSignIn, pathName, user]);
+  }, [handleSignIn, pathName, user,dispatch]);
 
   return { handleSignIn };
 };

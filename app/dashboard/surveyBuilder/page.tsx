@@ -17,16 +17,22 @@ import {
 } from "@/hooks/survey_builder/workspace";
 import { RootState } from "@/store/store";
 import GroupDialog from "@/components/survey_builder/Dialog/workspaces/groupDialog";
+import { logout } from "@/store/slices/authSlice";
+import { useRouter } from "next/navigation";
 
 const SurveyBuilder = () => {
   const [isMobileAsideOpen, setIsMobileAsideOpen] = useState(false);
-  const { workspaces:data,isLoading,isError } = useGetWorkspaces();
+  const { workspaces: data, isLoading, isError } = useGetWorkspaces();
   const dispatch = useDispatch();
+  const routeTo = useRouter();
 
-  const { currentWorkspace, workspaces } = useSelector((state: RootState) => ({
-    currentWorkspace: state.currentWorkspace.currentWorkspace,
-    workspaces: state.workspace.workspaces,
-  }));
+  const { currentWorkspace, workspaces, authState } = useSelector(
+    (state: RootState) => ({
+      currentWorkspace: state.currentWorkspace.currentWorkspace,
+      workspaces: state.workspace.workspaces,
+      authState: state.auth,
+    })
+  );
   const [menuOpen, setMenuOpen] = useState(false);
 
   const workspaceChangeMenuRef = useRef<HTMLDivElement>(null);
@@ -88,6 +94,25 @@ const SurveyBuilder = () => {
       dispatch(setWorkspaces(data));
     }
   }, [data, dispatch]);
+
+  useEffect(() => {
+    const localStorageAuth = localStorage.getItem("userData");
+    if (localStorageAuth) {
+      const { role } = JSON.parse(localStorageAuth);
+
+      // Check if the user is authenticated
+      if (!authState.isAuthenticated) {
+        dispatch(logout());
+        routeTo.push("/authportal");
+      }
+      // Role-based navigation
+      if (role !== 1 && role !== 2) {
+        routeTo.push("/authportal");
+      }
+    } else {
+      routeTo.push("/authportal");
+    }
+  }, [authState.isAuthenticated, dispatch, routeTo]);
 
   if (isLoading) {
     // todo: use loading animation

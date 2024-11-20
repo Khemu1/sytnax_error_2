@@ -31,6 +31,7 @@
     "@upstash/ratelimit": "^2.0.3",
     "@vercel/analytics": "^1.4.1",
     "@vercel/kv": "^3.0.0",
+    "@vercel/speed-insights": "^1.1.0",
     "bcrypt": "^5.1.1",
     "filepond": "^4.31.3",
     "filepond-plugin-image-exif-orientation": "^1.0.11",
