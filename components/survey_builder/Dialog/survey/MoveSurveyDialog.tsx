@@ -95,7 +95,7 @@ const MoveSurveyDialog: React.FC<MoveSurveyDialogProps> = ({
                   if (workspace.id !== currentWorkspace!.id) {
                     return (
                       <option key={workspace.id} value={workspace.id}>
-                        {workspace.title}
+                        {workspace.name}
                       </option>
                     );
                   }
