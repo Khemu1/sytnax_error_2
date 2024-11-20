@@ -8,7 +8,7 @@ export interface SurveyModel {
   id: string;
   workspaceId: string;
   name: string;
-  openInterval?: string;
+  openInterval: string | null;
   createdAt?: Date;
   updatedAt?: Date;
   workspace?: WorkSpaceModel;
