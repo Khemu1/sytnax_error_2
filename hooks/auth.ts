@@ -8,7 +8,7 @@ import {
 } from "@/frontendServices/auth";
 import { login } from "@/store/slices/authSlice";
 import { RootState } from "@/store/store";
-import { SignInProps } from "@/types";
+import { signInPropsFrontEnd } from "@/types";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -19,7 +19,7 @@ export const useSignIn = () => {
   const [success, setSuccess] = useState<boolean>(false);
   const routeTo = useRouter();
   const dispatch = useDispatch();
-  const handleSignIn = async (data: SignInProps) => {
+  const handleSignIn = async (data: signInPropsFrontEnd) => {
     setLoading(true);
     setError(null);
     setSuccess(false);
@@ -90,6 +90,7 @@ export const useAuthUser = () => {
         routeTo.push("/authportal");
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, routeTo]);
 
   useEffect(() => {

@@ -1,8 +1,12 @@
 import { CustomError } from "@/middleware/CustomError";
-import { CustomErrorResponse, SignInProps, SignInResponseProps } from "@/types";
+import {
+  CustomErrorResponse,
+  signInPropsFrontEnd,
+  SignInResponseProps,
+} from "@/types";
 
 export const signIn = async (
-  formData: SignInProps
+  formData: signInPropsFrontEnd
 ): Promise<SignInResponseProps> => {
   try {
     const response = await fetch("/api/auth/signin", {

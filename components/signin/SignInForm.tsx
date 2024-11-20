@@ -2,7 +2,7 @@
 import Image from "next/image";
 import React, { useState } from "react";
 import formStyle from "@/styles/formStyle.module.css";
-import { SignInProps } from "@/types";
+import { signInPropsFrontEnd } from "@/types";
 import { useSignIn } from "@/hooks/auth";
 import {
   signInSchema,
@@ -13,7 +13,7 @@ interface Props {
   changeTabTo: (newTab: "signin" | "sendemail") => void;
 }
 const SignInForm: React.FC<Props> = ({ changeTabTo }) => {
-  const [data, setData] = useState<SignInProps>({
+  const [data, setData] = useState<signInPropsFrontEnd>({
     usernameOrEmail: "",
     password: "",
   });
@@ -70,7 +70,7 @@ const SignInForm: React.FC<Props> = ({ changeTabTo }) => {
               }
               value={data.usernameOrEmail}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setData((prev: SignInProps) => ({
+                setData((prev: signInPropsFrontEnd) => ({
                   ...prev,
                   usernameOrEmail: e.target.value,
                 }))
@@ -98,7 +98,7 @@ const SignInForm: React.FC<Props> = ({ changeTabTo }) => {
               }
               value={data.password}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setData((prev: SignInProps) => ({
+                setData((prev: signInPropsFrontEnd) => ({
                   ...prev,
                   password: e.target.value,
                 }))
