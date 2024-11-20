@@ -28,7 +28,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "types/**/*.d.ts",
-    "prisma/seed.ts",
+    "prisma/seed.mjs",
     "components/dashboard/Owner.tsx"
   ],
   "exclude": ["node_modules"]

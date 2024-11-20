@@ -10,10 +10,10 @@
     "pages:build": "npx @cloudflare/next-on-pages",
     "preview": "npm run pages:build && wrangler pages dev",
     "deploy": "npm run pages:build && wrangler pages deploy",
-    "seed": "npx ./prisma/seed.ts"
+    "seed": "ts-node --require tsconfig-paths/register prisma/seed.mjs"
   },
   "prisma": {
-    "seed": "npx ./prisma/seed.ts"
+    "seed": "npx /prisma/seed.ts"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.0",
