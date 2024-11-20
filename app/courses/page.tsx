@@ -50,6 +50,7 @@ const Courses = () => {
       ) : (
         <CourseCards loading={loading} courses={filteredData} />
       )}
+      <Analytics />
     </div>
   );
 };

@@ -1,4 +1,4 @@
-"use client"; 
+"use client";
 
 import { Analytics } from "@vercel/analytics/react";
 import { useGetCourse } from "@/hooks/course";
@@ -107,6 +107,7 @@ const Course: React.FC<Props> = ({ params: { id } }) => {
           Join Now
         </Link>
       </div>
+      <Analytics />
     </div>
   );
 };

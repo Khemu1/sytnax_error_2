@@ -29,6 +29,7 @@
     "@types/node-cron": "^3.0.11",
     "@types/nodemailer": "^6.4.16",
     "@upstash/ratelimit": "^2.0.3",
+    "@vercel/analytics": "^1.4.1",
     "@vercel/kv": "^3.0.0",
     "bcrypt": "^5.1.1",
     "filepond": "^4.31.3",

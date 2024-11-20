@@ -129,6 +129,7 @@ export const Hero = () => {
           ))}
         </div>
       </div>
+      <Analytics/>
     </div>
   );
 };
