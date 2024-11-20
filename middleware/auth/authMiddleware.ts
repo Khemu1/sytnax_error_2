@@ -42,7 +42,9 @@ export const authenticateUser = async () => {
         !accessTokenData ||
         typeof accessTokenData.id !== "number" ||
         typeof accessTokenData.role !== "number" ||
-        typeof accessTokenData.username !== "string"
+        typeof accessTokenData.username !== "string" ||
+        typeof accessTokenData.groupId !== "string" ||
+        !Array.isArray(accessTokenData.groupMemebers)
       ) {
         throw new CustomError(
           "Invalid access token",
@@ -56,6 +58,11 @@ export const authenticateUser = async () => {
       const response = NextResponse.next();
       response.headers.set("User-Id", accessTokenData.id.toString());
       response.headers.set("User-Role", accessTokenData.role.toString());
+      response.headers.set("User-Group", accessTokenData.groupId);
+      response.headers.set(
+        "User-Group-Ids",
+        accessTokenData.groupMemebers.toString()
+      );
 
       return response;
     }
@@ -66,7 +73,9 @@ export const authenticateUser = async () => {
         !refreshTokenData ||
         typeof refreshTokenData.id !== "number" ||
         typeof refreshTokenData.role !== "number" ||
-        typeof refreshTokenData.username !== "string"
+        typeof refreshTokenData.username !== "string" ||
+        typeof refreshTokenData.groupId !== "string" ||
+        !Array.isArray(refreshTokenData.groupMemebers)
       ) {
         throw new CustomError(
           "Invalid refresh token",
@@ -81,6 +90,8 @@ export const authenticateUser = async () => {
         id: refreshTokenData.id,
         role: refreshTokenData.role,
         username: refreshTokenData.username,
+        groupId: refreshTokenData.groupId,
+        groupMemebers: refreshTokenData.groupMemebers,
       });
 
       const response = NextResponse.next();
@@ -92,6 +103,11 @@ export const authenticateUser = async () => {
       // response.cookies.set("User-Id", refreshTokenData.id as string);
       response.headers.set("User-Id", refreshTokenData.id.toString());
       response.headers.set("User-Role", refreshTokenData.role.toString());
+      response.headers.set("User-Group", refreshTokenData.groupId);
+      response.headers.set(
+        "User-Group-Ids",
+        refreshTokenData.groupMemebers.toString()
+      );
 
       return response;
     }

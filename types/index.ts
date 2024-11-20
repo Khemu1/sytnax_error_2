@@ -8,6 +8,8 @@ export interface CustomNextRequest extends NextRequest {
 export interface SignInProps {
   usernameOrEmail: string;
   password: string;
+  userGroupIds: string[];
+  userOwnGroup: string;
 }
 export interface SignUpProps {
   username: string;

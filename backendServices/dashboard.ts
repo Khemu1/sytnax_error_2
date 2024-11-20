@@ -1,8 +1,8 @@
-// import { PrismaClient } from "@prisma/client/edge";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client/edge";
+// import { PrismaClient } from "@prisma/client";
 
 import { CustomError } from "@/middleware/CustomError";
-// import { withAccelerate } from "@prisma/extension-accelerate";
+import { withAccelerate } from "@prisma/extension-accelerate";
 import {
   CourseModel,
   EditAdminProps,
@@ -12,8 +12,8 @@ import {
 import bcrypt from "bcrypt";
 import { deleteImgur, uploadToImgur } from "./imgurServices";
 
-// const prisma = new PrismaClient().$extends(withAccelerate());
-const prisma = new PrismaClient();
+const prisma = new PrismaClient().$extends(withAccelerate());
+// const prisma = new PrismaClient();
 
 export const dashboardCoursesService = async () => {
   try {
@@ -326,13 +326,13 @@ export const dashboardNewAdminsService = async (adminData: SignUpProps) => {
       },
     });
 
-    const group = await prisma.group.create({
+    await prisma.group.create({
       data: {
         name: `${newAdmin.username}'s group`,
         ownerId: newAdmin.id,
       },
     });
-    
+
     // will use this when inviting users to groups instead
     // await prisma.userGroup.create({
     //   data: {

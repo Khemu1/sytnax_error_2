@@ -37,7 +37,7 @@ const Admin = () => {
         }
       }
     } else {
-      routeTo.push("/signin");
+      routeTo.push("/authportal");
     }
   }, [authState.isAuthenticated, dispatch, routeTo]);
 

@@ -1,8 +1,9 @@
 import { CustomError } from "@/middleware/CustomError";
 import { WorkSpaceModel } from "@/types/survey";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client/edge";
+import { withAccelerate } from "@prisma/extension-accelerate";
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient().$extends(withAccelerate());
 
 export const getWorkSpacesService = async (
   userId: number
@@ -14,11 +15,9 @@ export const getWorkSpacesService = async (
       select: { groupId: true },
     });
 
-    console.log("user groups", userGroups);
     const userOwnedGroup = await prisma.group.findFirst({
       where: { ownerId: userId },
     });
-    console.log("user owned group", userOwnedGroup);
 
     const groupIds = userGroups
       .map((group) => group.groupId)
@@ -80,6 +79,32 @@ export const addWorkSpaceService = async (userId: number, name: string) => {
       },
     });
 
+    return workspace;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const deleteWorkspaceService = async (workspaceId: string) => {
+  try {
+    await prisma.workspace.delete({
+      where: { id: workspaceId },
+    });
+    return true;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const updateWorkspaceNameService = async (
+  name: string,
+  workspaceId: string
+) => {
+  try {
+    const workspace = await prisma.workspace.update({
+      where: { id: workspaceId },
+      data: { name },
+    });
     return workspace;
   } catch (error) {
     throw error;

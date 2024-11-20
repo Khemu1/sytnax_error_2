@@ -1,7 +1,7 @@
-import { useUpdateWorkspaceTitle } from "@/hooks/survey_builder/workspace";
+import { useUpdateWorkspaceName } from "@/hooks/survey_builder/workspace";
 import { RootState } from "@/store/store";
-import { newSurveySchema } from "@/utils/validations/survey";
 import { validateWithSchema } from "@/utils/validations/validations";
+import { newWorkspaceSchema } from "@/utils/validations/workspace";
 import { Dialog, DialogPanel } from "@headlessui/react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -21,10 +21,10 @@ const UpdateWorkspaceTitleDialog: React.FC<
     (state: RootState) => state.currentWorkspace
   );
 
-  const [title, setTitle] = useState("");
+  const [workspaceName, setworkspaceName] = useState("");
   const [errors, setErros] = useState<Record<string, string> | null>(null);
-  const { handleUpdateWorkspaceTitle, isError, errorState, isSuccess } =
-    useUpdateWorkspaceTitle();
+  const { handleUpdateWorkspaceName, isError, errorState, isSuccess } =
+    useUpdateWorkspaceName();
 
   const handleSave = async (e: React.FormEvent) => {
     setErros(null);
@@ -40,9 +40,9 @@ const UpdateWorkspaceTitleDialog: React.FC<
     }
 
     try {
-      newSurveySchema().parse({ title });
-      await handleUpdateWorkspaceTitle({
-        title,
+      newWorkspaceSchema().parse({ name: workspaceName });
+      await handleUpdateWorkspaceName({
+        name: workspaceName,
         workspaceId: workspaceId,
       });
     } catch (error) {
@@ -56,13 +56,13 @@ const UpdateWorkspaceTitleDialog: React.FC<
   useEffect(() => {
     if (isSuccess) {
       onClose();
-      setTitle("");
+      setworkspaceName("");
     }
   }, [isSuccess]);
 
   useEffect(() => {
     if (isOpen && currentWorkspaceState.currentWorkspace) {
-      setTitle(currentWorkspaceState.currentWorkspace.title);
+      setworkspaceName(currentWorkspaceState.currentWorkspace.name);
     }
   }, [isOpen, currentWorkspaceState.currentWorkspace]);
 
@@ -77,10 +77,10 @@ const UpdateWorkspaceTitleDialog: React.FC<
         aria-hidden="true"
       />
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <DialogPanel className="bg-[#1e1e1e] rounded-md py-5 w-[300px]">
+        <DialogPanel className="bg-base-100 rounded-md py-5 w-[300px]">
           <div className="">
             <form onSubmit={handleSave} className="">
-              <div className="flex w-full items-center border-b border-b-gray-500 pb-2 px-2">
+              <div className="flex w-full items-center pb-2 px-2">
                 <button type="button" className="" onClick={onClose}>
                   <Image
                     src="/assets/icons/close.svg"
@@ -89,16 +89,16 @@ const UpdateWorkspaceTitleDialog: React.FC<
                     height={20}
                   />
                 </button>
-                <span className="flex flex-1 justify-center text-white">
+                <span className="flex flex-1 justify-center text-white font-semibold">
                   Rename Workspace
                 </span>
               </div>
 
-              <div className="border-b border-b-gray-500 p-[2rem]">
+              <div className="border-b border-b-[#0000004f] p-[2rem]">
                 <input
                   type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
+                  value={workspaceName}
+                  onChange={(e) => setworkspaceName(e.target.value)}
                   placeholder="Enter Workspace Title"
                   className="w-full bg-[#2a2a2a] text-white border-none outline-none p-2 rounded-md"
                   disabled={isSubmitting}
@@ -111,16 +111,16 @@ const UpdateWorkspaceTitleDialog: React.FC<
                 </div>
               )}
 
-              <div className="flex justify-end gap-5 mt-4 px-4">
+              <div className="flex justify-end gap-5 mt-4 px-4 font-semibold text-white">
                 <button
-                  className=" bg-[#2f2b7226] py-2 px-4 rounded"
+                  className="bg-red-700 py-2 px-4 rounded"
                   type="button"
                   onClick={onClose}
                 >
                   Cancel
                 </button>
                 <button
-                  className=" bg-[#2c2f31] transition-all  py-2 px-4 rounded"
+                  className="bg-blue-600 transition-all py-2 px-4 rounded"
                   type="submit"
                 >
                   Save

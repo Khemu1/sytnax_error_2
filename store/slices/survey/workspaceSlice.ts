@@ -31,9 +31,9 @@ const workspaceSlice = createSlice({
       };
       state.workspaces.push(newWorkspace);
     },
-    updateWorkspace: (
+    updateWorkspaces: (
       state,
-      action: PayloadAction<{ workspaceData: WorkSpaceModel; id: number }>
+      action: PayloadAction<{ workspaceData: WorkSpaceModel; id: string }>
     ) => {
       state.workspaces = state.workspaces.map((workspace) =>
         workspace.id === action.payload.id
@@ -46,7 +46,7 @@ const workspaceSlice = createSlice({
           : workspace
       );
     },
-    deleteWorkspace: (state, action: PayloadAction<number>) => {
+    deleteWorkspace: (state, action: PayloadAction<string>) => {
       state.workspaces = state.workspaces.filter(
         (workspace) => workspace.id !== action.payload
       );
@@ -63,7 +63,7 @@ const workspaceSlice = createSlice({
     },
     deleteWorkspaceSurvey: (
       state,
-      action: PayloadAction<{ surveyId: number; workspaceId: number }>
+      action: PayloadAction<{ surveyId: string; workspaceId: string }>
     ) => {
       const workspace = state.workspaces.find(
         (ws) => +ws.id === +action.payload.workspaceId
@@ -102,9 +102,9 @@ const workspaceSlice = createSlice({
     moveSurveyToAnotherWorkspace: (
       state,
       action: PayloadAction<{
-        surveyId: number;
-        sourceWorkspaceId: number;
-        targetWorkspaceId: number;
+        surveyId: string;
+        sourceWorkspaceId: string;
+        targetWorkspaceId: string;
       }>
     ) => {
       const { surveyId, sourceWorkspaceId, targetWorkspaceId } = action.payload;
@@ -153,7 +153,7 @@ const workspaceSlice = createSlice({
 export const {
   setWorkspaces,
   signOut,
-  updateWorkspace,
+  updateWorkspaces,
   deleteWorkspace,
   addWorkspace,
   addSurveyToWorkspace,

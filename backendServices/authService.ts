@@ -1,6 +1,6 @@
 import { SignInProps } from "@/types";
-import { PrismaClient } from "@prisma/client";
-// import { withAccelerate } from "@prisma/extension-accelerate";
+import { PrismaClient } from "@prisma/client/edge";
+import { withAccelerate } from "@prisma/extension-accelerate";
 import bcrypt from "bcrypt";
 import { CustomError } from "@/middleware/CustomError";
 import { sendResetPasswordEmail } from "./emailService";
@@ -12,9 +12,8 @@ import {
   setTokenToUsed,
 } from "./tokenService";
 
-const prisma = new PrismaClient();
 
-// const prisma = new PrismaClient().$extends(withAccelerate());
+const prisma = new PrismaClient().$extends(withAccelerate());
 
 export const signInService = async (data: SignInProps) => {
   try {
@@ -36,11 +35,22 @@ export const signInService = async (data: SignInProps) => {
     if (!user || !(await bcrypt.compare(data.password, user.passwordHash))) {
       throw new CustomError("Invalid Credentials", 404, "Sign in Error", true);
     }
+    // get user own group
+    const userGroup = await prisma.group.findFirst({
+      where: { ownerId: user.id },
+    });
+    // get group memebers
+    const groupMemebers = await prisma.userGroup.findMany({
+      where: { groupId: userGroup!.id },
+    });
 
     return {
       id: user.id,
       role: user.userRole!.roleId,
       username: user.username,
+      // todo : find a better way instead of assertion
+      userOwnGroup: userGroup!.id,
+      groupMemebers: groupMemebers.map((member) => member.userId),
     };
   } catch (error) {
     throw error;

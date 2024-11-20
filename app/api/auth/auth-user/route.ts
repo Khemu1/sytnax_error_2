@@ -29,7 +29,9 @@ export const POST = async () => {
         !accessTokenData ||
         typeof accessTokenData.id !== "number" ||
         typeof accessTokenData.role !== "number" ||
-        typeof accessTokenData.username !== "string"
+        typeof accessTokenData.username !== "string" ||
+        typeof accessTokenData.groupId !== "string" ||
+        !Array.isArray(accessTokenData.groupMemebers)
       ) {
         throw new CustomError(
           "Invalid access token",
@@ -44,6 +46,8 @@ export const POST = async () => {
         id: accessTokenData.id,
         role: accessTokenData.role,
         username: accessTokenData.username,
+        groupMemebers: accessTokenData.groupMemebers,
+        groupId: accessTokenData.groupId,
       });
     } else if (!accessToken && refreshToken) {
       const refreshTokenData = await verifyRefreshToken(refreshToken);
@@ -52,7 +56,9 @@ export const POST = async () => {
         !refreshTokenData ||
         typeof refreshTokenData.id !== "number" ||
         typeof refreshTokenData.role !== "number" ||
-        typeof refreshTokenData.username !== "string"
+        typeof refreshTokenData.username !== "string" ||
+        typeof refreshTokenData.groupId !== "string" ||
+        !Array.isArray(refreshTokenData.groupMemebers)
       ) {
         throw new CustomError(
           "Invalid refresh token or its data",
@@ -67,12 +73,16 @@ export const POST = async () => {
         id: refreshTokenData.id,
         role: refreshTokenData.role,
         username: refreshTokenData.username,
+        groupId: refreshTokenData.groupId,
+        groupMemebers: refreshTokenData.groupMemebers,
       });
 
       const response = NextResponse.json({
         id: refreshTokenData.id,
         role: refreshTokenData.role,
         username: refreshTokenData.username,
+        groupMemebers: refreshTokenData.groupMemebers,
+        groupId: refreshTokenData.groupId,
       });
 
       response.cookies.set("access_token", newAccessToken, accessCookieOptions);

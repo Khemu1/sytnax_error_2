@@ -1,11 +1,9 @@
 import { useCreateWorkspace } from "@/hooks/survey_builder/workspace";
-import { RootState } from "@/store/store";
-import { newSurveySchema } from "@/utils/validations/survey";
 import { validateWithSchema } from "@/utils/validations/validations";
+import { newWorkspaceSchema } from "@/utils/validations/workspace";
 import { Dialog, DialogPanel } from "@headlessui/react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 
 interface CreateWorkspaceDialogProps {
   isOpen: boolean;
@@ -16,9 +14,6 @@ const CreateWorkspaceDialog: React.FC<CreateWorkspaceDialogProps> = ({
   isOpen,
   onClose,
 }) => {
-  const currentWorkspace = useSelector(
-    (state: RootState) => state.currentWorkspace.currentWorkspace
-  );
   const [workspaceTitle, setWorkspaceTitle] = useState("");
   const [errors, setErrors] = useState<Record<string, string> | null>(null);
 
@@ -30,15 +25,10 @@ const CreateWorkspaceDialog: React.FC<CreateWorkspaceDialogProps> = ({
     setErrors(null);
 
     try {
-      newSurveySchema().parse({ title: workspaceTitle });
-
-      if (!currentWorkspace?.id) {
-        setErrors({ chooseWorkspace: "an Unkown Error Occured" });
-        return;
-      }
+      newWorkspaceSchema().parse({ name: workspaceTitle });
 
       await handleCreateWorkspace({
-        title: workspaceTitle,
+        name: workspaceTitle,
       });
     } catch (error) {
       setErrors(validateWithSchema(error));
@@ -91,9 +81,9 @@ const CreateWorkspaceDialog: React.FC<CreateWorkspaceDialogProps> = ({
                 onChange={(e) => setWorkspaceTitle(e.target.value)}
                 className="w-full bg-[#2a2a2a] text-white border-none outline-none p-2 rounded-md"
               />
-              {((isError && errorState?.title) || (errors && errors.title)) && (
+              {((isError && errorState?.name) || (errors && errors.name)) && (
                 <div className="text-red-600 text-sm mt-2 px-4 text-center">
-                  {errorState?.title || errors?.title}
+                  {errorState?.name || errors?.name}
                 </div>
               )}
             </div>

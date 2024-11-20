@@ -4,83 +4,84 @@ import bcrypt from "bcrypt";
 const prisma = new PrismaClient();
 
 async function main() {
-  // Create roles if they don't exist
-  await prisma.role.upsert({
-    where: { name: "owner" },
-    update: {},
-    create: { name: "owner" },
-  });
-  await prisma.role.upsert({
-    where: { name: "admin" },
-    update: {},
-    create: { name: "admin" },
-  });
-  await prisma.role.upsert({
-    where: { name: "user" },
-    update: {},
-    create: { name: "user" },
-  });
+  const roles = ["owner", "admin", "user"];
+  const users = [
+    {
+      email: "alghost900020@gmail.com",
+      username: "khemu",
+      password: "password",
+    },
+    {
+      email: "stxerror2004@gmail.com",
+      username: "Moamen",
+      password: "password",
+    },
+  ];
 
-  // Emails and password hash
-  const ownerEmail = "alghost900020@gmail.com";
-  const ownerEmail2 = "stxerror2004@gmail.com"; // New owner email
-  const hashedPassword = await bcrypt.hash("password", 10);
+  // Dynamically create roles if they don't exist
+  await Promise.all(
+    roles.map((role) =>
+      prisma.role.upsert({
+        where: { name: role },
+        update: {},
+        create: { name: role },
+      })
+    )
+  );
 
-  // Find roles
+  // Hash passwords for all users
+  const hashedUsers = await Promise.all(
+    users.map(async (user) => ({
+      ...user,
+      passwordHash: await bcrypt.hash(user.password, 10),
+    }))
+  );
+
+  // Find the "owner" role
   const ownerRole = await prisma.role.findUnique({ where: { name: "owner" } });
 
-  // Create or update users
-  const owner = await prisma.user.upsert({
-    where: { email: ownerEmail },
-    update: {},
-    create: {
-      email: ownerEmail,
-      username: "khemu",
-      passwordHash: hashedPassword,
-    },
-  });
-
-  const owner2 = await prisma.user.upsert({
-    where: { email: ownerEmail2 },
-    update: {},
-    create: {
-      email: ownerEmail2,
-      username: "Moamen", // New owner username
-      passwordHash: hashedPassword,
-    },
-  });
-
-  // Link users to roles (userRole)
-  if (ownerRole && owner) {
-    await prisma.userRole.upsert({
-      where: {
-        userId_roleId: {
-          userId: owner.id,
-          roleId: ownerRole.id,
-        },
-      },
-      update: {},
-      create: {
-        userId: owner.id,
-        roleId: ownerRole.id,
-      },
-    });
+  if (!ownerRole) {
+    throw new Error(
+      "Owner role not found. Ensure roles are correctly created."
+    );
   }
 
-  if (ownerRole && owner2) {
-    await prisma.userRole.upsert({
-      where: {
-        userId_roleId: {
-          userId: owner2.id,
+  // Check if users exist and create or skip accordingly
+  for (const user of hashedUsers) {
+    const existingUser = await prisma.user.findUnique({
+      where: { email: user.email },
+    });
+
+    if (!existingUser) {
+      // Create new user if they don't exist
+      const createdUser = await prisma.user.create({
+        data: {
+          email: user.email,
+          username: user.username,
+          passwordHash: user.passwordHash,
+        },
+      });
+
+      // Link user to the "owner" role
+      await prisma.userRole.create({
+        data: {
+          userId: createdUser.id,
           roleId: ownerRole.id,
         },
-      },
-      update: {},
-      create: {
-        userId: owner2.id,
-        roleId: ownerRole.id,
-      },
-    });
+      });
+
+      // Create a group for the new user
+      await prisma.group.create({
+        data: {
+          name: `${createdUser.username}'s group`,
+          ownerId: createdUser.id,
+        },
+      });
+    } else {
+      console.log(
+        `User with email ${user.email} already exists, skipping creation.`
+      );
+    }
   }
 }
 

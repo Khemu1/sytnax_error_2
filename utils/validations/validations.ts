@@ -6,16 +6,17 @@ export const validateWithSchema = (error: CustomError | ZodError | unknown) => {
   console.log("got error schema", error instanceof CustomError);
 
   if (error instanceof ZodError) {
+    console.log("errors", error.errors);
     const errors = error.errors.reduce((acc: Record<string, string>, curr) => {
       const fieldName = curr.path.join(".");
       acc[fieldName] = curr.message;
       return acc;
     }, {});
-    return errors; // Return the errors in the desired format
+    return errors; 
   } else if (error instanceof CustomError) {
     return {
       message: error.message,
-      details: error.details, // Optionally include details
+      details: error.details,
     };
   }
 

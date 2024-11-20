@@ -4,7 +4,7 @@ import { object, string } from "zod";
 
 export const newSurveySchema = () => {
   return object({
-    title: string()
+    name: string()
       .min(1, "survey title is required")
       .max(100, "survey title is too long"),
   });

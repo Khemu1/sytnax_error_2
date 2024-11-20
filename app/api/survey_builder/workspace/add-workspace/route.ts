@@ -5,9 +5,9 @@ import { NextResponse, NextRequest } from "next/server";
 export const POST = async (req: NextRequest) => {
   try {
     const userId = req.headers.get("User-Id")!;
-    const body = (await req.json()) as { userId: number; title: string };
-    const workspace = addWorkSpaceService(+userId, body.title);
-    return NextResponse.json(workspace, { status: 201 });
+    const body = (await req.json()) as { userId: number; name: string };
+    const workspace = await addWorkSpaceService(+userId, body.name);
+    return NextResponse.json({ workspace }, { status: 201 });
   } catch (error) {
     errorHandler(error);
   }

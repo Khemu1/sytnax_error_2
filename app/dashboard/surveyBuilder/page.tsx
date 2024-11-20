@@ -20,7 +20,7 @@ import GroupDialog from "@/components/survey_builder/Dialog/workspaces/groupDial
 
 const SurveyBuilder = () => {
   const [isMobileAsideOpen, setIsMobileAsideOpen] = useState(false);
-  const { handleGetWorkspaces, loading, error, data } = useGetWorkspaces();
+  const { workspaces:data,isLoading,isError } = useGetWorkspaces();
   const dispatch = useDispatch();
 
   const { currentWorkspace, workspaces } = useSelector((state: RootState) => ({
@@ -46,6 +46,24 @@ const SurveyBuilder = () => {
   const [isGroupProfileOpen, setIsGroupProfileOpen] = useState(false);
   const { handleDeleteWorkspace } = useDeleteWorkspace();
 
+  const deleteWorkspace = async (workspaceId: string) => {
+    try {
+      if (!workspaceId) {
+        return;
+      }
+      await handleDeleteWorkspace({ workspaceId });
+      console.log("sending");
+      setMenuOpen(false);
+      // todo : add the toast later
+      // setToast({
+      //   message: `Workspace deleted successfully.`,
+      //   type: "success",
+      // });
+    } catch (error) {
+      console.error("Error deleting workspace:", error);
+    }
+  };
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -66,22 +84,17 @@ const SurveyBuilder = () => {
   }, []);
 
   useEffect(() => {
-    handleGetWorkspaces();
-  }, [handleGetWorkspaces]);
-
-  useEffect(() => {
-    console.log(data);
     if (Array.isArray(data) && data.length > 0) {
       dispatch(setWorkspaces(data));
     }
   }, [data, dispatch]);
 
-  if (loading) {
+  if (isLoading) {
     // todo: use loading animation
     return <div>Loading...</div>;
   }
 
-  if (error) {
+  if (isError) {
     // todo: redirect to error page
     return <div>error</div>;
   }
@@ -220,10 +233,7 @@ const SurveyBuilder = () => {
                   <span
                     className="survey_card_buttons text-red-600"
                     onClick={() => {
-                      handleDeleteWorkspace({
-                        workspaceId: currentWorkspace!.id,
-                      });
-                      setMenuOpen(false);
+                      deleteWorkspace(currentWorkspace?.id);
                     }}
                   >
                     Delete

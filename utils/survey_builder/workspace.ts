@@ -1,34 +1,32 @@
-import { setCurrentWorkspace, updateCurrentWorkspace } from "@/store/slices/survey/currentWorkspaceSlice";
-import { setSurveys } from "@/store/slices/survey/surveySlice";
-import { addWorkspace, updateWorkspace,deleteWorkspace } from "@/store/slices/survey/workspaceSlice";
+import { clearCurrentWorkspace, updateCurrentWorkspace } from "@/store/slices/survey/currentWorkspaceSlice";
+import {
+  addWorkspace,
+  updateWorkspaces,
+  deleteWorkspace,
+} from "@/store/slices/survey/workspaceSlice";
 import { WorkSpaceModel } from "@/types/survey";
 import { Dispatch } from "@reduxjs/toolkit";
 
 export const updateWorkspaceF = async (
-  workspaceId: number,
+  workspaceId: string,
   workspaceData: WorkSpaceModel,
   dispatch: Dispatch
 ) => {
   try {
     dispatch(updateCurrentWorkspace(workspaceData));
-    dispatch(updateWorkspace({ workspaceData, id: +workspaceId }));
+    dispatch(updateWorkspaces({ workspaceData, id: workspaceId }));
   } catch (error) {
     console.error("Error updating survey title:", error);
   }
 };
 
 export const deleteWorkspaceF = async (
-  workspaceId: number,
-  currentWorkspaceId: number,
-  workspaces: WorkSpaceModel[],
+  workspaceId: string,
   dispatch: Dispatch
 ) => {
   try {
-    dispatch(deleteWorkspace(+workspaceId));
-    if (+currentWorkspaceId === +workspaceId) {
-      dispatch(setCurrentWorkspace(workspaces[0]));
-      dispatch(setSurveys(workspaces[0].surveys || []));
-    }
+    dispatch(deleteWorkspace(workspaceId));
+    dispatch(clearCurrentWorkspace());
   } catch (error) {
     console.error("Error deleting workspace:", error);
   }

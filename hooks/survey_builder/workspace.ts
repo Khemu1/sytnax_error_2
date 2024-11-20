@@ -1,70 +1,84 @@
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { WorkSpaceModel } from "@/types/survey";
 import {
   createNewWorkspace,
   deleteWorkspace,
   getWorkspaces,
-  updateWorkspaceTitle,
+  updateWorkspaceName,
 } from "@/frontendServices/survey_builder/workspace";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { CustomError } from "@/middleware/CustomError";
+import {
+  addNewWorkspaceF,
+  deleteWorkspaceF,
+  updateWorkspaceF,
+} from "@/utils/survey_builder/workspace";
+import { useDispatch } from "react-redux";
 
 export const useGetWorkspaces = () => {
-  const [data, setData] = useState<[] | WorkSpaceModel[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Record<string, string> | null>(null);
-  const [success, setSuccess] = useState<boolean>(false);
-  const handleGetWorkspaces = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    setSuccess(false);
-    try {
-      setData(await getWorkspaces());
-    } catch (err: unknown) {
-      if (err instanceof CustomError) {
-        if (err.errors) {
-          setError(err.errors);
-        } else {
-          setError({
-            message: err.message,
-          });
-        }
-      } else {
-        setError({
-          message: "An unknown error occurred.",
-        });
+  const [errorState, setErrorState] = useState<Record<string, string> | null>(
+    null
+  );
+
+  const {
+    data: workspaces,
+    isError,
+    isLoading,
+    isSuccess,
+  } = useQuery<WorkSpaceModel[], CustomError>({
+    queryKey: ["getWorkspaces"],
+    queryFn: async () => {
+      try {
+        setErrorState(null);
+        return await getWorkspaces();
+      } catch (error) {
+        const message =
+          error instanceof CustomError
+            ? error.errors || { message: error.message }
+            : { message: "Unknown Error" };
+        setErrorState(message);
+        throw error;
       }
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-  return { handleGetWorkspaces, data, loading, error, success };
+    },
+  });
+
+  return {
+    workspaces,
+    isLoading,
+    isError,
+    isSuccess,
+    errorState,
+  };
 };
 
-export const useUpdateWorkspaceTitle = () => {
+export const useUpdateWorkspaceName = () => {
+  const dispatch = useDispatch();
   const [errorState, setErrorState] = useState<Record<string, string> | null>(
     null
   );
 
   const mutation = useMutation<
-    { title: string },
+    { workspace: WorkSpaceModel },
     CustomError | unknown,
     {
-      title: string;
+      name: string;
       workspaceId: string;
     }
   >({
     mutationFn: async ({
-      title,
+      name,
       workspaceId,
     }: {
-      title: string;
+      name: string;
       workspaceId: string;
     }) => {
       setErrorState(null);
 
-      return await updateWorkspaceTitle(workspaceId, title);
+      return await updateWorkspaceName(workspaceId, name);
+    },
+    onSuccess: async ({ workspace }) => {
+      await updateWorkspaceF(workspace.id, workspace, dispatch);
     },
     onError: (err: CustomError | unknown) => {
       const message =
@@ -78,14 +92,14 @@ export const useUpdateWorkspaceTitle = () => {
   });
 
   const {
-    mutateAsync: handleUpdateWorkspaceTitle,
+    mutateAsync: handleUpdateWorkspaceName,
     isError,
     isSuccess,
     isPending,
   } = mutation;
 
   return {
-    handleUpdateWorkspaceTitle,
+    handleUpdateWorkspaceName,
     isError,
     isSuccess,
     errorState,
@@ -94,12 +108,13 @@ export const useUpdateWorkspaceTitle = () => {
 };
 
 export const useDeleteWorkspace = () => {
+  const dispatch = useDispatch();
   const [errorState, setErrorState] = useState<Record<string, string> | null>(
     null
   );
 
   const mutation = useMutation<
-    void,
+    { workspaceId: string },
     CustomError | unknown,
     {
       workspaceId: string;
@@ -108,7 +123,10 @@ export const useDeleteWorkspace = () => {
     mutationFn: async ({ workspaceId }) => {
       setErrorState(null);
 
-      await deleteWorkspace(workspaceId);
+      return await deleteWorkspace(workspaceId);
+    },
+    onSuccess: async ({ workspaceId }) => {
+      await deleteWorkspaceF(workspaceId, dispatch);
     },
     onError: (err: CustomError | unknown) => {
       const message =
@@ -137,22 +155,26 @@ export const useDeleteWorkspace = () => {
 };
 
 export const useCreateWorkspace = () => {
+  const dispatch = useDispatch();
   const [errorState, setErrorState] = useState<Record<string, string> | null>(
     null
   );
 
   const mutation = useMutation<
-    WorkSpaceModel,
+    { workspace: WorkSpaceModel },
     CustomError | unknown,
     {
-      title: string;
+      name: string;
     }
   >({
-    mutationFn: async ({ title }) => {
+    mutationFn: async ({ name }) => {
       setErrorState(null);
 
-      const response = await createNewWorkspace(title);
+      const response = await createNewWorkspace(name);
       return response;
+    },
+    onSuccess: async ({ workspace }) => {
+      await addNewWorkspaceF(workspace, dispatch);
     },
     onError: (err: CustomError | unknown) => {
       const message =

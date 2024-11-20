@@ -15,7 +15,7 @@ export interface SurveyModel {
 }
 
 export interface SurveyPreviewModel {
-  id: number;
+  id: string;
   title: string;
   isActive: boolean;
   url: string;
@@ -28,7 +28,7 @@ export interface SurveyPreviewModel {
 }
 
 export interface GroupModel {
-  id: number;
+  id: string;
   maker: number;
   name: string;
   description?: string;
@@ -43,7 +43,7 @@ export interface UserModel {
   password: string;
   createdAt?: Date;
   updatedAt?: Date;
-  groupId: number;
+  groupId: string;
   workspaces?: WorkSpaceModel[];
   userGroups?: UserGroupModel[];
   createdGroup: GroupModel;
@@ -51,7 +51,7 @@ export interface UserModel {
 
 export interface UserGroupModel {
   userId: number;
-  groupId: number;
+  groupId: string;
   createdAt?: string;
   updatedAt?: string;
   groupName: string;

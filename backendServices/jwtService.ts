@@ -37,12 +37,16 @@ export const generateAccessTokens = async (user: {
   id: number;
   role: number;
   username: string;
+  groupId: string;
+  groupMemebers: number[];
 }) => {
   try {
     const jwt = await new SignJWT({
       id: user.id,
       role: user.role,
       username: user.username,
+      groupId: user.groupId,
+      groupMemebers: user.groupMemebers,
     })
       .setProtectedHeader({ alg: "HS256" })
       .setExpirationTime(process.env.ACCESS_TOKEN_TIME as string)
@@ -65,12 +69,16 @@ export const generateRefreshTokens = async (user: {
   id: number;
   role: number;
   username: string;
+  groupId: string;
+  groupMemebers: number[];
 }) => {
   try {
     const jwt = await new SignJWT({
       id: user.id,
       role: user.role,
       username: user.username,
+      groupId: user.groupId,
+      groupMemebers: user.groupMemebers,
     })
       .setProtectedHeader({ alg: "HS256" })
       .setExpirationTime(process.env.REFRESH_TOKEN_TIME as string)
@@ -92,7 +100,7 @@ export const generateRefreshTokens = async (user: {
 export const verifyAccessToken = async (token: string) => {
   try {
     const { payload } = await jwtVerify(token, accessSecret);
-    return payload; // This will contain the decoded data, like id, role, username
+    return payload;
   } catch (error) {
     console.error(error);
     throw new CustomError(

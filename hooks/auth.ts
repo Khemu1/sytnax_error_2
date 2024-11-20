@@ -87,7 +87,7 @@ export const useAuthUser = () => {
     } catch (err) {
       localStorage.removeItem("userData");
       if (pathName.startsWith("/dashboard")) {
-        routeTo.push("/signin");
+        routeTo.push("/authportal");
       }
     }
   }, [dispatch, routeTo]);

@@ -37,16 +37,19 @@ export const getWorkspaces = async (): Promise<WorkSpaceModel[]> => {
 };
 
 export const createNewWorkspace = async (
-  title: string,
-): Promise<WorkSpaceModel> => {
+  name: string
+): Promise<{ workspace: WorkSpaceModel }> => {
   try {
-    const response = await fetch(`/api/survey_builder/workspace/add-workspace`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ title }),
-    });
+    const response = await fetch(
+      `/api/survey_builder/workspace/add-workspace`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name }),
+      }
+    );
 
     if (!response.ok) {
       const errorData: CustomError = await response.json();
@@ -72,17 +75,17 @@ export const createNewWorkspace = async (
   }
 };
 
-export const updateWorkspaceTitle = async (
-  WorkspaceId: string,
-  title: string
-): Promise<{ title: string }> => {
+export const updateWorkspaceName = async (
+  workspaceId: string,
+  name: string
+): Promise<{ workspace: WorkSpaceModel }> => {
   try {
     const response = await fetch(
-      `/api/survey_builder/workspace/${WorkspaceId}/update-title`,
+      `/api/survey_builder/workspace/${workspaceId}/update-name`,
       {
         method: "PATCH",
 
-        body: JSON.stringify({ title }),
+        body: JSON.stringify({ name }),
       }
     );
 
@@ -111,11 +114,11 @@ export const updateWorkspaceTitle = async (
 };
 
 export const deleteWorkspace = async (
-  WorkspaceId: string,
-): Promise<void> => {
+  workspaceId: string
+): Promise<{ workspaceId: string }> => {
   try {
     const response = await fetch(
-      `/api/survey_builder/workspace/${WorkspaceId}/delete`,
+      `/api/survey_builder/workspace/${workspaceId}/delete`,
       {
         method: "DELETE",
       }
@@ -136,7 +139,7 @@ export const deleteWorkspace = async (
       );
       throw err;
     }
-    return;
+    return await response.json();
   } catch (error) {
     console.error(error);
     throw error;

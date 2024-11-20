@@ -1,4 +1,4 @@
-import {  useState } from "react";
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Survey from "./Survey";
 import CreateSurveyDialog from "../Dialog/survey/CreateSurveyDialog";
@@ -7,18 +7,14 @@ import { setCurrentSurvey } from "@/store/slices/survey/currentSurveySlice";
 import { SurveyModel } from "@/types/survey";
 import Image from "next/image";
 
-
-
 const Surveys = () => {
   const dispatch = useDispatch();
 
-  const { surveys } = useSelector(
-    (state: RootState) => ({
-      currentWorkspace: state.currentWorkspace.currentWorkspace,
-      surveys: state.survey.surveys,
-      currentSurvey: state.currentSurvey.currentSurvey,
-    })
-  );
+  const { surveys } = useSelector((state: RootState) => ({
+    currentWorkspace: state.currentWorkspace.currentWorkspace,
+    surveys: state.survey.surveys,
+    currentSurvey: state.currentSurvey.currentSurvey,
+  }));
   const [selectedSurvey, setSelectedSurvey] = useState<SurveyModel | null>(
     null
   );
@@ -50,12 +46,10 @@ const Surveys = () => {
           </button>
           <p className="text-[#859fd1] font-semibold">Create Survey</p>
         </div>
-        
+
         {surveys.map((survey) => (
           <Survey
-            key={
-              survey.id * Date.now() * Math.ceil(Math.random()) * Math.random()
-            }
+            key={survey.id}
             selected={selectedSurvey?.id === survey.id}
             survey={survey}
             onSelect={handleSurveySelect}

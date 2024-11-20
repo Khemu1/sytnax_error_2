@@ -17,11 +17,15 @@ export const POST = async (req: NextRequest) => {
       id: user.id,
       role: user.role,
       username: user.username,
+      groupMemebers: user.groupMemebers,
+      groupId: user.userOwnGroup,
     });
     const refreshToken = await generateRefreshTokens({
       id: user.id,
       role: user.role,
       username: user.username,
+      groupMemebers: user.groupMemebers,
+      groupId: user.userOwnGroup,
     });
 
     const response = NextResponse.json(
@@ -37,7 +41,6 @@ export const POST = async (req: NextRequest) => {
     response.cookies.set("refresh_token", refreshToken, refreshCookieOptions);
     return response;
   } catch (error) {
-    console.error(error);
     return errorHandler(error);
   }
 };

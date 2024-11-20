@@ -97,7 +97,10 @@ const handleDashboardRoutes = async (req: NextRequest) => {
   }
 };
 
-export async function middleware(req: CustomNextRequest) {
+
+export async function middleware(
+  req: CustomNextRequest,
+) {
   try {
     // await checkRateLimit(req); // Check general rate limits
     const { pathname } = req.nextUrl;

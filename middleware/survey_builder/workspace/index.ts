@@ -1,24 +1,25 @@
 import { CustomError } from "@/middleware/CustomError";
 import { CustomNextRequest } from "@/types";
+import { WorkSpaceModel } from "@/types/survey";
 import { validateWithSchema } from "@/utils/validations/validations";
 import { newWorkspaceSchema } from "@/utils/validations/workspace";
-import { PrismaClient } from "@prisma/client";
-import { NextResponse } from "next/server";
+import { PrismaClient } from "@prisma/client/edge";
+import { withAccelerate } from "@prisma/extension-accelerate";
+import { NextRequest, NextResponse } from "next/server";
+import { ZodError } from "zod";
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient().$extends(withAccelerate());
 
-export const validateNewWorkSpace = async (req: CustomNextRequest,res:NextResponse) => {
+export const validateNewWorkSpace = async (
+  req: CustomNextRequest,
+  res: NextResponse
+) => {
   try {
     const data = await req.json();
     const schema = newWorkspaceSchema();
     schema.parse(data);
 
     const response = NextResponse.next();
-    req.context = req.context || {};
-    req.context.text = "meh"; // Add context to the request
-    response.cookies.set("survey", JSON.stringify({ test: "meh" }), {
-      path: "/",
-    });
     response.headers.set("User-Id", res.headers.get("User-Id")!);
     return response;
   } catch (error) {
@@ -33,10 +34,13 @@ export const validateNewWorkSpace = async (req: CustomNextRequest,res:NextRespon
   }
 };
 
-export async function checkWorkspaceExists(req: CustomNextRequest) {
+export async function checkWorkspaceExists(
+  req: CustomNextRequest,
+  res: NextResponse
+) {
   try {
-    const { searchParams } = req.nextUrl;
-    const workspaceId = searchParams.get("workspaceId"); // Get workspaceId from query params
+    const workspaceId = req.nextUrl.pathname.split("/")[4]; // Adjust index based on your route structure
+    console.log("Extracted workspaceId:", workspaceId);
 
     if (!workspaceId) {
       return NextResponse.json(
@@ -44,145 +48,110 @@ export async function checkWorkspaceExists(req: CustomNextRequest) {
         { status: 400 }
       );
     }
-
-    // Check if the workspace exists in the database
     const workspace = await prisma.workspace.findUnique({
       where: { id: workspaceId },
     });
 
     if (!workspace) {
+      console.error("Workspace not found for ID:", workspaceId);
       return NextResponse.json(
         { message: "Workspace not found" },
         { status: 404 }
       );
     }
 
-    req.context = req.context || {};
-    req.context.workspace = workspace;
-
-    return NextResponse.next();
+    const repsonse = NextResponse.next();
+    repsonse.headers.set("workspace", JSON.stringify(workspace));
+    repsonse.headers.set(
+      "User-Group-Ids",
+      res.headers.get("User-Group-Ids") ?? ""
+    );
+    repsonse.headers.set("User-Id", res.headers.get("User-Id")!);
+    return repsonse;
   } catch (error) {
     throw error;
   }
 }
-// export const checkGroupMembershipFowWorkspace = async (
-//   req: Request<
-//     { endingId: string; surveyId: string; workspaceId: string },
-//     {},
-//     {
-//       isActive: boolean;
-//       title: string;
-//       targetWorkspaceId: string;
-//       workspaceId: string;
-//     }
-//   >,
-//   res: Response<
-//     {},
-//     {
-//       userGroupIds?: number[];
-//       userId: string;
-//       groupMembers?: UserGroupModel[];
-//       workspaceOwner?: string;
-//     }
-//   >,
-//   next: NextFunction
-// ) => {
-//   try {
-//     const { userGroupIds, workspaceOwner } = res.locals;
-//     const { workspaceId } = req.body;
-//     const { workspaceId: fromParams } = req.params;
-//     const finalWorkspaceId = workspaceId || fromParams;
-//     const currentLang = (req.headers["accept-language"] as "en" | "de") ?? "en";
 
-//     const workspace = await prisma.workspace.findFirst({
-//       where: { id: finalWorkspaceId },
-//     });
+export const checkGroupMembershipForWorkspace = async (
+  req: NextRequest,
+  res: NextResponse
+) => {
+  try {
+    const rawUserId = res.headers.get("User-Id");
+    const rawWorkspace = res.headers.get("workspace");
+    if (!rawUserId || !rawWorkspace) {
+      throw new CustomError(
+        "missing user id or workspace",
+        400,
+        "workspace middleware",
+        false
+      );
+    }
+    let groupMembers: number[] = [];
+    const userGroupIdsHeader = res.headers.get("User-Group-Ids");
+    if (userGroupIdsHeader && userGroupIdsHeader.trim() !== "") {
+      try {
+        groupMembers = JSON.parse(userGroupIdsHeader) as number[];
+        if (!Array.isArray(groupMembers)) {
+          throw new Error("Invalid group members");
+        }
+      } catch (parseError) {
+        console.error("Failed to parse User-Group-Ids header:", parseError);
+        return NextResponse.json(
+          { message: "Invalid User-Group-Ids header format" },
+          { status: 400 }
+        );
+      }
+    }
+    const userId = +rawUserId;
+    const workspace: WorkSpaceModel = JSON.parse(rawWorkspace);
 
-//     if (!workspace) {
-//       return next(
-//         new CustomError(
-//           getTranslation(currentLang, "workspaceNotFound"),
-//           404,
-//           true,
-//           "workspaceNotFound"
-//         )
-//       );
-//     }
-//     if (!userGroupIds || userGroupIds.length === 0) {
-//       return next(
-//         new CustomError(
-//           getTranslation(currentLang, "notAMemberOfAnyGroup"),
-//           403,
-//           true,
-//           "notAMemberOfAnyGroup"
-//         )
-//       );
-//     }
+    if (isNaN(userId) || !workspace || typeof workspace.userId !== "number") {
+      throw new CustomError("Invalid User-Id or workspace data", 400);
+    }
 
-//     const hasAccess = await WorkspaceGroup.findOne({
-//       where: { workspaceId: workspace.id, groupId: userGroupIds },
-//     });
+    const response = NextResponse.next();
+    
+    response.headers.set("User-Group-Ids", JSON.stringify(groupMembers));
+    response.headers.set("workspace", JSON.stringify(workspace));
 
-//     if (!hasAccess) {
-//       return next(
-//         new CustomError(
-//           getTranslation(currentLang, "notAMemberOfGroup"),
-//           403,
-//           true,
-//           "accessDeniedToWorkspace"
-//         )
-//       );
-//     }
+    if (workspace.userId === userId) {
+      return response;
+    }
 
-//     const userGroup = await Group.findOne({
-//       where: { maker: workspaceOwner },
-//     });
+    if (groupMembers.includes(userId)) {
+      return response;
+    }
 
-//     const groupMembers = await UserGroup.findAll({
-//       where: { groupId: userGroup?.id },
-//     });
+    throw new CustomError("You don't have access to this workspace", 403);
+  } catch (error) {
+    console.error("Error in checkGroupMembershipForWorkspace:", error);
+    throw error;
+  }
+};
 
-//     res.locals.userGroupIds = userGroupIds;
-//     res.locals.groupMembers = groupMembers.map((member) =>
-//       member.get({ plain: true })
-//     );
-
-//     next();
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-
-// export const checkWorkspaceTitle = async (
-//   req: Request<{ workspaceId: string }, {}, { title: string }>,
-//   res: Response<{}, { userId: string }>,
-//   next: NextFunction
-// ) => {
-//   try {
-//     const currentLang = (req.headers["accept-language"] as "en" | "de") ?? "en";
-
-//     const { title } = req.body;
-//     const { workspaceId } = req.params;
-
-//     newWorkspaceSchema().parse({ title });
-
-//     next();
-//   } catch (error) {
-//     const { headers } = req;
-//     const currentLang = headers["accept-language"] as "en" | "de";
-//     if (error instanceof ZodError) {
-//       console.log(validateWithSchema(error, currentLang));
-//       return next(
-//         new CustomError(
-//           "Validation Error",
-//           400,
-//           true,
-//           "`validationError`",
-//           "",
-//           validateWithSchema(error, currentLang)
-//         )
-//       );
-//     }
-//     next(error);
-//   }
-// };
+export async function checkWorkspaceTitle(req: NextRequest, res: NextResponse) {
+  try {
+    const { name } = await req.json();
+    newWorkspaceSchema().parse({ name });
+    const response = NextResponse.next();
+    response.headers.set(
+      "workspace",
+      JSON.stringify(res.headers.get("workspace"))
+    );
+    return response;
+  } catch (error) {
+    if (error instanceof ZodError) {
+      throw new CustomError(
+        "Validation Error",
+        400,
+        "workspace",
+        true,
+        "",
+        validateWithSchema(error)
+      );
+    }
+    throw error;
+  }
+}

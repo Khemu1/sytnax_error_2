@@ -1,16 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NewCourseProps, RegisterCourseFormProps } from "@/types";
-// import { PrismaClient } from "@prisma/client/edge";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client/edge";
 
-// import { withAccelerate } from "@prisma/extension-accelerate";
+import { withAccelerate } from "@prisma/extension-accelerate";
 import { CustomError } from "@/middleware/CustomError";
 import { uploadToImgur } from "./imgurServices";
 import { google } from "googleapis";
 import { formatDateToCustomString } from "@/utils";
 import { sendRegistrationNotification } from "./emailService";
-// const prisma = new PrismaClient().$extends(withAccelerate());
-const prisma = new PrismaClient();
+const prisma = new PrismaClient().$extends(withAccelerate());
+// const prisma = new PrismaClient();
 
 export const addCourseService = async (
   data: NewCourseProps,
