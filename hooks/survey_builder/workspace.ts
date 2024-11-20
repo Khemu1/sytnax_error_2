@@ -28,7 +28,7 @@ export const useGetWorkspaces = () => {
     isSuccess,
   } = useQuery<WorkSpaceModel[], CustomError>({
     queryKey: ["getWorkspaces"],
-    enabled: false,
+    enabled: true,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
     staleTime: Infinity,
