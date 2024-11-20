@@ -1,18 +1,34 @@
-import { clearCurrentSurvey, updateCurrentSurvey } from "@/store/slices/survey/currentSurveySlice";
-import { addSurveyToCurrentWorkspace, deleteCurrnetWorkspaceSurvey, updateCurrentWorkspaceSurveys } from "@/store/slices/survey/currentWorkspaceSlice";
-import { addSurvey, deleteSurvey, updateSurveys } from "@/store/slices/survey/surveySlice";
-import { addSurveyToWorkspace, deleteWorkspaceSurvey, moveSurveyToAnotherWorkspace, updateWorkspaceSurvey } from "@/store/slices/survey/workspaceSlice";
+import {
+  clearCurrentSurvey,
+  updateCurrentSurvey,
+} from "@/store/slices/survey/currentSurveySlice";
+import {
+  addSurveyToCurrentWorkspace,
+  deleteCurrnetWorkspaceSurvey,
+  updateCurrentWorkspaceSurveys,
+} from "@/store/slices/survey/currentWorkspaceSlice";
+import {
+  addSurvey,
+  deleteSurvey,
+  updateSurveys,
+} from "@/store/slices/survey/surveySlice";
+import {
+  addSurveyToWorkspace,
+  deleteWorkspaceSurvey,
+  moveSurveyToAnotherWorkspace,
+  updateWorkspaceSurvey,
+} from "@/store/slices/survey/workspaceSlice";
 import { SurveyModel } from "@/types/survey";
 import { Dispatch, UnknownAction } from "@reduxjs/toolkit";
 
 export const addSurveyF = async (
-  currentWorkspaceId: number,
+  currentWorkspaceId: string,
   newSurvey: SurveyModel,
   dispatch: Dispatch<UnknownAction>
 ) => {
   try {
     console.log(newSurvey.workspace, currentWorkspaceId);
-    if (newSurvey.workspace === currentWorkspaceId) {
+    if (newSurvey.workspaceId === currentWorkspaceId) {
       dispatch(addSurveyToCurrentWorkspace(newSurvey));
       dispatch(addSurvey(newSurvey));
     }
@@ -23,9 +39,9 @@ export const addSurveyF = async (
 };
 
 export const deleteSurveyF = async (
-  surveyId: number,
-  currnetWorkspaceId: number,
-  surveyWorkspaceId: number,
+  surveyId: string,
+  currnetWorkspaceId: string,
+  surveyWorkspaceId: string,
   dispatch: Dispatch
 ) => {
   try {
@@ -44,9 +60,9 @@ export const deleteSurveyF = async (
 
 export const updateSurveyF = async (
   survey: SurveyModel,
-  currentSurveyId: number,
-  surveyWorkspaceId: number,
-  currentWorkspaceId: number,
+  currentSurveyId: string,
+  surveyWorkspaceId: string,
+  currentWorkspaceId: string,
   dispatch: Dispatch
 ) => {
   try {
@@ -72,11 +88,11 @@ export const updateSurveyF = async (
 
 export const duplicateSurveyF = async (
   newSurvey: SurveyModel,
-  currentWorkspaceId: number,
+  currentWorkspaceId: string,
   dispatch: Dispatch
 ) => {
   try {
-    if (newSurvey.workspace === currentWorkspaceId) {
+    if (newSurvey.workspaceId === currentWorkspaceId) {
       dispatch(addSurveyToCurrentWorkspace(newSurvey));
       dispatch(addSurvey(newSurvey));
     }
@@ -88,10 +104,10 @@ export const duplicateSurveyF = async (
 };
 
 export const moveSurveyF = async (
-  surveyId: number,
-  sourceWorkspaceId: number,
-  targetWorkspaceId: number,
-  currentWorkspaceId: number,
+  surveyId: string,
+  sourceWorkspaceId: string,
+  targetWorkspaceId: string,
+  currentWorkspaceId: string,
   survey: SurveyModel,
   dispatch: Dispatch
 ) => {
