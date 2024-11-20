@@ -1,7 +1,7 @@
 import { CustomError } from "@/middleware/CustomError";
 
 export const addUserToGroup = async (
-  groupId: number,
+  groupId: string,
   groupName: string,
   username: string,
 ) => {
@@ -37,7 +37,7 @@ export const addUserToGroup = async (
 };
 
 export const removeUserFromGroup = async (
-  groupId: number,
+  groupId: string,
   userId: number,
 ) => {
   try {

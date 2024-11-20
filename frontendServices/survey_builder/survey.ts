@@ -147,8 +147,8 @@ export const moveSurveyToWorkspace = async (
 };
 
 export const deleteSurveyFromWorkspace = async (
-  workspaceId: number,
-  surveyId: number,
+  workspaceId: string,
+  surveyId: string
 ): Promise<void> => {
   try {
     const response = await fetch(`/api/survey/${surveyId}/delete`, {

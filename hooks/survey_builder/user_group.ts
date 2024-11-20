@@ -21,7 +21,7 @@ export const useAddGroupMember = () => {
     CustomError | unknown,
     {
       username: string;
-      groupId: number;
+      groupId: string;
       groupName: string;
     }
   >({
@@ -85,7 +85,7 @@ export const useRemoveGroupMember = () => {
     CustomError | unknown,
     {
       memberId: number;
-      groupId: number;
+      groupId: string;
     }
   >({
     mutationFn: async ({

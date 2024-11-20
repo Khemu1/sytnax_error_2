@@ -1,4 +1,3 @@
-
 export interface AuthSliceProps {
   id: number | null;
   username: string | null;
@@ -9,6 +8,7 @@ export interface SurveyModel {
   id: string;
   workspaceId: string;
   name: string;
+  openInterval?: string;
   createdAt?: Date;
   updatedAt?: Date;
   workspace?: WorkSpaceModel;

@@ -1,75 +1,62 @@
 import {
-  useChangeSurveyStatus,
   useDeleteSurvey,
 } from "@/hooks/survey_builder/survey";
-import { setCurrentSurvey } from "@/store/slices/survey/currentSurveySlice";
 import { RootState } from "@/store/store";
 import { SurveyProps } from "@/types/survey";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import UpdateSurveyTitleDialog from "../Dialog/survey/UpdateSurveyTitleDialog";
 import MoveSurveyDialog from "../Dialog/survey/MoveSurveyDialog";
 import DuplicateSurveyDialog from "../Dialog/survey/DuplicateSurveyDialog";
 
 const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
-  const dispatch = useDispatch();
   const [menuOpen, setMenuOpen] = useState(false);
   const [isUpdateDialogOpen, setUpdateDialogOpen] = useState(false);
   const [isMoveDialogOpen, setMoveDialogOpen] = useState(false);
-  const [isDuplicateDialogOpen, setIsDuplicateDialogOpen] = useState(false);
-  const { handleDeleteSurvey } = useDeleteSurvey();
+  const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
   const surveyCardMenuRef = useRef<HTMLDivElement>(null);
   const toggleButtonRef = useRef<HTMLButtonElement>(null);
-  const { handleUpdateSurveyStatus } = useChangeSurveyStatus();
+
+  const { handleDeleteSurvey } = useDeleteSurvey();
 
   const currentWorkspace = useSelector(
     (state: RootState) => state.currentWorkspace.currentWorkspace
   );
 
-  const toggleSurveyStatus = async () => {
-    try {
-      dispatch(setCurrentSurvey(survey));
-      await handleUpdateSurveyStatus({
-        surveyId: survey.id,
-        workspaceId: survey.workspace,
-      });
-    } catch (error) {
-      console.error("Error toggling survey status:", error);
+  const handleOpenDialog = (dialogType: "update" | "move" | "duplicate") => {
+    setMenuOpen(false);
+    switch (dialogType) {
+      case "update":
+        setUpdateDialogOpen(true);
+        break;
+      case "move":
+        setMoveDialogOpen(true);
+        break;
+      case "duplicate":
+        setDuplicateDialogOpen(true);
+        break;
     }
-  };
-
-  const handleOpenUpdateTitleDialog = () => {
-    setMenuOpen(false);
-    setUpdateDialogOpen(true);
-  };
-
-  const handleOpenMoveDialog = () => {
-    setMenuOpen(false);
-    setMoveDialogOpen(true);
-  };
-
-  const handleOpenDuplicateDialog = () => {
-    setMenuOpen(false);
-    setIsDuplicateDialogOpen(true);
   };
 
   const handleCloseDialogs = () => {
     setUpdateDialogOpen(false);
     setMoveDialogOpen(false);
-    setIsDuplicateDialogOpen(false);
+    setDuplicateDialogOpen(false);
   };
 
   const handleDelete = () => {
     handleDeleteSurvey({
       surveyId: survey.id,
-      workspaceId: survey.workspace,
+      workspaceId: survey.workspaceId,
     });
   };
-  const toggleMenu = async () => {
+
+  const toggleMenu = () => {
     setMenuOpen((prev) => !prev);
   };
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -92,48 +79,28 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
     <>
       <div className="survey">
         <div className="flex w-full h-full">
+          {/* Survey Name & Link */}
           <Link
             href={`/survey/${currentWorkspace?.id}/${survey.id}/build`}
             className="flex item h-full pl-2 border-r cursor-pointer border-r-gray-500 w-[60%]"
           >
             <p className="m-auto text-[#859fd1] font-semibold text-ellipsis overflow-hidden px-2 text-nowrap whitespace-nowrap">
-              {survey.title}
+              {survey.name}
             </p>
           </Link>
+
+          {/* Survey Actions */}
           <div className="flex flex-col justify-end h-full w-[40%] bg-[#1b1b1b] p-2 gap-1">
-            <div className="flex flex-col h-full w-full relative">
-              <Link
-                href={`/survey/${survey.url}`}
-                className="survey_card_buttons"
-              >
-                Preview
-              </Link>
-              <button
-                onClick={toggleSurveyStatus}
-                className={`survey_card_buttons ${
-                  survey.isActive ? "text-red-600" : "text-green-600"
-                }`}
-              >
-                {survey.isActive ? "Deactivate" : "Activate"}
-              </button>
-              <div
-                className={`status flex absolute inset-0 bg-[#1b1b1b] transition-opacity duration-250`}
-              >
-                <button
-                  className={`font-semibold ${
-                    survey.isActive ? "text-green-600" : "text-red-600"
-                  }`}
-                >
-                  {survey.isActive ? "Active" : "Inactive"}
-                </button>
-              </div>
+            <div className="relative">
+              <button className="survey_card_buttons">Copy Link</button>
             </div>
 
+            {/* Toggle Menu Button */}
             <button
               ref={toggleButtonRef}
               className="border opacity-100 border-gray-500 w-max h-max rounded-md"
-              onClick={async () => {
-                await toggleMenu();
+              onClick={() => {
+                toggleMenu();
                 onSelect(survey);
               }}
             >
@@ -145,6 +112,7 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
               />
             </button>
 
+            {/* Menu Dropdown */}
             {menuOpen && (
               <div
                 ref={surveyCardMenuRef}
@@ -152,19 +120,19 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
               >
                 <span
                   className="survey_card_buttons"
-                  onClick={handleOpenUpdateTitleDialog}
+                  onClick={() => handleOpenDialog("update")}
                 >
                   Rename
                 </span>
                 <span
                   className="survey_card_buttons"
-                  onClick={handleOpenMoveDialog}
+                  onClick={() => handleOpenDialog("move")}
                 >
                   Move
                 </span>
                 <span
                   className="survey_card_buttons"
-                  onClick={handleOpenDuplicateDialog}
+                  onClick={() => handleOpenDialog("duplicate")}
                 >
                   Duplicate
                 </span>
@@ -180,6 +148,7 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
         </div>
       </div>
 
+      {/* Dialogs */}
       {isUpdateDialogOpen && (
         <UpdateSurveyTitleDialog
           isOpen={isUpdateDialogOpen}

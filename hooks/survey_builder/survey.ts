@@ -274,20 +274,14 @@ export const useDeleteSurvey = () => {
     void,
     CustomError | unknown,
     {
-      surveyId: number;
-      workspaceId: number;
+      surveyId: string;
+      workspaceId: string;
     }
   >({
-    mutationFn: async ({
-      surveyId,
-      workspaceId,
-    }) => {
+    mutationFn: async ({ surveyId, workspaceId }) => {
       setErrorState(null);
 
-      await deleteSurveyFromWorkspace(
-        workspaceId,
-        surveyId,
-      );
+      await deleteSurveyFromWorkspace(workspaceId, surveyId);
     },
     onError: (err: CustomError | unknown) => {
       const message =
