@@ -29,13 +29,13 @@ export const useUpdateSurvey = () => {
     UpdateSurveyTitleProps
   >({
     mutationFn: async ({
-      title,
+      name,
       workspaceId,
       surveyId,
     }: UpdateSurveyTitleProps) => {
       setErrorState(null);
 
-      return await updateSurveyTitle(title, workspaceId, surveyId);
+      return await updateSurveyTitle(name, workspaceId, surveyId);
     },
     onError: (err: CustomError | unknown) => {
       const message =
@@ -126,8 +126,8 @@ export const useDuplicateSurvey = () => {
     unknown,
     {
       title: string;
-      workspaceId: number;
-      surveyId: number;
+      workspaceId: string;
+      surveyId: string;
       targetWorkspaceId: number;
     }
   >({
@@ -173,8 +173,8 @@ export const useMoveSurvey = () => {
     { targetWorkspaceId: number },
     CustomError | unknown,
     {
-      workspaceId: number;
-      surveyId: number;
+      workspaceId: string;
+      surveyId: string;
       targetWorkspaceId: number;
     }
   >({
@@ -223,8 +223,8 @@ export const useChangeSurveyStatus = () => {
     void,
     CustomError | unknown,
     {
-      surveyId: number;
-      workspaceId: number;
+      surveyId: string;
+      workspaceId: string;
     }
   >({
     mutationFn: async ({
@@ -319,7 +319,7 @@ export const useCreateSurvey = () => {
     CustomError | unknown,
     {
       title: string;
-      workspaceId: number;
+      workspaceId: string;
     }
   >({
     mutationFn: async ({
@@ -361,8 +361,8 @@ export const useCreateSurvey = () => {
 };
 
 export const useGetSurvey = (
-  workspaceId: number,
-  surveyId: number,
+  workspaceId: string,
+  surveyId: string,
 ) => {
   const [errorState, setErrorState] = useState<Record<string, string> | null>(
     null

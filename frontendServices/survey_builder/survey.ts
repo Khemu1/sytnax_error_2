@@ -2,9 +2,9 @@ import { CustomError } from "@/middleware/CustomError";
 import { SurveyModel, UpdateSurveyTitleResponse } from "@/types/survey";
 
 export const updateSurveyTitle = async (
-  title: string,
-  workspaceId: number,
-  surveyId: number
+  name: string,
+  workspaceId: string,
+  surveyId: string
 ): Promise<UpdateSurveyTitleResponse> => {
   try {
     const response = await fetch(`/api/survey/${surveyId}/update-title`, {
@@ -12,7 +12,7 @@ export const updateSurveyTitle = async (
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ workspaceId, title }),
+      body: JSON.stringify({ workspaceId, name }),
     });
 
     if (!response.ok) {
@@ -41,8 +41,8 @@ export const updateSurveyTitle = async (
 
 export const duplicateSurvey = async (
   title: string,
-  workspaceId: number,
-  surveyId: number,
+  workspaceId: string,
+  surveyId: string,
   targetWorkspaceId: number
 ): Promise<SurveyModel> => {
   try {
@@ -77,8 +77,8 @@ export const duplicateSurvey = async (
 };
 
 export const updateSurveyStatus = async (
-  workspaceId: number,
-  surveyId: number,
+  workspaceId: string,
+  surveyId: string
 ): Promise<void> => {
   console.log("updateSurveyStatus", workspaceId, surveyId);
   try {
@@ -112,9 +112,9 @@ export const updateSurveyStatus = async (
 };
 
 export const moveSurveyToWorkspace = async (
-  workspaceId: number,
-  surveyId: number,
-  targetWorkspaceId: number,
+  workspaceId: string,
+  surveyId: string,
+  targetWorkspaceId: number
 ): Promise<{ targetWorkspaceId: number }> => {
   try {
     const response = await fetch(`/api/survey/${surveyId}/move`, {
@@ -181,7 +181,7 @@ export const deleteSurveyFromWorkspace = async (
 };
 
 export const createNewSurvey = async (
-  workspaceId: number,
+  workspaceId: string,
   title: string
 ): Promise<SurveyModel> => {
   try {
@@ -215,8 +215,8 @@ export const createNewSurvey = async (
 };
 
 export const getSurvey = async (
-  workspaceId: number,
-  surveyId: number
+  workspaceId: string,
+  surveyId: string
 ): Promise<SurveyModel> => {
   try {
     const response = await fetch(`/api/survey/${workspaceId}/${surveyId}`, {
@@ -248,8 +248,8 @@ export const getSurvey = async (
 };
 
 export const updateSurveyUrl = async (
-  workspaceId: number,
-  surveyId: number,
+  workspaceId: string,
+  surveyId: string,
   url: string
 ) => {
   try {

@@ -94,13 +94,13 @@ export interface UpdateSurveyStatusResponse {
 }
 
 export interface UpdateSurveyTitleProps {
-  title: string;
-  workspaceId: number;
-  surveyId: number;
+  name: string;
+  workspaceId: string;
+  surveyId: string;
 }
 
 export interface UpdateSurveyTitleResponse {
-  title: string;
+  name: string;
   updatedAt: Date;
 }
 
@@ -110,7 +110,7 @@ export interface UpdateSurveyUrlResponse {
 }
 
 export interface UpdateWorkspaceTitleResponse {
-  title: string;
+  name: string;
   updatedAt: Date;
 }
 
@@ -288,8 +288,8 @@ export interface DefaultEndingOptions {
 }
 
 export interface UpdateSurveyUrlProps {
-  workspaceId: number;
-  surveyId: number;
+  workspaceId: string;
+  surveyId: string;
   url: string;
   currentLang: "de" | "en";
 }
