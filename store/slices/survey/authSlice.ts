@@ -1,5 +1,5 @@
+import { AuthSliceProps } from "@/types/survey";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AuthSliceProps } from "../../types";
 
 const initialState: AuthSliceProps = {
   id: null,
