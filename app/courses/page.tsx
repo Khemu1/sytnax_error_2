@@ -1,4 +1,5 @@
 "use client";
+import { Analytics } from "@vercel/analytics/react";
 import CourseCards from "@/components/coursePage/CourseCards";
 import Filter from "@/components/coursePage/Filter";
 import SearchBar from "@/components/coursePage/SearchBar";

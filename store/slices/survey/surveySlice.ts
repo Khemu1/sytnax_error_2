@@ -27,7 +27,7 @@ const surveySlice = createSlice({
         state.surveys[index] = action.payload; // Update the survey
       }
     },
-    deleteSurvey: (state, action: PayloadAction<number>) => {
+    deleteSurvey: (state, action: PayloadAction<string>) => {
       state.surveys = state.surveys.filter(
         (survey) => survey.id !== action.payload
       );

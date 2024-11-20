@@ -10,10 +10,10 @@
     "pages:build": "npx @cloudflare/next-on-pages",
     "preview": "npm run pages:build && wrangler pages dev",
     "deploy": "npm run pages:build && wrangler pages deploy",
-    "seed": "bunx ./prisma/seed.ts"
+    "seed": "npx ./prisma/seed.ts"
   },
   "prisma": {
-    "seed": "bunx ./prisma/seed.ts"
+    "seed": "npx ./prisma/seed.ts"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.0",
@@ -31,7 +31,6 @@
     "@upstash/ratelimit": "^2.0.3",
     "@vercel/kv": "^3.0.0",
     "bcrypt": "^5.1.1",
-    "cloudinary": "^2.5.0",
     "filepond": "^4.31.3",
     "filepond-plugin-image-exif-orientation": "^1.0.11",
     "filepond-plugin-image-preview": "^4.6.12",

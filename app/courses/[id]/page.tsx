@@ -1,4 +1,6 @@
-"use client"; // Ensure this is at the very top of the file
+"use client"; 
+
+import { Analytics } from "@vercel/analytics/react";
 import { useGetCourse } from "@/hooks/course";
 import React, { useEffect } from "react";
 import Image from "next/image";
