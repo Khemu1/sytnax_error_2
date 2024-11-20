@@ -8,6 +8,6 @@ export const GET = async (req: NextRequest) => {
     const workspaces = await getWorkSpacesService(+userId);
     return NextResponse.json(workspaces);
   } catch (error) {
-    errorHandler(error);
+    return errorHandler(error);
   }
 };
