@@ -26,8 +26,8 @@ const UpdateSurveyTitleDialog: React.FC<UpdateSurveyTitleDialogProps> = ({
     (state: RootState) => state.currentWorkspace
   );
 
-  const [title, setTitle] = useState(
-    currentSurveyState.currentSurvey?.title || ""
+  const [name, setName] = useState(
+    currentSurveyState.currentSurvey?.name || ""
   );
   const [errors, setErros] = useState<Record<string, string> | null>(null);
   const { handleUpdateSurvey, isError, errorState, isSuccess } =
@@ -47,10 +47,9 @@ const UpdateSurveyTitleDialog: React.FC<UpdateSurveyTitleDialogProps> = ({
     }
 
     try {
-      newSurveySchema().parse({ title });
-      console.log("heading to update", title);
+      newSurveySchema().parse({ name });
       await handleUpdateSurvey({
-        title,
+        name,
         surveyId: currentSurveyId,
         workspaceId: workspaceId,
       });
@@ -64,7 +63,7 @@ const UpdateSurveyTitleDialog: React.FC<UpdateSurveyTitleDialogProps> = ({
 
   useEffect(() => {
     if (isSuccess) {
-      setTitle("");
+      setName("");
       onClose();
     }
   }, [isSuccess]);
@@ -96,8 +95,8 @@ const UpdateSurveyTitleDialog: React.FC<UpdateSurveyTitleDialogProps> = ({
               <div className="border-b border-b-gray-500 p-[2rem]">
                 <input
                   type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   className="w-full bg-[#2a2a2a] text-white border-none outline-none p-2 rounded-md"
                   disabled={isSubmitting}
                 />
