@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Survey from "./Survey";
 import CreateSurveyDialog from "../Dialog/survey/CreateSurveyDialog";
 import { RootState } from "@/store/store";
 import { setCurrentSurvey } from "@/store/slices/survey/currentSurveySlice";
 import { SurveyModel } from "@/types/survey";
 import Image from "next/image";
+import Survey from "./Survey";
 
 const Surveys = () => {
   const dispatch = useDispatch();
