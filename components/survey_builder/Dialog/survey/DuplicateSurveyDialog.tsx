@@ -110,7 +110,7 @@ const DuplicateSurveyDialog: React.FC<DuplicateSurveyDialogProps> = ({
                 </option>
                 {workspaces.map((workspace) => (
                   <option key={workspace.id} value={workspace.id}>
-                    {workspace.title}
+                    {workspace.name}
                   </option>
                 ))}
               </select>
