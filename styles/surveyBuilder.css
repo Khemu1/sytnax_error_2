@@ -41,7 +41,7 @@
   @apply w-full flex gap-2 items-center justify-between cursor-pointer py-[.5rem] px-2  rounded-md;
 }
 .survey {
-  @apply relative flex items-center justify-center gap-5 w-[292px] h-[212px] bg-[#1d2022] rounded-lg overflow-hidden;
+  @apply relative flex items-center justify-center gap-5 w-[292px] h-[212px] bg-[#1e2a38a1] rounded-lg overflow-hidden;
 }
 
 .survey:hover .status {
@@ -57,7 +57,7 @@
 }
 
 .survey_card_buttons {
-  @apply text-left font-semibold cursor-pointer  w-full transition-all hover:bg-[#6272a4] hover:text-white py-2 px-1 rounded-md;
+  @apply text-center font-semibold cursor-pointer  w-full transition-all hover:bg-[#3d65df] hover:text-white py-2 px-1 rounded-md;
 }
 .workspace_selected {
   background-color: rgba(15, 3, 245, 0.15);

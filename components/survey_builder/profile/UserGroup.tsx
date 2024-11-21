@@ -37,7 +37,9 @@ const UserGroup = () => {
 
   return (
     <div className="flex flex-col gap-3 p-6 text-white rounded-md">
-      <h3 className="text-2xl font-bold mb-2 text-[#e4e4e4]">Your Group</h3>
+      <h3 className="text-2xl font-bold mb-2 text-[#e4e4e4]">
+        {groupState.name}
+      </h3>
       <span className="text-sm text-gray-600 font-semibold">
         You can invite other admins to share your surveys with them
       </span>

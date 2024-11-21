@@ -2,6 +2,7 @@ import { Dialog, DialogPanel } from "@headlessui/react";
 import { useSelector } from "react-redux";
 import {
   useAddGroupMember,
+  useGetGroup,
   useRemoveGroupMember,
 } from "@/hooks/survey_builder/user_group";
 import { useEffect, useState } from "react";
@@ -14,6 +15,7 @@ interface GroupDialogProps {
 }
 
 const GroupDialog: React.FC<GroupDialogProps> = ({ isOpen, onClose }) => {
+  const { isLoading, isError } = useGetGroup();
   const groupState = useSelector((state: RootState) => state.userGroup);
   const { handleRemoveMember, errorState: removeErrorState } =
     useRemoveGroupMember();
@@ -69,7 +71,7 @@ const GroupDialog: React.FC<GroupDialogProps> = ({ isOpen, onClose }) => {
           </button>
           <div className="flex flex-col gap-3 p-6 text-white rounded-md">
             <h3 className="text-2xl font-bold mb-2 text-[#e4e4e4]">
-              Your Group
+              {groupState.group?.name ?? "Your Group"}
             </h3>
             <span className="text-sm text-gray-600 font-semibold">
               You can invite other admins to share your surveys with them

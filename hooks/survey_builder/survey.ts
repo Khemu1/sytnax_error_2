@@ -170,12 +170,12 @@ export const useMoveSurvey = () => {
   );
 
   const mutation = useMutation<
-    { targetWorkspaceId: number },
+    { targetWorkspaceId: string },
     CustomError | unknown,
     {
       workspaceId: string;
       surveyId: string;
-      targetWorkspaceId: number;
+      targetWorkspaceId: string;
     }
   >({
     mutationFn: async ({ workspaceId, surveyId, targetWorkspaceId }) => {

@@ -30,7 +30,7 @@ const CreateSurveyDialog: React.FC<CreateSurveyDialogProps> = ({
     setErrors(null);
 
     try {
-      newSurveySchema().parse({ title: surveyTitle });
+      newSurveySchema().parse({ name: surveyTitle });
 
       if (!currentWorkspace?.id) {
         setErrors({ chooseWorkspace: "an Unkown Error Occured" });

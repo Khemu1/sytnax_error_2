@@ -26,7 +26,7 @@ const MoveSurveyDialog: React.FC<MoveSurveyDialogProps> = ({
   );
   const [errors, setErrors] = useState<Record<string, string> | null>(null);
 
-  const [targetWorkspaceId, setTargetWorkspaceId] = useState<number | null>(
+  const [targetWorkspaceId, setTargetWorkspaceId] = useState<string | null>(
     null
   );
   const { handleMoveSurvey, isError, errorState, isSuccess } = useMoveSurvey();
@@ -84,7 +84,7 @@ const MoveSurveyDialog: React.FC<MoveSurveyDialogProps> = ({
             <div className="border-b border-b-gray-500 p-[2rem]">
               <Select
                 value={targetWorkspaceId || ""}
-                onChange={(e) => setTargetWorkspaceId(+e.target.value)}
+                onChange={(e) => setTargetWorkspaceId(e.target.value)}
                 aria-label={"Select Workspace"}
                 className="w-full bg-[#2a2a2a] border-none outline-none p-2 rounded-md"
               >

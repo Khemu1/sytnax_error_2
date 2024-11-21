@@ -71,3 +71,35 @@ export const removeUserFromGroup = async (
     throw error;
   }
 };
+
+
+export const getUserGroup = async () => {
+  try {
+    const response = await fetch("/api/survey_builder/group", {
+      method: "GET",
+    });
+
+    if (!response.ok) {
+      const errorData: CustomError = await response.json();
+
+      const errorMessage = errorData.message ?? "Unknown Error Occurred";
+
+      const err = new CustomError(
+        errorMessage,
+        response.status,
+        "getUserGroup",
+        true,
+        errorData.details,
+        errorData.errors
+      );
+      throw err;
+    }
+
+    return response.json();
+  } catch (error) {
+    if (!(error instanceof CustomError)) {
+      throw new CustomError("Network error", 500);
+    }
+    throw error;
+  }
+};

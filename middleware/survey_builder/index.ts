@@ -1,37 +1,24 @@
-import { NextResponse } from "next/server";
-import { authenticateUser, checkDashBoardRoles } from "../auth/authMiddleware";
-import {
-  checkGroupMembershipForWorkspace,
-  checkWorkspaceExists,
-  checkWorkspaceTitle,
-  validateNewWorkSpace,
-} from "./workspace";
-import { CustomNextRequest } from "@/types";
+import { NextResponse,NextRequest } from "next/server";
+import { workspaceBuilderRoutes } from "./workspace/handler";
+import { surveyBuilderRoutes } from "./survey/handler";
 
-export const surveyBuilderRoutes = async (req: CustomNextRequest) => {
-  const authUser = await authenticateUser();
-  const method = req.method;
-  await checkDashBoardRoles(authUser);
-  if (method === "GET") {
-    return authUser;
-  }
-  if (method === "POST") {
-    return await validateNewWorkSpace(req, authUser);
-  }
+export const handleSurveyBuilderRoutes = async (req: NextRequest) => {
+  try {
+    const pathName = req.nextUrl.pathname;
 
-  if (method === "DELETE") {
-    const checkworkspace = await checkWorkspaceExists(req, authUser);
-    return await checkGroupMembershipForWorkspace(req, checkworkspace);
-  }
+    if (pathName.startsWith("/api/survey_builder/survey")) {
+      return await surveyBuilderRoutes(req);
+    }
 
-  if (method === "PATCH") {
-    const checkworkspace = await checkWorkspaceExists(req, authUser);
-    const checkMemberShip = await checkGroupMembershipForWorkspace(
-      req,
-      checkworkspace
+    if (pathName.startsWith("/api/survey_builder/workspace")) {
+      return await workspaceBuilderRoutes(req);
+    }
+
+    return NextResponse.json(
+      { message: "Survey Builder Route Not found" },
+      { status: 404 }
     );
-    return await checkWorkspaceTitle(req, checkMemberShip);
+  } catch (error) {
+    throw error;
   }
-
-  return NextResponse.json({ message: "Method not allowed" }, { status: 405 });
 };

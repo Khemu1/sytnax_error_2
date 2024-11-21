@@ -7,13 +7,16 @@ export const updateSurveyTitle = async (
   surveyId: string
 ): Promise<UpdateSurveyTitleResponse> => {
   try {
-    const response = await fetch(`/api/survey/${surveyId}/update-title`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ workspaceId, name }),
-    });
+    const response = await fetch(
+      `/api/survey_builder/survey/${surveyId}/update-name`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ workspaceId, name }),
+      }
+    );
 
     if (!response.ok) {
       const errorData: CustomError = await response.json();
@@ -114,13 +117,16 @@ export const updateSurveyStatus = async (
 export const moveSurveyToWorkspace = async (
   workspaceId: string,
   surveyId: string,
-  targetWorkspaceId: number
-): Promise<{ targetWorkspaceId: number }> => {
+  targetWorkspaceId: string
+): Promise<{ targetWorkspaceId: string }> => {
   try {
-    const response = await fetch(`/api/survey/${surveyId}/move`, {
-      method: "PATCH",
-      body: JSON.stringify({ workspaceId, surveyId, targetWorkspaceId }),
-    });
+    const response = await fetch(
+      `/api/survey_builder/survey/${surveyId}/move`,
+      {
+        method: "PATCH",
+        body: JSON.stringify({ workspaceId, surveyId, targetWorkspaceId }),
+      }
+    );
 
     if (!response.ok) {
       const errorData: CustomError = await response.json();
@@ -151,10 +157,13 @@ export const deleteSurveyFromWorkspace = async (
   surveyId: string
 ): Promise<void> => {
   try {
-    const response = await fetch(`/api/survey/${surveyId}/delete`, {
-      method: "DELETE",
-      body: JSON.stringify({ workspaceId }),
-    });
+    const response = await fetch(
+      `/api/survey_builder/survey/${surveyId}/delete`,
+      {
+        method: "DELETE",
+        body: JSON.stringify({ workspaceId }),
+      }
+    );
 
     if (!response.ok) {
       const errorData: CustomError = await response.json();
@@ -182,12 +191,12 @@ export const deleteSurveyFromWorkspace = async (
 
 export const createNewSurvey = async (
   workspaceId: string,
-  title: string
+  name: string
 ): Promise<SurveyModel> => {
   try {
-    const response = await fetch(`/api/survey/add-survey`, {
+    const response = await fetch(`/api/survey_builder/survey/add-survey`, {
       method: "POST",
-      body: JSON.stringify({ workspaceId, title }),
+      body: JSON.stringify({ workspaceId, name }),
     });
 
     if (!response.ok) {
@@ -219,9 +228,12 @@ export const getSurvey = async (
   surveyId: string
 ): Promise<SurveyModel> => {
   try {
-    const response = await fetch(`/api/survey/${workspaceId}/${surveyId}`, {
-      method: "GET",
-    });
+    const response = await fetch(
+      `/api/survey_builder/survey/builder/${workspaceId}/${surveyId}`,
+      {
+        method: "GET",
+      }
+    );
 
     if (!response.ok) {
       const errorData: CustomError = await response.json();

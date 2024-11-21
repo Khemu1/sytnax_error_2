@@ -1,6 +1,4 @@
-import {
-  useDeleteSurvey,
-} from "@/hooks/survey_builder/survey";
+import { useDeleteSurvey } from "@/hooks/survey_builder/survey";
 import { RootState } from "@/store/store";
 import { SurveyProps } from "@/types/survey";
 import Image from "next/image";
@@ -82,7 +80,7 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
           {/* Survey Name & Link */}
           <Link
             href={`/survey/${currentWorkspace?.id}/${survey.id}/build`}
-            className="flex item h-full pl-2 border-r cursor-pointer border-r-gray-500 w-[60%]"
+            className="flex item h-full pl-2 border-r cursor-pointer border-r-gray-700 w-[60%]"
           >
             <p className="m-auto text-[#859fd1] font-semibold text-ellipsis overflow-hidden px-2 text-nowrap whitespace-nowrap">
               {survey.name}
@@ -90,9 +88,11 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
           </Link>
 
           {/* Survey Actions */}
-          <div className="flex flex-col justify-end h-full w-[40%] bg-[#1b1b1b] p-2 gap-1">
-            <div className="relative">
-              <button className="survey_card_buttons">Copy Link</button>
+          <div className="flex flex-col justify-end h-full w-[40%] bg-[#1e2a38a1] p-2 gap-1">
+            <div className="relative mb-1">
+              <button className="survey_card_buttons ">
+                Copy Link
+              </button>
             </div>
 
             {/* Toggle Menu Button */}

@@ -18,7 +18,7 @@ import {
   validateNewCourse,
   vlidateCourseRegister,
 } from "@/middleware/courses/courseMiddleware";
-import { surveyBuilderRoutes } from "./middleware/survey_builder";
+import { handleSurveyBuilderRoutes } from "./middleware/survey_builder";
 import { CustomNextRequest } from "./types";
 
 // Handle /api/courses routes
@@ -97,10 +97,7 @@ const handleDashboardRoutes = async (req: NextRequest) => {
   }
 };
 
-
-export async function middleware(
-  req: CustomNextRequest,
-) {
+export async function middleware(req: CustomNextRequest) {
   try {
     // await checkRateLimit(req); // Check general rate limits
     const { pathname } = req.nextUrl;
@@ -112,7 +109,7 @@ export async function middleware(
     } else if (pathname.startsWith("/api/dashboard")) {
       return await handleDashboardRoutes(req);
     } else if (pathname.startsWith("/api/survey_builder")) {
-      return await surveyBuilderRoutes(req);
+      return await handleSurveyBuilderRoutes(req);
     }
 
     return NextResponse.next();

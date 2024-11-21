@@ -19,7 +19,6 @@ export const validateWithSchema = (error: CustomError | ZodError | unknown) => {
       details: error.details,
     };
   }
-
   return {
     message: "An unknown error occurred",
   };

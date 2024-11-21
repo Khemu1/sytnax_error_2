@@ -1,8 +1,8 @@
 import { CustomError } from "@/middleware/CustomError";
 import { CustomNextRequest } from "@/types";
 import { WorkSpaceModel } from "@/types/survey";
+import { newSurveySchema } from "@/utils/validations/survey";
 import { validateWithSchema } from "@/utils/validations/validations";
-import { newWorkspaceSchema } from "@/utils/validations/workspace";
 import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
 import { NextRequest, NextResponse } from "next/server";
@@ -10,23 +10,24 @@ import { ZodError } from "zod";
 
 const prisma = new PrismaClient().$extends(withAccelerate());
 
-export const validateNewWorkSpace = async (
-  req: CustomNextRequest,
-  res: NextResponse
+export const validateNewSurvey = async (
+  req: NextRequest,
+  res: NextResponse,
+  name: string
 ) => {
   try {
-    const data = await req.json();
-    const schema = newWorkspaceSchema();
-    schema.parse(data);
+
+    const schema = newSurveySchema();
+    schema.parse({ name });
 
     const response = NextResponse.next();
     response.headers.set("User-Id", res.headers.get("User-Id")!);
     return response;
   } catch (error) {
     throw new CustomError(
-      "Error Validating new Workspace",
+      "Error Validating new survey",
       400,
-      "workspace",
+      "survey",
       true,
       "",
       validateWithSchema(error)
@@ -34,14 +35,12 @@ export const validateNewWorkSpace = async (
   }
 };
 
-export async function checkWorkspaceExists(
+export async function checkWorkspaceExistsForSurvey(
   req: CustomNextRequest,
-  res: NextResponse
+  res: NextResponse,
+  workspaceId:string
 ) {
   try {
-    const workspaceId = req.nextUrl.pathname.split("/")[4]; // Adjust index based on your route structure
-    console.log("Extracted workspaceId:", workspaceId);
-
     if (!workspaceId) {
       return NextResponse.json(
         { message: "Workspace ID is required" },
@@ -67,7 +66,7 @@ export async function checkWorkspaceExists(
       res.headers.get("User-Group-Ids") ?? ""
     );
     repsonse.headers.set("User-Id", res.headers.get("User-Id")!);
-    console.log("workspace response", repsonse);
+    console.log("workspace existing for survey done");
     return repsonse;
   } catch (error) {
     throw error;
@@ -81,8 +80,6 @@ export const checkGroupMembershipForWorkspace = async (
   try {
     const rawUserId = res.headers.get("User-Id");
     const rawWorkspace = res.headers.get("workspace");
-    console.log("rawUserId", rawUserId);
-    console.log("rawWorkspace", rawWorkspace);
     if (!rawUserId || !rawWorkspace) {
       throw new CustomError(
         "missing user id or workspace",
@@ -115,9 +112,10 @@ export const checkGroupMembershipForWorkspace = async (
     }
 
     const response = NextResponse.next();
-    
+
     response.headers.set("User-Group-Ids", JSON.stringify(groupMembers));
     response.headers.set("workspace", JSON.stringify(workspace));
+    console.log("group membership check for survey done");
 
     if (workspace.userId === userId) {
       return response;
@@ -134,10 +132,14 @@ export const checkGroupMembershipForWorkspace = async (
   }
 };
 
-export async function checkWorkspaceTitle(req: NextRequest, res: NextResponse) {
+export async function checkSurveyTitle(
+  _req: NextRequest,
+  res: NextResponse,
+  name: string
+) {
   try {
-    const { name } = await req.json();
-    newWorkspaceSchema().parse({ name });
+    newSurveySchema().parse({ name });
+
     const response = NextResponse.next();
     response.headers.set(
       "workspace",
@@ -158,3 +160,79 @@ export async function checkWorkspaceTitle(req: NextRequest, res: NextResponse) {
     throw error;
   }
 }
+
+export const checkSurveyExists = async (
+  req: NextRequest,
+  res: NextResponse,
+  surveyId: string
+) => {
+  try {
+    if (!surveyId) {
+      return NextResponse.json(
+        { message: "Survey ID is required" },
+        { status: 400 }
+      );
+    }
+    const survey = await prisma.survey.findUnique({
+      where: { id: surveyId },
+    });
+
+    if (!survey) {
+      console.error("Survey not found for ID:", surveyId);
+      return NextResponse.json(
+        { message: "Survey not found" },
+        { status: 404 }
+      );
+    }
+
+    const repsonse = NextResponse.next();
+    repsonse.headers.set("survey", JSON.stringify(survey));
+    repsonse.headers.set(
+      "User-Group-Ids",
+      res.headers.get("User-Group-Ids") ?? ""
+    );
+    repsonse.headers.set("User-Id", res.headers.get("User-Id")!);
+    return repsonse;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const checkSurveyForDuplicatingOrMoving = async (
+  req: NextRequest,
+  res: NextResponse,
+  targetWorkspaceId:string
+) => {
+  try {
+    if (!targetWorkspaceId) {
+      throw new CustomError(
+        "Targed Workspace Not Found",
+        400,
+        "duplicateSurvey",
+        false
+      );
+    }
+    const targetedWorkspace = await prisma.workspace.findUnique({
+      where: { id: targetWorkspaceId },
+    });
+
+    if (!targetedWorkspace) {
+      console.error("Workspace not found for ID:", targetWorkspaceId);
+      return NextResponse.json(
+        { message: "Workspace not found" },
+        { status: 404 }
+      );
+    }
+
+    const response = NextResponse.next();
+    response.headers.set("User-Id", res.headers.get("User-Id")!);
+    response.headers.set(
+      "workspace",
+      JSON.stringify(res.headers.get("workspace"))
+    );
+    response.headers.set("survey", JSON.stringify(res.headers.get("survey")));
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
