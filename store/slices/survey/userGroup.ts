@@ -3,12 +3,11 @@ import { GroupModel, UserGroupModel } from "../../../types/survey";
 
 const initialState: GroupModel = {
   id: "",
-  maker: 0,
+  ownerId: 0,
   name: "",
-  description: "",
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
-  members: [],
+  groupMembers: [],
 };
 
 const groupSlice = createSlice({
@@ -20,16 +19,16 @@ const groupSlice = createSlice({
     },
 
     addMember: (state, action: PayloadAction<UserGroupModel>) => {
-      state.members.push(action.payload);
+      state.groupMembers.push(action.payload);
     },
 
     deleteMember: (state, action: PayloadAction<number>) => {
-      console.log("bfeore", state.members.length);
+      console.log("bfeore", state.groupMembers.length);
       console.log("in", action.payload);
-      state.members = state.members.filter(
+      state.groupMembers = state.groupMembers.filter(
         (member) => +member.userId !== +action.payload
       );
-      console.log("after", state.members.length);
+      console.log("after", state.groupMembers.length);
     },
   },
 });

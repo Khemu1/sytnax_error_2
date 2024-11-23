@@ -1,7 +1,10 @@
-import { WorkSpaceModel } from "@/types/survey";
+import { GroupModel, WorkSpaceModel } from "@/types/survey";
 import { CustomError } from "@/middleware/CustomError";
 
-export const getWorkspaces = async (): Promise<WorkSpaceModel[]> => {
+export const getWorkspaces = async (): Promise<{
+  allWorkspaces: WorkSpaceModel[];
+  group: GroupModel;
+}> => {
   try {
     const response = await fetch(
       "/api/survey_builder/workspace/get-workspaces",
@@ -25,8 +28,7 @@ export const getWorkspaces = async (): Promise<WorkSpaceModel[]> => {
       );
       throw err;
     }
-
-    const data: WorkSpaceModel[] = await response.json();
+    const data = await response.json();
     return data;
   } catch (error) {
     if (!(error instanceof CustomError)) {

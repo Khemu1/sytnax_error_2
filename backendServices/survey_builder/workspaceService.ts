@@ -1,13 +1,10 @@
 import { CustomError } from "@/middleware/CustomError";
-import { WorkSpaceModel } from "@/types/survey";
 import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
 
 const prisma = new PrismaClient().$extends(withAccelerate());
 
-export const getWorkSpacesService = async (
-  userId: number
-): Promise<WorkSpaceModel[]> => {
+export const getWorkSpacesService = async (userId: number) => {
   try {
     // getting groups that user is in
     const userGroups = await prisma.userGroup.findMany({
@@ -17,6 +14,21 @@ export const getWorkSpacesService = async (
 
     const userOwnedGroup = await prisma.group.findFirst({
       where: { ownerId: userId },
+    });
+
+    const userGroupAndGroupMembers = await prisma.group.findFirst({
+      where: { ownerId: userId },
+      include: {
+        UserGroup: {
+          include: {
+            user: {
+              select: {
+                username: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     const groupIds = userGroups
@@ -50,7 +62,7 @@ export const getWorkSpacesService = async (
         new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
     );
 
-    return allWorkspaces;
+    return { allWorkspaces, groupMembers: userGroupAndGroupMembers };
   } catch (error) {
     console.error("Error fetching workspaces:", error);
     throw error;

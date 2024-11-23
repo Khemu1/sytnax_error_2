@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { WorkSpaceModel } from "@/types/survey";
+import { GroupModel, WorkSpaceModel } from "@/types/survey";
 import {
   createNewWorkspace,
   deleteWorkspace,
@@ -26,7 +26,10 @@ export const useGetWorkspaces = () => {
     isError,
     isLoading,
     isSuccess,
-  } = useQuery<WorkSpaceModel[], CustomError>({
+  } = useQuery<
+    { allWorkspaces: WorkSpaceModel[]; group: GroupModel },
+    CustomError
+  >({
     queryKey: ["getWorkspaces"],
     enabled: true,
     refetchOnWindowFocus: false,

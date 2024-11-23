@@ -9,6 +9,5 @@ datasource db {
     // url      = env("DATABASE_URL_ACC")
 
   // directUrl = env("SUB_DIRECT")
-    // directUrl = env("POSTGRES_URL_NON_POOLING")
-
+    directUrl = env("SUB_DIRECT")
 }

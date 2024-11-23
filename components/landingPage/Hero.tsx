@@ -11,7 +11,7 @@ export const Hero = () => {
       <div className="relative w-full overflow-hidden">
         <Image
           className="rounded-lg shadow-lg object-cover"
-          src="/assets/imgs/cover.png"
+          src="https://i.imgur.com/cfKyIGv.png"
           alt="Cover"
           priority={true}
           width={1920}
@@ -129,7 +129,7 @@ export const Hero = () => {
           ))}
         </div>
       </div>
-      <Analytics/>
+      <Analytics />
     </div>
   );
 };

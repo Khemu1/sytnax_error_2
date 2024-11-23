@@ -8,12 +8,14 @@ import { useSelector } from "react-redux";
 import UpdateSurveyTitleDialog from "../Dialog/survey/UpdateSurveyTitleDialog";
 import MoveSurveyDialog from "../Dialog/survey/MoveSurveyDialog";
 import DuplicateSurveyDialog from "../Dialog/survey/DuplicateSurveyDialog";
+import SurveySettingsDialog from "../Dialog/survey/SurveySettingsDialog";
 
 const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isUpdateDialogOpen, setUpdateDialogOpen] = useState(false);
   const [isMoveDialogOpen, setMoveDialogOpen] = useState(false);
   const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
+  const [isSettingsDialogOpen, setSettingsDialogOpen] = useState(false);
   const surveyCardMenuRef = useRef<HTMLDivElement>(null);
   const toggleButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -23,7 +25,9 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
     (state: RootState) => state.currentWorkspace.currentWorkspace
   );
 
-  const handleOpenDialog = (dialogType: "update" | "move" | "duplicate") => {
+  const handleOpenDialog = (
+    dialogType: "update" | "move" | "duplicate" | "settings"
+  ) => {
     setMenuOpen(false);
     switch (dialogType) {
       case "update":
@@ -35,6 +39,9 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
       case "duplicate":
         setDuplicateDialogOpen(true);
         break;
+      case "settings":
+        setSettingsDialogOpen(true);
+        break;
     }
   };
 
@@ -42,6 +49,7 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
     setUpdateDialogOpen(false);
     setMoveDialogOpen(false);
     setDuplicateDialogOpen(false);
+    setSettingsDialogOpen(false);
   };
 
   const handleDelete = () => {
@@ -90,9 +98,7 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
           {/* Survey Actions */}
           <div className="flex flex-col justify-end h-full w-[40%] bg-[#1e2a38a1] p-2 gap-1">
             <div className="relative mb-1">
-              <button className="survey_card_buttons ">
-                Copy Link
-              </button>
+              <button className="survey_card_buttons ">Copy Link</button>
             </div>
 
             {/* Toggle Menu Button */}
@@ -137,6 +143,12 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
                   Duplicate
                 </span>
                 <span
+                  className="survey_card_buttons"
+                  onClick={() => handleOpenDialog("settings")}
+                >
+                  Settings
+                </span>
+                <span
                   className="survey_card_buttons text-red-600"
                   onClick={handleDelete}
                 >
@@ -165,6 +177,12 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
         <DuplicateSurveyDialog
           isOpen={isDuplicateDialogOpen}
           onClose={handleCloseDialogs}
+        />
+      )}
+      {isSettingsDialogOpen && (
+        <SurveySettingsDialog
+          isOpen={isSettingsDialogOpen}
+          onClose={() => setSettingsDialogOpen(false)}
         />
       )}
     </>

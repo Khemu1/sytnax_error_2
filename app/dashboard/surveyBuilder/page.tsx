@@ -19,6 +19,7 @@ import { RootState } from "@/store/store";
 import GroupDialog from "@/components/survey_builder/Dialog/workspaces/groupDialog";
 import { logout } from "@/store/slices/authSlice";
 import { useRouter } from "next/navigation";
+import { setGroup } from "@/store/slices/survey/userGroup";
 
 const SurveyBuilder = () => {
   const [isMobileAsideOpen, setIsMobileAsideOpen] = useState(false);
@@ -90,8 +91,15 @@ const SurveyBuilder = () => {
   }, []);
 
   useEffect(() => {
-    if (Array.isArray(data) && data.length > 0) {
-      dispatch(setWorkspaces(data));
+    if (
+      data &&
+      Array.isArray(data.allWorkspaces) &&
+      data.allWorkspaces.length > 0
+    ) {
+      dispatch(setWorkspaces(data.allWorkspaces));
+    }
+    if (data && data.group) {
+      dispatch(setGroup(data.group));
     }
   }, [data, dispatch]);
 

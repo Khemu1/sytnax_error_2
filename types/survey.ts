@@ -29,12 +29,11 @@ export interface SurveyPreviewModel {
 
 export interface GroupModel {
   id: string;
-  maker: number;
+  ownerId: number;
   name: string;
-  description?: string;
   createdAt?: string;
   updatedAt?: string;
-  members: UserGroupModel[];
+  groupMembers: UserGroupModel[];
 }
 
 export interface UserModel {
@@ -54,8 +53,9 @@ export interface UserGroupModel {
   groupId: string;
   createdAt?: string;
   updatedAt?: string;
-  groupName: string;
-  username: string;
+  user: {
+    username: string;
+  };
 }
 export interface WorkSpaceModel {
   id: string;

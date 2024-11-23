@@ -2,7 +2,6 @@ import { Dialog, DialogPanel } from "@headlessui/react";
 import { useSelector } from "react-redux";
 import {
   useAddGroupMember,
-  useGetGroup,
   useRemoveGroupMember,
 } from "@/hooks/survey_builder/user_group";
 import { useEffect, useState } from "react";
@@ -15,7 +14,6 @@ interface GroupDialogProps {
 }
 
 const GroupDialog: React.FC<GroupDialogProps> = ({ isOpen, onClose }) => {
-  const { isLoading, isError } = useGetGroup();
   const groupState = useSelector((state: RootState) => state.userGroup);
   const { handleRemoveMember, errorState: removeErrorState } =
     useRemoveGroupMember();
@@ -71,7 +69,7 @@ const GroupDialog: React.FC<GroupDialogProps> = ({ isOpen, onClose }) => {
           </button>
           <div className="flex flex-col gap-3 p-6 text-white rounded-md">
             <h3 className="text-2xl font-bold mb-2 text-[#e4e4e4]">
-              {groupState.group?.name ?? "Your Group"}
+              {groupState.name ?? "Your Group"}
             </h3>
             <span className="text-sm text-gray-600 font-semibold">
               You can invite other admins to share your surveys with them
@@ -105,14 +103,14 @@ const GroupDialog: React.FC<GroupDialogProps> = ({ isOpen, onClose }) => {
                 {removeErrorState.message}
               </span>
             )}
-            {groupState.members.length !== 0 ? (
+            {groupState.groupMembers.length !== 0 ? (
               <ul className="px-3">
-                {groupState.members.map((member) => (
+                {groupState.groupMembers.map((member) => (
                   <li
                     key={member.userId}
                     className="flex justify-between px-3 items-center p-2 bg-[#2b2b2b] rounded-md"
                   >
-                    <span>{member.username}</span>
+                    <span>{member.user.username}</span>
                     <button
                       onClick={() => removeMember(member.userId)}
                       className="text-red-400 hover:text-red-500 transition-all"
