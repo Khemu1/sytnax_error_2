@@ -9,8 +9,9 @@ import UpdateSurveyTitleDialog from "../Dialog/survey/UpdateSurveyTitleDialog";
 import MoveSurveyDialog from "../Dialog/survey/MoveSurveyDialog";
 import DuplicateSurveyDialog from "../Dialog/survey/DuplicateSurveyDialog";
 import SurveySettingsDialog from "../Dialog/survey/SurveySettingsDialog";
-import moment from "moment";
-import time from "moment-timezone";
+import { setCurrentSurvey } from "@/store/slices/survey/currentSurveySlice";
+import { getSurveyStatus } from "@/utils";
+import { useDispatch } from "react-redux";
 const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isUpdateDialogOpen, setUpdateDialogOpen] = useState(false);
@@ -19,10 +20,11 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
   const [isSettingsDialogOpen, setSettingsDialogOpen] = useState(false);
   const surveyCardMenuRef = useRef<HTMLDivElement>(null);
   const toggleButtonRef = useRef<HTMLButtonElement>(null);
-  const currentTime = moment();
-  const startTime = time(survey.startTime).tz("Africa/Cairo");
-  const endTime = time(survey.endTime).tz("Africa/Cairo");
-  const isActive = currentTime.isBefore(survey.endTime);
+  const { isActive, startTime, endTime } = getSurveyStatus(
+    survey.startTime,
+    survey.endTime
+  );
+  const dispatch = useDispatch();
 
   const { handleDeleteSurvey } = useDeleteSurvey();
 
@@ -45,7 +47,9 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
         setDuplicateDialogOpen(true);
         break;
       case "settings":
+        dispatch(setCurrentSurvey(survey));
         setSettingsDialogOpen(true);
+        
         break;
     }
   };
@@ -157,16 +161,14 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
             <div className="flex flex-col gap-2">
               {/* Start and End Time */}
               <div className="text-sm">
-                {startTime.isValid() && (
+                {startTime && (
                   <div>
-                    <strong>Start Time:</strong>{" "}
-                    {startTime.format("YYYY-MM-DD HH:mm")}
+                    <strong>Start Time:</strong> {startTime}
                   </div>
                 )}
-                {endTime.isValid() && (
+                {endTime && (
                   <div>
-                    <strong>End Time:</strong>{" "}
-                    {endTime.format("YYYY-MM-DD HH:mm")}
+                    <strong>End Time:</strong> {endTime}
                   </div>
                 )}
                 <div
@@ -224,7 +226,7 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
       {isSettingsDialogOpen && (
         <SurveySettingsDialog
           isOpen={isSettingsDialogOpen}
-          onClose={() => setSettingsDialogOpen(false)}
+          onClose={handleCloseDialogs}
         />
       )}
     </>

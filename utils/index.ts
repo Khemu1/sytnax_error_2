@@ -26,7 +26,7 @@ export const calculateExpirationDate = (duration: string): Date => {
   }
 };
 
-export const formatDate = (date:Date) => {
+export const formatDate = (date: Date) => {
   if (!(date instanceof Date) || isNaN(date.getTime())) {
     return null; // Handle invalid dates
   }
@@ -39,6 +39,61 @@ export const formatDate = (date:Date) => {
     hours: hours % 12 || 12, // Convert to 12-hour format
     minutes: date.getMinutes(),
     period: hours >= 12 ? "PM" : "AM",
+  };
+};
+
+export const getSurveyStatus = (
+  _startTime: string | null,
+  _endTime: string | null
+) => {
+  if (!_startTime || !_endTime) {
+    return {
+      startTime: null,
+      endTime: null,
+      isActive: false,
+    };
+  }
+  const startTime = new Date(_startTime);
+  const endTime = new Date(_endTime);
+
+  const convertToEgyptTime = (date: Date) => {
+    // Convert the provided date to Africa/Cairo timezone and format it
+    const formatter = new Intl.DateTimeFormat("en-US", {
+      timeZone: "Africa/Cairo",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false, // Use 24-hour format
+    });
+
+    const formattedDate = formatter.format(date);
+
+    // Split formatted date into components
+    const [month, day, year] = formattedDate.split(", ")[0].split("/");
+    const [hour, minute, second] = formattedDate.split(", ")[1].split(":");
+
+    // Construct a new Date object in the Cairo time zone
+    const egyptDate = new Date(
+      `${year}-${month}-${day}T${hour}:${minute}:${second}+02:00`
+    );
+
+    // Return the ISO string representation
+    return egyptDate.toISOString();
+  };
+
+  const egyptStartTime = convertToEgyptTime(startTime);
+  const egyptEndTime = convertToEgyptTime(endTime);
+
+  const now = new Date();
+  const isActive = now < endTime;
+
+  return {
+    startTime: egyptStartTime,
+    endTime: egyptEndTime,
+    isActive,
   };
 };
 
@@ -110,7 +165,7 @@ export function formatDateToCustomString(date: Date): string {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
-    timeZone: "Africa/Cairo", // Ensure date is also in the correct time zone
+    timeZone: "Africa/Cairo",
   };
 
   // Get the time part
@@ -122,7 +177,6 @@ export function formatDateToCustomString(date: Date): string {
   // Combine time and date in the desired format
   return `${timeString} ${dateString}`;
 }
-
 
 // export function clearSlices(dispatch: Dispatch) {
 //   dispatch(resetSharedFormSliceFields());
