@@ -1,9 +1,9 @@
 import { Dialog, DialogPanel } from "@headlessui/react";
 import React, { useState } from "react";
-import moment, { Moment } from "moment";
 import DateSelector from "../../surveys/DateSelector";
 import { RootState } from "@/store/store";
 import { useSelector } from "react-redux";
+import { formatDate } from "@/utils";
 interface SurveySettingsProps {
   isOpen: boolean;
   onClose: () => void;
@@ -18,8 +18,10 @@ const SurveySettingsDialog: React.FC<SurveySettingsProps> = ({
   );
   console.log(currentSurvey);
   const [surveyDetails, setSurveyDetails] = useState({
-    startTime: moment(currentSurvey?.startTime),
-    endTime: moment(currentSurvey?.endTime),
+    startTime: currentSurvey?.startTime
+      ? new Date(currentSurvey.startTime)
+      : null,
+    endTime: currentSurvey?.endTime ? new Date(currentSurvey.endTime) : null,
     questionsPerPage: currentSurvey?.questionsPerPage ?? 5,
     duration: currentSurvey?.duration ?? 5,
     gradesVisibility: currentSurvey?.gradesVisibility ?? "Hidden",
@@ -31,14 +33,14 @@ const SurveySettingsDialog: React.FC<SurveySettingsProps> = ({
       gradesVisibility: event.target.value,
     }));
   };
-  const handleStartTimeChange = (newStartTime: Moment) => {
+  const handleStartTimeChange = (newStartTime: Date) => {
     setSurveyDetails((prev) => ({
       ...prev,
       startTime: newStartTime,
     }));
   };
 
-  const handleEndTimeChange = (newEndTime: Moment) => {
+  const handleEndTimeChange = (newEndTime: Date) => {
     setSurveyDetails((prev) => ({
       ...prev,
       endTime: newEndTime,
@@ -62,24 +64,12 @@ const SurveySettingsDialog: React.FC<SurveySettingsProps> = ({
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    const formattedStartTime = {
-      year: surveyDetails.startTime.year().toString(),
-      month: surveyDetails.startTime.month() + 1,
-      day: surveyDetails.startTime.date(),
-      hours: surveyDetails.startTime.hour() % 12 || 12,
-      minutes: surveyDetails.startTime.minute(),
-      period: surveyDetails.startTime.hour() >= 12 ? "PM" : "AM",
-    };
-
-    const formattedEndTime = {
-      year: surveyDetails.endTime.year().toString(),
-      month: surveyDetails.endTime.month() + 1,
-      day: surveyDetails.endTime.date(),
-      hours: surveyDetails.endTime.hour() % 12 || 12,
-      minutes: surveyDetails.endTime.minute(),
-      period: surveyDetails.endTime.hour() >= 12 ? "PM" : "AM",
-    };
+    if (!surveyDetails.startTime || !surveyDetails.endTime) {
+      alert("Please select a start and end time.");
+      return;
+    }
+    const formattedStartTime = formatDate(surveyDetails.startTime)!;
+    const formattedEndTime = formatDate(surveyDetails.endTime)!;
     const startString = `${formattedStartTime.year}-${formattedStartTime.month}-${formattedStartTime.day} ${formattedStartTime.hours}:${formattedStartTime.minutes} ${formattedStartTime.period}`;
     const endString = `${formattedEndTime.year}-${formattedEndTime.month}-${formattedEndTime.day} ${formattedEndTime.hours}:${formattedEndTime.minutes} ${formattedEndTime.period}`;
 

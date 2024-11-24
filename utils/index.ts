@@ -1,7 +1,4 @@
-// import { resetGenericTextSliceFields } from "@/store/slices/survey/genericTextSlice";
-// import { resetSharedFormSliceFields } from "@/store/slices/survey/sharedFormSlice";
 import { PublicCardCourseProps } from "@/types";
-import { Dispatch } from "@reduxjs/toolkit";
 
 export const calculateExpirationDate = (duration: string): Date => {
   const match = duration.match(/^(\d+)([smhd])$/); // Matches the format "15m", "1h", etc.
@@ -27,6 +24,22 @@ export const calculateExpirationDate = (duration: string): Date => {
     default:
       throw new Error("Invalid time unit.");
   }
+};
+
+export const formatDate = (date:Date) => {
+  if (!(date instanceof Date) || isNaN(date.getTime())) {
+    return null; // Handle invalid dates
+  }
+
+  const hours = date.getHours();
+  return {
+    year: date.getFullYear().toString(),
+    month: date.getMonth() + 1, // `getMonth()` is 0-indexed, so add 1
+    day: date.getDate(),
+    hours: hours % 12 || 12, // Convert to 12-hour format
+    minutes: date.getMinutes(),
+    period: hours >= 12 ? "PM" : "AM",
+  };
 };
 
 export const filterBy = (data: PublicCardCourseProps[], by: string) => {

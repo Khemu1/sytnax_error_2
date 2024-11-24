@@ -188,7 +188,7 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
               </div>
 
               {/* Actions */}
-              <div className="flex justify-between flex-wrap gap-2">
+              <div className="flex justify-between flex-wrap gap-1">
                 <button
                   className="py-2  "
                   onClick={() => handleOpenDialog("settings")}

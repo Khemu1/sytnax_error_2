@@ -1,117 +1,160 @@
-import React from "react";
-import moment, { Moment } from "moment";
+import React, { useState, useEffect } from "react";
 
 interface DateSelectorProps {
-  selectedDate: Moment | null;
-  onDateChange: (newDate: Moment) => void;
+  selectedDate: Date | null;
+  onDateChange: (newDate: Date) => void;
 }
 
 const DateSelector: React.FC<DateSelectorProps> = ({
   selectedDate,
   onDateChange,
 }) => {
-  // Check if selectedDate is valid, otherwise fallback to the current date
-  const date = selectedDate && selectedDate.isValid() ? selectedDate : moment();
-  console.log("Selected Date:", selectedDate);
-  console.log("Date used:", date);
+  const today = new Date();
 
-  const handleDateChange = (
-    type: "year" | "month" | "day" | "hour" | "minute" | "period",
-    value: string
-  ) => {
-    let updatedDate = date.clone();
+  // State to manage date and time fields
+  const [year, setYear] = useState(today.getFullYear());
+  const [month, setMonth] = useState(today.getMonth()); // 0-based
+  const [day, setDay] = useState(today.getDate());
+  const [hour, setHour] = useState(today.getHours() % 12 || 12); // 12-hour format
+  const [minute, setMinute] = useState(today.getMinutes());
+  const [period, setPeriod] = useState(today.getHours() >= 12 ? "PM" : "AM");
 
-    if (type === "period") {
-      const isPM = value === "PM";
-      const currentHour = date.hour();
-      updatedDate = updatedDate.hour(
-        isPM ? currentHour + 12 : currentHour - 12
-      );
-    } else {
-      updatedDate = updatedDate.set(type, parseInt(value));
+  useEffect(() => {
+    if (selectedDate) {
+      setYear(selectedDate.getFullYear());
+      setMonth(selectedDate.getMonth());
+      setDay(selectedDate.getDate());
+      setHour(selectedDate.getHours() % 12 || 12);
+      setMinute(selectedDate.getMinutes());
+      setPeriod(selectedDate.getHours() >= 12 ? "PM" : "AM");
+      console.log(selectedDate);
+    }
+  }, []);
+
+  const getDaysInMonth = (year: number, month: number) =>
+    new Date(year, month + 1, 0).getDate();
+
+  const handleDateChange = () => {
+    const newHour = period === "PM" ? (hour % 12) + 12 : hour % 12;
+    const newDate = new Date(year, month, day, newHour, minute);
+
+    if (isNaN(newDate.getTime())) {
+      alert("Please select a valid start and end time.");
+      return;
     }
 
-    onDateChange(updatedDate); // Pass the updated date to the parent
+    onDateChange(newDate);
+  };
+
+  const handleYearChange = (newYear: number) => {
+    setYear(newYear);
+    const maxDays = getDaysInMonth(newYear, month);
+    if (day > maxDays) {
+      setDay(maxDays);
+    }
+    handleDateChange();
+  };
+
+  const handleMonthChange = (newMonth: number) => {
+    setMonth(newMonth);
+    const maxDays = getDaysInMonth(year, newMonth);
+    if (day > maxDays) {
+      setDay(maxDays);
+    }
+    handleDateChange();
   };
 
   return (
     <div>
       <div className="flex gap-2">
-        {/* Year Selection */}
+        {/* Year Selector */}
         <select
-          value={date.year()}
-          onChange={(e) => handleDateChange("year", e.target.value)}
+          value={year}
+          onChange={(e) => handleYearChange(Number(e.target.value))}
           className="text-white p-2 rounded-md text-sm"
         >
-          {Array.from({ length: 10 }, (_, i) => moment().year() + i).map(
-            (year) => (
-              <option key={year} value={year}>
-                {year}
+          {Array.from({ length: 10 }, (_, i) => today.getFullYear() + i).map(
+            (y) => (
+              <option key={y} value={y}>
+                {y}
               </option>
             )
           )}
         </select>
 
-        {/* Month Selection */}
+        {/* Month Selector */}
         <select
-          value={date.month()}
-          onChange={(e) => handleDateChange("month", e.target.value)}
+          value={month}
+          onChange={(e) => handleMonthChange(Number(e.target.value))}
           className="text-white p-2 rounded-md text-sm"
         >
-          {moment.months().map((month, index) => (
-            <option key={index} value={index}>
-              {month}
+          {Array.from({ length: 12 }, (_, i) => i).map((m) => (
+            <option key={m} value={m}>
+              {new Date(0, m).toLocaleString("default", { month: "long" })}
             </option>
           ))}
         </select>
 
-        {/* Day Selection */}
+        {/* Day Selector */}
         <select
-          value={date.date()}
-          onChange={(e) => handleDateChange("day", e.target.value)}
+          value={day}
+          onChange={(e) => {
+            setDay(Number(e.target.value));
+            handleDateChange();
+          }}
           className="text-white p-2 rounded-md text-sm"
         >
-          {Array.from({ length: date.daysInMonth() }, (_, i) => i + 1).map(
-            (day) => (
-              <option key={day} value={day}>
-                {day}
-              </option>
-            )
-          )}
+          {Array.from(
+            { length: getDaysInMonth(year, month) },
+            (_, i) => i + 1
+          ).map((d) => (
+            <option key={d} value={d}>
+              {d}
+            </option>
+          ))}
         </select>
       </div>
 
       <div className="flex gap-2 mt-3">
-        {/* Hour Selection */}
+        {/* Hour Selector */}
         <select
-          value={date.hour() % 12 || 12} // Convert to 12-hour format
-          onChange={(e) => handleDateChange("hour", e.target.value)}
+          value={hour}
+          onChange={(e) => {
+            setHour(Number(e.target.value));
+            handleDateChange();
+          }}
           className="text-white p-2 rounded-md text-sm"
         >
-          {Array.from({ length: 12 }, (_, i) => i + 1).map((hour) => (
-            <option key={hour} value={hour}>
-              {hour}
+          {Array.from({ length: 12 }, (_, i) => i + 1).map((h) => (
+            <option key={h} value={h}>
+              {h}
             </option>
           ))}
         </select>
 
-        {/* Minute Selection */}
+        {/* Minute Selector */}
         <select
-          value={date.minute()}
-          onChange={(e) => handleDateChange("minute", e.target.value)}
+          value={minute}
+          onChange={(e) => {
+            setMinute(Number(e.target.value));
+            handleDateChange();
+          }}
           className="text-white p-2 rounded-md text-sm"
         >
-          {Array.from({ length: 60 }, (_, i) => i).map((minute) => (
-            <option key={minute} value={minute}>
-              {minute < 10 ? `0${minute}` : minute}
+          {Array.from({ length: 60 }, (_, i) => i).map((m) => (
+            <option key={m} value={m}>
+              {m < 10 ? `0${m}` : m}
             </option>
           ))}
         </select>
 
-        {/* AM/PM Selection */}
+        {/* AM/PM Selector */}
         <select
-          value={date.hour() >= 12 ? "PM" : "AM"}
-          onChange={(e) => handleDateChange("period", e.target.value)}
+          value={period}
+          onChange={(e) => {
+            setPeriod(e.target.value);
+            handleDateChange();
+          }}
           className="text-white p-2 rounded-md text-sm"
         >
           <option value="AM">AM</option>

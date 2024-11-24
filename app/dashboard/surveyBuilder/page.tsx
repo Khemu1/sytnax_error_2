@@ -285,7 +285,7 @@ const SurveyBuilder = () => {
         )}
       </section>
       <button
-        className="flex items-start"
+        className="flex items-start absolute right-0"
         onClick={() => setIsGroupProfileOpen(true)}
       >
         <Image
