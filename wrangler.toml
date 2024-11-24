@@ -1,5 +1,12 @@
-main = ".worker-next/index.mjs"
+name = "raspy-sunset-5d89"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = ".vercel/output/static"
+
+[[env.production]]
 name = "my-app"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
 assets = { directory = ".worker-next/assets", binding = "ASSETS" }
+
+# Optional: Customize with more bindings if necessary
