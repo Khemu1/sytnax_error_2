@@ -33,6 +33,7 @@
     "@vercel/kv": "^3.0.0",
     "@vercel/speed-insights": "^1.1.0",
     "bcrypt": "^5.1.1",
+    "esbuild": "^0.24.0",
     "filepond": "^4.31.3",
     "filepond-plugin-image-exif-orientation": "^1.0.11",
     "filepond-plugin-image-preview": "^4.6.12",
@@ -44,7 +45,7 @@
     "jose": "^5.9.2",
     "libphonenumber-js": "^1.11.9",
     "multer": "^1.4.5-lts.1",
-    "next": "14.2.11",
+    "next": "^15.0.3",
     "next-cloudinary": "^6.13.0",
     "node-cron": "^3.0.3",
     "nodemailer": "^6.9.15",
@@ -54,11 +55,12 @@
     "react-filepond": "^7.1.2",
     "react-phone-input-2": "^2.15.1",
     "react-redux": "^9.1.2",
+    "server-only": "^0.0.1",
     "sharp": "^0.33.5",
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@cloudflare/next-on-pages": "^1.13.3",
+    "@cloudflare/next-on-pages": "^1.13.5",
     "@types/formidable": "^3.4.5",
     "@types/multer": "^1.4.12",
     "@types/node": "^22.5.5",
@@ -70,6 +72,7 @@
     "eslint-config-next": "14.2.11",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5.6.2"
+    "typescript": "^5.6.2",
+    "wrangler": "^3.90.0"
   }
 }

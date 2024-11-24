@@ -2,25 +2,44 @@
 
 import { Analytics } from "@vercel/analytics/react";
 import { useGetCourse } from "@/hooks/course";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 
 interface Props {
-  params: { id: number };
+  params: Promise<{ id: number }>;
 }
 
-const Course: React.FC<Props> = ({ params: { id } }) => {
+const Course: React.FC<Props> = ({ params }) => {
+  const [id, setId] = useState<number | null>(null);
   const { loading, data, error, handleGetCourse } = useGetCourse();
 
   useEffect(() => {
-    if (!isNaN(+id) && id > 0) {
+    const fetchParams = async () => {
+      try {
+        const resolvedParams = await params; 
+        const courseId = resolvedParams.id;
+
+        if (!isNaN(courseId) && courseId > 0) {
+          setId(courseId); 
+        } else {
+          notFound(); 
+        }
+      } catch (err) {
+        console.error("Failed to resolve params:", err);
+        notFound();
+      }
+    };
+
+    fetchParams(); 
+  }, [params]); 
+
+  useEffect(() => {
+    if (id !== null) {
       handleGetCourse(id);
-    } else {
-      return notFound();
     }
-  }, [id]);
+  }, [id, handleGetCourse]);
 
   if (loading) {
     return (

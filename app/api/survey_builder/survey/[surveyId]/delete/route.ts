@@ -3,15 +3,15 @@ import { errorHandler } from "@/middleware/CustomError";
 import { NextRequest, NextResponse } from "next/server";
 
 interface Props {
-  params: { surveyId: string };
+  params: Promise<{ surveyId: string }>;
 }
 
 export const DELETE = async (req: NextRequest, { params }: Props) => {
   try {
-    console.log("deleting survey", params.surveyId);
-    await deleteSurveyService(params.surveyId);
+    const { surveyId } = await params;
+    await deleteSurveyService(surveyId);
     return NextResponse.json(
-      { surveyId: params.surveyId },
+      { surveyId },
       {
         status: 200,
       }

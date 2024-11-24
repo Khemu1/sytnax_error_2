@@ -22,7 +22,7 @@ import {
 
 export const authenticateUser = async () => {
   try {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
 
     const accessToken = cookieStore.get("access_token")?.value;
     const refreshToken = cookieStore.get("refresh_token")?.value;

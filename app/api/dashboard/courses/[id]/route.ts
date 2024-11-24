@@ -7,15 +7,15 @@ import { processFormData } from "@/utils";
 import {} from "@/utils/validations/validations";
 import { NextRequest, NextResponse } from "next/server";
 interface Props {
-  params: { id: number };
+  params: Promise<{ id: number }>;
 }
 export const GET = async (req: NextRequest, { params }: Props) => {
   try {
-    const id = params.id;
+    const {id} = await params;
     if (isNaN(id) || id === 0) {
       throw new CustomError("invalid course id", 404, "", true);
     }
-    const course = await dashboardAllCourseDataService(+params.id);
+    const course = await dashboardAllCourseDataService(+id);
     return NextResponse.json(course, { status: 200 });
   } catch (error) {
     return errorHandler(error);
@@ -24,14 +24,14 @@ export const GET = async (req: NextRequest, { params }: Props) => {
 
 export const PUT = async (req: NextRequest, { params }: Props) => {
   try {
-    const id = params.id;
+    const {id} = await params;
     if (isNaN(id) || id === 0) {
       throw new CustomError("invalid course id", 404, "", true);
     }
     const data = await req.formData();
     const processedFormData = processFormData(data);
     const course = await dashboardEditCourseService(
-      +params.id,
+      +id,
       processedFormData
     );
     return NextResponse.json(course, { status: 200 });

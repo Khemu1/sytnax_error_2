@@ -72,14 +72,14 @@ const UserGroup = () => {
           {removeErrorState.message}
         </span>
       )}
-      {groupState.members.length !== 0 ? (
+      {groupState.groupMembers.length !== 0 ? (
         <ul className="px-3">
-          {groupState.members.map((member) => (
+          {groupState.groupMembers.map((member) => (
             <li
               key={member.userId}
               className="flex justify-between px-3 items-center p-2 bg-[#2b2b2b] rounded-md"
             >
-              <span>{member.username}</span>
+              <span>{member.user.username}</span>
               <button
                 onClick={() => removeMember(member.userId)}
                 className="text-red-400 hover:text-red-500 transition-all"

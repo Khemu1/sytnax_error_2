@@ -3,13 +3,14 @@ import { errorHandler } from "@/middleware/CustomError";
 import { NextRequest, NextResponse } from "next/server";
 
 interface Props {
-  params: { surveyId: string };
+  params: Promise<{ surveyId: string }>;
 }
 
 export const PATCH = async (req: NextRequest, { params }: Props) => {
   try {
+    const { surveyId } = await params;
     const { name } = await req.json();
-    const survey = await updateSurveyNameService(name, params.surveyId);
+    const survey = await updateSurveyNameService(name, surveyId);
     return NextResponse.json(
       { survey },
       {
