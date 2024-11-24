@@ -9,7 +9,8 @@ import UpdateSurveyTitleDialog from "../Dialog/survey/UpdateSurveyTitleDialog";
 import MoveSurveyDialog from "../Dialog/survey/MoveSurveyDialog";
 import DuplicateSurveyDialog from "../Dialog/survey/DuplicateSurveyDialog";
 import SurveySettingsDialog from "../Dialog/survey/SurveySettingsDialog";
-
+import moment from "moment";
+import time from "moment-timezone";
 const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isUpdateDialogOpen, setUpdateDialogOpen] = useState(false);
@@ -18,6 +19,10 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
   const [isSettingsDialogOpen, setSettingsDialogOpen] = useState(false);
   const surveyCardMenuRef = useRef<HTMLDivElement>(null);
   const toggleButtonRef = useRef<HTMLButtonElement>(null);
+  const currentTime = moment();
+  const startTime = time(survey.startTime).tz("Africa/Cairo");
+  const endTime = time(survey.endTime).tz("Africa/Cairo");
+  const isActive = currentTime.isBefore(survey.endTime);
 
   const { handleDeleteSurvey } = useDeleteSurvey();
 
@@ -84,78 +89,115 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
   return (
     <>
       <div className="survey">
-        <div className="flex w-full h-full">
+        <div className="flex sm:flex-row flex-col w-full h-full">
           {/* Survey Name & Link */}
           <Link
             href={`/survey/${currentWorkspace?.id}/${survey.id}/build`}
-            className="flex item h-full pl-2 border-r cursor-pointer border-r-gray-700 w-[60%]"
+            className="flex item sm:h-full pl-2 sm:border-r cursor-pointer sm:border-r-gray-700 sm:w-[60%]  h-[100px] sm:border-b-0  border-b border-b-gray-700"
           >
             <p className="m-auto text-[#859fd1] font-semibold text-ellipsis overflow-hidden px-2 text-nowrap whitespace-nowrap">
               {survey.name}
             </p>
           </Link>
 
-          {/* Survey Actions */}
-          <div className="flex flex-col justify-end h-full w-[40%] bg-[#1e2a38a1] p-2 gap-1">
-            <div className="relative mb-1">
-              <button className="survey_card_buttons ">Copy Link</button>
-            </div>
-
+          <div className="flex flex-col justify-start sm:w-[40%] bg-[#1e2a38a1] p-4 gap-3 font-semibold">
             {/* Toggle Menu Button */}
-            <button
-              ref={toggleButtonRef}
-              className="border opacity-100 border-gray-500 w-max h-max rounded-md"
-              onClick={() => {
-                toggleMenu();
-                onSelect(survey);
-              }}
-            >
-              <Image
-                src="/assets/icons/dots.svg"
-                alt="options"
-                width={27}
-                height={27}
-              />
-            </button>
+            <div className="flex justify-end">
+              <button
+                ref={toggleButtonRef}
+                className="border border-gray-500 rounded-md p-2 hover:bg-gray-700"
+                onClick={() => {
+                  toggleMenu();
+                  onSelect(survey);
+                }}
+              >
+                <Image
+                  src="/assets/icons/dots.svg"
+                  alt="options"
+                  width={27}
+                  height={27}
+                />
+              </button>
+            </div>
 
             {/* Menu Dropdown */}
             {menuOpen && (
               <div
                 ref={surveyCardMenuRef}
-                className="flex flex-col text-left right-0 text-sm absolute top-0 bg-[#0e0e0e] p-2 rounded-md shadow-md z-10"
+                className="absolute right-4 top-12 bg-[#0e0e0e] text-sm text-white rounded-md shadow-md p-3 z-10"
               >
                 <span
-                  className="survey_card_buttons"
+                  className="block py-1 px-3 hover:bg-gray-700 rounded-md cursor-pointer"
                   onClick={() => handleOpenDialog("update")}
                 >
                   Rename
                 </span>
                 <span
-                  className="survey_card_buttons"
+                  className="block py-1 px-3 hover:bg-gray-700 rounded-md cursor-pointer"
                   onClick={() => handleOpenDialog("move")}
                 >
                   Move
                 </span>
                 <span
-                  className="survey_card_buttons"
+                  className="block py-1 px-3 hover:bg-gray-700 rounded-md cursor-pointer"
                   onClick={() => handleOpenDialog("duplicate")}
                 >
                   Duplicate
                 </span>
                 <span
-                  className="survey_card_buttons"
-                  onClick={() => handleOpenDialog("settings")}
-                >
-                  Settings
-                </span>
-                <span
-                  className="survey_card_buttons text-red-600"
+                  className="block py-1 px-3 text-red-600 hover:bg-gray-700 rounded-md cursor-pointer"
                   onClick={handleDelete}
                 >
                   Delete
                 </span>
               </div>
             )}
+
+            {/* Survey Details */}
+            <div className="flex flex-col gap-2">
+              {/* Start and End Time */}
+              <div className="text-sm">
+                {startTime.isValid() && (
+                  <div>
+                    <strong>Start Time:</strong>{" "}
+                    {startTime.format("YYYY-MM-DD HH:mm")}
+                  </div>
+                )}
+                {endTime.isValid() && (
+                  <div>
+                    <strong>End Time:</strong>{" "}
+                    {endTime.format("YYYY-MM-DD HH:mm")}
+                  </div>
+                )}
+                <div
+                  className={`${
+                    isActive ? "text-green-500" : "text-red-600"
+                  } py-2 text-base`}
+                >
+                  {isActive ? "Active" : "Inactive"}
+                </div>
+              </div>
+
+              {/* Grades Visibility */}
+              <div className="text-sm py-2">
+                {survey.gradesVisibility === "hidden"
+                  ? "Hidden Grades"
+                  : survey.gradesVisibility === "visible"
+                  ? "Visible Grades"
+                  : "Visible Grades After Closing"}
+              </div>
+
+              {/* Actions */}
+              <div className="flex justify-between flex-wrap gap-2">
+                <button
+                  className="py-2  "
+                  onClick={() => handleOpenDialog("settings")}
+                >
+                  Settings
+                </button>
+                <button className="py-2">Copy Link</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

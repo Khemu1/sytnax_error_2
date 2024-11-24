@@ -41,7 +41,7 @@
   @apply w-full flex gap-2 items-center justify-between cursor-pointer py-[.5rem] px-2  rounded-md;
 }
 .survey {
-  @apply relative flex items-center justify-center gap-5 w-[292px] h-[212px] bg-[#1e2a38a1] rounded-lg overflow-hidden;
+  @apply relative flex items-center justify-center gap-5 w-[290px] sm:w-[380px]  sm:h-[292px] bg-[#1e2a38a1] rounded-lg overflow-hidden;
 }
 
 .survey:hover .status {

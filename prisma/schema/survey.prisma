@@ -1,8 +1,17 @@
+enum GradesVisibility {
+  hidden
+  visible
+  visibleAfterSurveyCloses
+}
 model Survey {
   id          String             @id @default(cuid())
   workspaceId String             @unique
   name        String
-  openInterval String?
+  startTime        String?
+  endTime          String?
+  questionsPerPage Int @default(5)
+  duration Int @default(5)
+  gradesVisibility GradesVisibility @default(hidden)
   createdAt   DateTime           @default(now())
   updatedAt   DateTime           @updatedAt
   workspace   Workspace          @relation(fields: [workspaceId], references: [id])

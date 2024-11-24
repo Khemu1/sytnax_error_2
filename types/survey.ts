@@ -8,8 +8,11 @@ export interface SurveyModel {
   id: string;
   workspaceId: string;
   name: string;
-  openInterval: string | null;
-  createdAt?: Date;
+  startTime: string | null;
+  endTime: string | null;
+  gradesVisibility: "hidden" | "visible" | "visibleAfterSurveyCloses";
+  duration: number;
+  questionsPerPage: number;
   updatedAt?: Date;
   workspace?: WorkSpaceModel;
 }

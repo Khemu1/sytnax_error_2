@@ -14,17 +14,17 @@ const surveySlice = createSlice({
   initialState,
   reducers: {
     setSurveys: (state, action: PayloadAction<SurveyModel[]>) => {
-      state.surveys = action.payload; // Set the entire array of surveys
+      state.surveys = action.payload;
     },
     signOut: (state) => {
-      state.surveys = []; // Reset surveys on sign out
+      state.surveys = [];
     },
     updateSurveys: (state, action: PayloadAction<SurveyModel>) => {
       const index = state.surveys.findIndex(
         (survey) => survey.id === action.payload.id
       );
       if (index !== -1) {
-        state.surveys[index] = action.payload; // Update the survey
+        state.surveys[index] = action.payload;
       }
     },
     deleteSurvey: (state, action: PayloadAction<string>) => {

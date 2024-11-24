@@ -1,6 +1,5 @@
 model SurveySubmission {
   id          String             @id @default(cuid())
-  workspaceId String             @unique
   surveyId    String
   createdAt   DateTime           @default(now())
   updatedAt   DateTime           @updatedAt

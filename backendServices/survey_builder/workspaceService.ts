@@ -62,7 +62,7 @@ export const getWorkSpacesService = async (userId: number) => {
         new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
     );
 
-    return { allWorkspaces, groupMembers: userGroupAndGroupMembers };
+    return { allWorkspaces, group: userGroupAndGroupMembers };
   } catch (error) {
     console.error("Error fetching workspaces:", error);
     throw error;
