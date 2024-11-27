@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
-  checkGroupMembershipForWorkspace,
+  checkGroupMembershipForSurvey,
   checkWorkspaceExistsForSurvey,
   checkSurveyExists,
   checkSurveyTitle,
@@ -40,7 +40,7 @@ const performCommonSurveyChecks = async (
     authUser,
     body.workspaceId
   );
-  const checkMemberShip = await checkGroupMembershipForWorkspace(
+  const checkMemberShip = await checkGroupMembershipForSurvey(
     req,
     workspaceExists
   );

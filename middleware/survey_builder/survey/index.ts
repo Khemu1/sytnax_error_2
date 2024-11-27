@@ -75,7 +75,7 @@ export async function checkWorkspaceExistsForSurvey(
   }
 }
 
-export const checkGroupMembershipForWorkspace = async (
+export const checkGroupMembershipForSurvey = async (
   _req: NextRequest,
   res: NextResponse
 ) => {
