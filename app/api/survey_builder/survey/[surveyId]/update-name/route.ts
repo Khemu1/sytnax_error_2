@@ -11,12 +11,9 @@ export const PATCH = async (req: NextRequest, { params }: Props) => {
     const { surveyId } = await params;
     const { name } = await req.json();
     const survey = await updateSurveyNameService(name, surveyId);
-    return NextResponse.json(
-      { survey },
-      {
-        status: 200,
-      }
-    );
+    return NextResponse.json(survey, {
+      status: 200,
+    });
   } catch (error) {
     return errorHandler(error);
   }

@@ -16,7 +16,6 @@ const Nav = () => {
   const authState = useSelector((state: RootState) => state.auth);
   const handleSignOut = async () => {
     try {
-      console.log("click");
       await signoutUser();
       dispatch(logout());
     } catch (error) {

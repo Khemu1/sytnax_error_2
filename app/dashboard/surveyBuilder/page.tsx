@@ -20,10 +20,11 @@ import GroupDialog from "@/components/survey_builder/Dialog/workspaces/groupDial
 import { logout } from "@/store/slices/authSlice";
 import { useRouter } from "next/navigation";
 import { setGroup } from "@/store/slices/survey/userGroup";
+import GlobalError from "@/app/global-error";
 
 const SurveyBuilder = () => {
   const [isMobileAsideOpen, setIsMobileAsideOpen] = useState(false);
-  const { workspaces: data, isLoading, isError } = useGetWorkspaces();
+  const { workspaces: data, isLoading, isError,errorState:apiError } = useGetWorkspaces();
   const dispatch = useDispatch();
   const routeTo = useRouter();
 
@@ -99,6 +100,7 @@ const SurveyBuilder = () => {
       dispatch(setWorkspaces(data.allWorkspaces));
     }
     if (data && data.group) {
+      console.log("group", data.group);
       dispatch(setGroup(data.group));
     }
   }, [data, dispatch]);
@@ -108,12 +110,10 @@ const SurveyBuilder = () => {
     if (localStorageAuth) {
       const { role } = JSON.parse(localStorageAuth);
 
-      // Check if the user is authenticated
       if (!authState.isAuthenticated) {
         dispatch(logout());
         routeTo.push("/authportal");
       }
-      // Role-based navigation
       if (role !== 1 && role !== 2) {
         routeTo.push("/authportal");
       }
@@ -123,13 +123,15 @@ const SurveyBuilder = () => {
   }, [authState.isAuthenticated, dispatch, routeTo]);
 
   if (isLoading) {
-    // todo: use loading animation
-    return <div>Loading...</div>;
+    return (
+      <div className="flex w-full h-full my-auto justify-center items-center">
+        <span className="loading loading-infinity w-[150px]" />
+      </div>
+    );
   }
 
-  if (isError) {
-    // todo: redirect to error page
-    return <div>error</div>;
+  if (isError && apiError?.message) {
+    return <GlobalError />;
   }
 
   return (

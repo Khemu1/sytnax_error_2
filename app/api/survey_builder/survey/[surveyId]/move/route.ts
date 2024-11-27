@@ -3,16 +3,19 @@ import { errorHandler } from "@/middleware/CustomError";
 import { NextRequest, NextResponse } from "next/server";
 
 interface Props {
-  params:  Promise<{ surveyId: string }>;
+  params: Promise<{ surveyId: string }>;
 }
 
 export const PATCH = async (req: NextRequest, { params }: Props) => {
   try {
     const { surveyId } = await params;
-    const {  targetWorkspaceId } = await req.json();
+    const { targetWorkspaceId, workspaceId } = (await req.json()) as {
+      targetWorkspaceId: string;
+      workspaceId: string;
+    };
     await moveSuveryService(surveyId, targetWorkspaceId);
     return NextResponse.json(
-      { targetWorkspaceId, surveyId: surveyId },
+      { targetWorkspaceId, surveyId, soruceWorkspaceId: workspaceId },
       {
         status: 200,
       }

@@ -19,10 +19,10 @@ const CreateSurveyDialog: React.FC<CreateSurveyDialogProps> = ({
   const currentWorkspace = useSelector(
     (state: RootState) => state.currentWorkspace.currentWorkspace
   );
-  const [surveyTitle, setSurveyTitle] = useState("");
+  const [surveyName, setSurvayName] = useState("");
   const [errors, setErrors] = useState<Record<string, string> | null>(null);
 
-  const { handleCreateSurvey, isError, errorState, isSuccess } =
+  const { handleCreateSurvey, isError, errorState, isSuccess, isPending } =
     useCreateSurvey();
 
   const handleSave = async (e: React.FormEvent) => {
@@ -30,7 +30,7 @@ const CreateSurveyDialog: React.FC<CreateSurveyDialogProps> = ({
     setErrors(null);
 
     try {
-      newSurveySchema().parse({ name: surveyTitle });
+      newSurveySchema().parse({ name: surveyName });
 
       if (!currentWorkspace?.id) {
         setErrors({ chooseWorkspace: "an Unkown Error Occured" });
@@ -38,7 +38,7 @@ const CreateSurveyDialog: React.FC<CreateSurveyDialogProps> = ({
       }
 
       await handleCreateSurvey({
-        title: surveyTitle,
+        title: surveyName,
         workspaceId: currentWorkspace?.id,
       });
     } catch (error) {
@@ -49,7 +49,7 @@ const CreateSurveyDialog: React.FC<CreateSurveyDialogProps> = ({
 
   useEffect(() => {
     if (isSuccess) {
-      setSurveyTitle("");
+      setSurvayName("");
       onClose();
     }
   }, [isSuccess]);
@@ -61,9 +61,12 @@ const CreateSurveyDialog: React.FC<CreateSurveyDialogProps> = ({
         aria-hidden="true"
       />
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <DialogPanel className="bg-[#1e1e1e] rounded-md py-5 w-[300px]">
+        <DialogPanel
+          transition
+          className="w-[300px] max-w-md rounded-xl bg-white/5 p-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
+        >
           <form onSubmit={handleSave}>
-            <div className="flex w-full items-center border-b border-b-gray-500 pb-2 px-2">
+            <div className="flex w-full items-center pb-2 px-2">
               <button type="button" onClick={onClose}>
                 <Image
                   src="/assets/icons/close.svg"
@@ -73,7 +76,7 @@ const CreateSurveyDialog: React.FC<CreateSurveyDialogProps> = ({
                   height={20}
                 />
               </button>
-              <span className="flex flex-1 justify-center text-white">
+              <span className="flex flex-1 justify-center text-white font-semibold">
                 Create Survey
               </span>
             </div>
@@ -81,9 +84,9 @@ const CreateSurveyDialog: React.FC<CreateSurveyDialogProps> = ({
             <div className="border-b border-b-gray-500 p-[2rem]">
               <input
                 type="text"
-                value={surveyTitle}
+                value={surveyName}
                 placeholder="Enter Title"
-                onChange={(e) => setSurveyTitle(e.target.value)}
+                onChange={(e) => setSurvayName(e.target.value)}
                 className="w-full bg-[#2a2a2a] text-white border-none outline-none p-2 rounded-md"
               />
               {((isError && errorState?.title) || (errors && errors.title)) && (
@@ -99,19 +102,26 @@ const CreateSurveyDialog: React.FC<CreateSurveyDialogProps> = ({
               </div>
             )}
 
-            <div className="flex justify-end gap-5 mt-4 px-4">
+            <div className="flex justify-end gap-5 mt-4 px-4 font-semibold text-white">
               <button
-                className="bg-[#2f2b7226] py-2 px-4 rounded"
+                className="bg-red-700 py-2 px-4 rounded"
                 type="button"
-                onClick={onClose}
+                onClick={() => {
+                  onClose();
+                }}
               >
                 Cancel
               </button>
               <button
-                className="bg-[#2c2f31] transition-all py-2 px-4 rounded"
+                disabled={isPending}
+                className="flex justify-center items-center bg-blue-600 transition-all py-2 px-4 rounded"
                 type="submit"
               >
-                Save
+                {isPending ? (
+                  <span className="loading loading-spinner loading-sm"></span>
+                ) : (
+                  "Save"
+                )}
               </button>
             </div>
           </form>

@@ -5,6 +5,7 @@ import {
   duplicateSurvey,
   getSurvey,
   moveSurveyToWorkspace,
+  updateSurveySettings,
   updateSurveyStatus,
   updateSurveyTitle,
   updateSurveyUrl,
@@ -12,19 +13,26 @@ import {
 import { useState } from "react";
 import {
   SurveyModel,
+  SurveySettings,
   UpdateSurveyTitleProps,
-  UpdateSurveyTitleResponse,
   UpdateSurveyUrlProps,
 } from "@/types/survey";
 import { CustomError } from "@/middleware/CustomError";
+import {
+  addSurveyF,
+  moveSurveyF,
+  updateSurveyF,
+} from "@/utils/survey_builder/survey";
+import { useDispatch } from "react-redux";
 
 export const useUpdateSurvey = () => {
+  const dispatch = useDispatch();
   const [errorState, setErrorState] = useState<Record<string, string> | null>(
     null
   );
 
   const mutation = useMutation<
-    UpdateSurveyTitleResponse,
+    SurveyModel,
     CustomError | unknown,
     UpdateSurveyTitleProps
   >({
@@ -46,8 +54,8 @@ export const useUpdateSurvey = () => {
       setErrorState(message);
       console.error("Error updating survey title:", err);
     },
-    onSettled: () => {
-      console.log("Mutation has either succeeded or failed");
+    onSuccess: async (survey) => {
+      await updateSurveyF(survey, dispatch);
     },
   });
 
@@ -154,23 +162,30 @@ export const useDuplicateSurvey = () => {
     },
   });
 
-  const { mutateAsync: handleDuplicateSurvey, isError, isSuccess } = mutation;
+  const {
+    mutateAsync: handleDuplicateSurvey,
+    isError,
+    isSuccess,
+    isPending,
+  } = mutation;
 
   return {
     handleDuplicateSurvey,
     isError,
     isSuccess,
     errorState,
+    isPending,
   };
 };
 
 export const useMoveSurvey = () => {
+  const dispatch = useDispatch();
   const [errorState, setErrorState] = useState<Record<string, string> | null>(
     null
   );
 
   const mutation = useMutation<
-    { targetWorkspaceId: string },
+    { targetWorkspaceId: string; surveyId: string; soruceWorkspaceId: string },
     CustomError | unknown,
     {
       workspaceId: string;
@@ -185,6 +200,14 @@ export const useMoveSurvey = () => {
         workspaceId,
         surveyId,
         targetWorkspaceId
+      );
+    },
+    onSuccess: async ({ targetWorkspaceId, surveyId, soruceWorkspaceId }) => {
+      await moveSurveyF(
+        surveyId,
+        soruceWorkspaceId,
+        targetWorkspaceId,
+        dispatch
       );
     },
 
@@ -227,16 +250,10 @@ export const useChangeSurveyStatus = () => {
       workspaceId: string;
     }
   >({
-    mutationFn: async ({
-      surveyId,
-      workspaceId,
-    }) => {
+    mutationFn: async ({ surveyId, workspaceId }) => {
       setErrorState(null);
 
-      return await updateSurveyStatus(
-        workspaceId,
-        surveyId,
-      );
+      return await updateSurveyStatus(workspaceId, surveyId);
     },
 
     onError: (err: CustomError | unknown) => {
@@ -310,6 +327,7 @@ export const useDeleteSurvey = () => {
 };
 
 export const useCreateSurvey = () => {
+  const dispatch = useDispatch();
   const [errorState, setErrorState] = useState<Record<string, string> | null>(
     null
   );
@@ -322,17 +340,14 @@ export const useCreateSurvey = () => {
       workspaceId: string;
     }
   >({
-    mutationFn: async ({
-      title,
-      workspaceId,
-    }) => {
+    mutationFn: async ({ title, workspaceId }) => {
       setErrorState(null);
 
-      const response = await createNewSurvey(
-        workspaceId,
-        title,
-      );
+      const response = await createNewSurvey(workspaceId, title);
       return response;
+    },
+    onSuccess: async (survey) => {
+      await addSurveyF(survey, dispatch);
     },
     onError: (err: CustomError | unknown) => {
       const message =
@@ -360,10 +375,7 @@ export const useCreateSurvey = () => {
   };
 };
 
-export const useGetSurvey = (
-  workspaceId: string,
-  surveyId: string,
-) => {
+export const useGetSurvey = (workspaceId: string, surveyId: string) => {
   const [errorState, setErrorState] = useState<Record<string, string> | null>(
     null
   );
@@ -378,10 +390,7 @@ export const useGetSurvey = (
       try {
         setErrorState(null);
 
-        const survey = await getSurvey(
-          workspaceId,
-          surveyId,
-        );
+        const survey = await getSurvey(workspaceId, surveyId);
         return survey;
       } catch (error) {
         const message =
@@ -395,4 +404,61 @@ export const useGetSurvey = (
   });
 
   return { survey, isError, isLoading, errorState };
+};
+
+export const useUpdateSurveySettings = () => {
+  const dispatch = useDispatch();
+  const [errorState, setErrorState] = useState<Record<string, string> | null>(
+    null
+  );
+
+  const mutation = useMutation<
+    SurveyModel,
+    CustomError | unknown,
+    {
+      workspaceId: string;
+      surveyId: string;
+      settings: SurveySettings;
+    }
+  >({
+    mutationFn: async ({
+      workspaceId,
+      surveyId,
+      settings,
+    }: {
+      workspaceId: string;
+      surveyId: string;
+      settings: SurveySettings;
+    }) => {
+      setErrorState(null);
+
+      return await updateSurveySettings(workspaceId, surveyId, settings);
+    },
+    onSuccess: async (survey) => {
+      await updateSurveyF(survey, dispatch);
+    },
+    onError: (err: CustomError | unknown) => {
+      const message =
+        err instanceof CustomError
+          ? err.errors || { message: err.message }
+          : { message: "Unknown Error" };
+      setErrorState(message);
+      console.error("Error updating survey settings:", err);
+    },
+  });
+
+  const {
+    mutateAsync: handleUpdateSurveySettings,
+    isError,
+    isSuccess,
+    isPending,
+  } = mutation;
+
+  return {
+    handleUpdateSurveySettings,
+    isError,
+    isSuccess,
+    errorState,
+    isPending,
+  };
 };

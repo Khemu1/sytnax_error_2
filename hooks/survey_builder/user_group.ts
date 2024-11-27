@@ -1,49 +1,16 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import {
   addUserToGroup,
-  getUserGroup,
   removeUserFromGroup,
 } from "@/frontendServices/survey_builder/user_group";
-import { GroupModel, UserGroupModel } from "@/types/survey";
-import { addGroupMemberF, removeGroupMemberF } from "@/utils/survey_builder/user_group";
+import { UserGroupModel } from "@/types/survey";
+import {
+  addGroupMemberF,
+  removeGroupMemberF,
+} from "@/utils/survey_builder/user_group";
 import { useDispatch } from "react-redux";
 import { CustomError } from "@/middleware/CustomError";
-
-
-export const useGetGroup = () => {
-  const [errorState, setErrorState] = useState<Record<string, string> | null>(
-    null
-  );
-
-  const {
-    data: group,
-    isError,
-    isLoading,
-  } = useQuery<GroupModel, CustomError>({
-    queryKey: ["userGroup"],
-    enabled: true,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-    staleTime: Infinity,
-    queryFn: async () => {
-      try {
-        setErrorState(null);
-
-        return await getUserGroup();
-      } catch (error) {
-        const message =
-          error instanceof CustomError
-            ? error.errors || { message: error.message }
-            : { message: "Unknown Error" };
-        setErrorState(message);
-        throw error;
-      }
-    },
-  });
-
-  return { group, isError, isLoading, errorState };
-};
 
 export const useAddGroupMember = () => {
   const dispatch = useDispatch();
@@ -61,18 +28,10 @@ export const useAddGroupMember = () => {
       groupName: string;
     }
   >({
-    mutationFn: async ({
-      username,
-      groupId,
-      groupName,
-    }) => {
+    mutationFn: async ({ username, groupId, groupName }) => {
       setErrorState(null);
 
-      const response = await addUserToGroup(
-        groupId,
-        groupName,
-        username,
-      );
+      const response = await addUserToGroup(groupId, groupName, username);
 
       return response;
     },
@@ -124,16 +83,10 @@ export const useRemoveGroupMember = () => {
       groupId: string;
     }
   >({
-    mutationFn: async ({
-      memberId,
-      groupId,
-    }) => {
+    mutationFn: async ({ memberId, groupId }) => {
       setErrorState(null);
 
-      const response = await removeUserFromGroup(
-        groupId,
-        memberId,
-      );
+      const response = await removeUserFromGroup(groupId, memberId);
       return response;
     },
     onSuccess: (userId: number) => {

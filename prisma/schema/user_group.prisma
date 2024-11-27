@@ -1,7 +1,8 @@
 model UserGroup {
   id        String @id @default(cuid())
-  userId   Int
+  userId   Int 
   groupId   String
+  createdAt DateTime? @default(now())
   group     Group  @relation(fields: [groupId], references: [id])
   user      User   @relation(fields: [userId], references: [id])
 

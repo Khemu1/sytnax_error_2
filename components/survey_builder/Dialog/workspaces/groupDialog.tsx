@@ -1,10 +1,10 @@
-import { Dialog, DialogPanel } from "@headlessui/react";
+import { Dialog, DialogPanel, Transition } from "@headlessui/react";
 import { useSelector } from "react-redux";
 import {
   useAddGroupMember,
   useRemoveGroupMember,
 } from "@/hooks/survey_builder/user_group";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, Fragment } from "react";
 import { RootState } from "@/store/store";
 import Image from "next/image";
 
@@ -15,26 +15,38 @@ interface GroupDialogProps {
 
 const GroupDialog: React.FC<GroupDialogProps> = ({ isOpen, onClose }) => {
   const groupState = useSelector((state: RootState) => state.userGroup);
-  const { handleRemoveMember, errorState: removeErrorState } =
-    useRemoveGroupMember();
-  const { handleAddMember, errorState, isSuccess } = useAddGroupMember();
+  const {
+    handleRemoveMember,
+    errorState: removeErrorState,
+    isPending: deletePending,
+  } = useRemoveGroupMember();
+  const { handleAddMember, errorState, isSuccess, isPending } =
+    useAddGroupMember();
 
   const [text, setText] = useState("");
 
   const addMember = async () => {
     if (!text.trim()) return;
-    await handleAddMember({
-      username: text,
-      groupId: groupState.id,
-      groupName: groupState.name,
-    });
+    try {
+      await handleAddMember({
+        username: text.trim(),
+        groupId: groupState.id,
+        groupName: groupState.name,
+      });
+    } catch (error) {
+      console.error("Error adding member:", error);
+    }
   };
 
   const removeMember = async (memberId: number) => {
-    await handleRemoveMember({
-      memberId,
-      groupId: groupState.id,
-    });
+    try {
+      await handleRemoveMember({
+        memberId,
+        groupId: groupState.id,
+      });
+    } catch (error) {
+      console.error("Error removing member:", error);
+    }
   };
 
   useEffect(() => {
@@ -42,91 +54,120 @@ const GroupDialog: React.FC<GroupDialogProps> = ({ isOpen, onClose }) => {
       setText("");
     }
   }, [isSuccess]);
-  useEffect(() => {
+
+  const handleClose = useCallback(() => {
     setText("");
+    onClose();
   }, [onClose]);
+
   return (
-    <Dialog open={isOpen} onClose={onClose} className="relative z-50">
-      <div
-        className="fixed inset-0 bg-black bg-opacity-30"
-        aria-hidden="true"
-      />
-      <div className="fixed inset-0 flex items-center justify-center p-4">
-        <DialogPanel className=" bg-base-100 rounded-md py-5">
-          <button
-            className="w-full flex justify-end pr-2"
-            type="button"
-            onClick={() => {
-              onClose();
-            }}
-          >
-            <Image
-              src="/assets/icons/close.svg"
-              alt="close"
-              width={25}
-              height={25}
-            />
-          </button>
-          <div className="flex flex-col gap-3 p-6 text-white rounded-md">
-            <h3 className="text-2xl font-bold mb-2 text-[#e4e4e4]">
-              {groupState.name ?? "Your Group"}
-            </h3>
-            <span className="text-sm text-gray-600 font-semibold">
-              You can invite other admins to share your surveys with them
-            </span>
-            <div className="flex flex-col items-center gap-1">
-              <div className="flex flex-wrap items-center gap-5">
-                <input
-                  type="text"
-                  value={text}
-                  onChange={(e) => setText(e.target.value)}
-                  placeholder="Enter user's name"
-                  className="w-[350px] px-4 py-2 bg-[#2b2b2b] text-[#d1d1d1] rounded-md border border-[#3d3d3d] focus:outline-none focus:border-[#4b6ef5] transition-all"
-                />
-                <button
-                  className="bg-[#4b6ef5] px-4 py-2 rounded-md text-sm font-semibold transition-all hover:bg-[#3d37a9]"
-                  onClick={addMember}
-                >
-                  Add
-                </button>
+    <Transition show={isOpen} as={Fragment}>
+      <Dialog
+        open={isOpen}
+        onClose={handleClose}
+        className="relative z-50"
+        aria-labelledby="dialog-title"
+        aria-describedby="dialog-description"
+      >
+        <div
+          className="fixed inset-0 bg-black bg-opacity-30"
+          aria-hidden="true"
+        />
+        <div className="fixed inset-0 flex items-center justify-center p-4">
+          <DialogPanel className="w-full max-w-md rounded-xl bg-white/5 p-6 backdrop-blur-2xl">
+            <button
+              className="w-full flex justify-end pr-2"
+              type="button"
+              onClick={handleClose}
+            >
+              <Image
+                src="/assets/icons/close.svg"
+                alt="close"
+                width={25}
+                height={25}
+              />
+            </button>
+            <div className="flex flex-col gap-3 p-6 text-white rounded-md">
+              <h3
+                id="dialog-title"
+                className="text-2xl font-bold mb-2 text-[#e4e4e4]"
+              >
+                {groupState.name ?? "Your Group"}
+              </h3>
+              <span
+                id="dialog-description"
+                className="text-sm text-gray-600 font-semibold"
+              >
+                You can invite other admins to share your surveys with them
+              </span>
+              <div className="flex flex-col items-center gap-1">
+                <div className="flex flex-wrap items-center gap-5">
+                  <input
+                    type="text"
+                    value={text}
+                    onChange={(e) => setText(e.target.value)}
+                    placeholder="Enter user's name"
+                    className="w-[350px] px-4 py-2 bg-[#2b2b2b] text-[#d1d1d1] rounded-md border border-[#3d3d3d] focus:outline-none focus:border-[#4b6ef5] transition-all"
+                  />
+                  <button
+                    disabled={isPending}
+                    className="flex justify-center items-center bg-blue-600 transition-all py-2 px-4 rounded"
+                    type="submit"
+                    onClick={addMember}
+                  >
+                    {isPending ? (
+                      <span className="loading loading-spinner loading-sm"></span>
+                    ) : (
+                      "Add"
+                    )}
+                  </button>
+                </div>
+                {errorState?.message && (
+                  <span className="text font-semibold text-red-600 text-center">
+                    {errorState.message}
+                  </span>
+                )}
               </div>
-              {errorState && errorState.message && (
-                <span className="text font-semibold text-red-600 text-center">
-                  {errorState.message}
+
+              <h4 className="font-semibold mt-4 mb-2 text-[#e4e4e4]">
+                Members
+              </h4>
+              {removeErrorState?.message && (
+                <span className="text mx-auto font-semibold text-red-600 text-center">
+                  {removeErrorState.message}
                 </span>
               )}
-            </div>
-
-            <h4 className="font-semibold mt-4 mb-2 text-[#e4e4e4]">Members</h4>
-            {removeErrorState && removeErrorState.message && (
-              <span className="text mx-auto font-semibold text-red-600 text-center">
-                {removeErrorState.message}
-              </span>
-            )}
-            {groupState.groupMembers.length !== 0 ? (
-              <ul className="px-3">
-                {groupState.groupMembers.map((member) => (
-                  <li
-                    key={member.userId}
-                    className="flex justify-between px-3 items-center p-2 bg-[#2b2b2b] rounded-md"
-                  >
-                    <span>{member.user.username}</span>
-                    <button
-                      onClick={() => removeMember(member.userId)}
-                      className="text-red-400 hover:text-red-500 transition-all"
+              {groupState.groupMembers.length !== 0 ? (
+                <ul className="px-3 overflow-y-scroll">
+                  {groupState.groupMembers.map((member) => (
+                    <li
+                      key={member.userId}
+                      className="flex justify-between px-3 items-center p-2 bg-base-100 rounded-md"
                     >
-                      Remove
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p>Start Inviting others </p>
-            )}
-          </div>
-        </DialogPanel>
-      </div>
-    </Dialog>
+                      <span>{member.user?.username}</span>
+                      <button
+                        type="button"
+                        disabled={deletePending}
+                        onClick={() => removeMember(member.userId)}
+                        className="text-red-400 hover:text-red-500 transition-all font-semibold"
+                      >
+                        {deletePending ? (
+                          <span className="loading loading-spinner loading-sm"></span>
+                        ) : (
+                          "Remove"
+                        )}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>Start Inviting others</p>
+              )}
+            </div>
+          </DialogPanel>
+        </div>
+      </Dialog>
+    </Transition>
   );
 };
 

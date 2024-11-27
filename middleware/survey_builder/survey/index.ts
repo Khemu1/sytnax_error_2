@@ -1,7 +1,10 @@
 import { CustomError } from "@/middleware/CustomError";
 import { CustomNextRequest } from "@/types";
-import { WorkSpaceModel } from "@/types/survey";
-import { newSurveySchema } from "@/utils/validations/survey";
+import { SurveySettings, WorkSpaceModel } from "@/types/survey";
+import {
+  newSurveySchema,
+  surveySettingsSchema,
+} from "@/utils/validations/survey";
 import { validateWithSchema } from "@/utils/validations/validations";
 import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
@@ -16,7 +19,6 @@ export const validateNewSurvey = async (
   name: string
 ) => {
   try {
-
     const schema = newSurveySchema();
     schema.parse({ name });
 
@@ -38,7 +40,7 @@ export const validateNewSurvey = async (
 export async function checkWorkspaceExistsForSurvey(
   req: CustomNextRequest,
   res: NextResponse,
-  workspaceId:string
+  workspaceId: string
 ) {
   try {
     if (!workspaceId) {
@@ -145,6 +147,7 @@ export async function checkSurveyTitle(
       "workspace",
       JSON.stringify(res.headers.get("workspace"))
     );
+    console.log("name checking done")
     return response;
   } catch (error) {
     if (error instanceof ZodError) {
@@ -201,7 +204,7 @@ export const checkSurveyExists = async (
 export const checkSurveyForDuplicatingOrMoving = async (
   req: NextRequest,
   res: NextResponse,
-  targetWorkspaceId:string
+  targetWorkspaceId: string
 ) => {
   try {
     if (!targetWorkspaceId) {
@@ -234,5 +237,31 @@ export const checkSurveyForDuplicatingOrMoving = async (
     return response;
   } catch (error) {
     throw error;
+  }
+};
+
+export const validateSurveySettings = async (
+  _req: NextRequest,
+  _res: NextResponse,
+  settings: SurveySettings
+) => {
+  try {
+    const schema = surveySettingsSchema();
+    schema.parse({
+      ...settings,
+      startTime: settings.startTime ? new Date(settings.startTime) : null,
+      endTime: settings.endTime ? new Date(settings.endTime) : null,
+    });
+    const response = NextResponse.next();
+    return response;
+  } catch (error) {
+    throw new CustomError(
+      "Error Validating Survey Settings",
+      400,
+      "survey",
+      true,
+      "",
+      validateWithSchema(error)
+    );
   }
 };

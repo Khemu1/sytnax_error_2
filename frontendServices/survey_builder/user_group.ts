@@ -3,10 +3,10 @@ import { CustomError } from "@/middleware/CustomError";
 export const addUserToGroup = async (
   groupId: string,
   groupName: string,
-  username: string,
+  username: string
 ) => {
   try {
-    const response = await fetch("/api/group/add-user", {
+    const response = await fetch("/api/survey_builder/group/add-user", {
       method: "POST",
       body: JSON.stringify({ username, groupId, groupName }),
     });
@@ -36,12 +36,9 @@ export const addUserToGroup = async (
   }
 };
 
-export const removeUserFromGroup = async (
-  groupId: string,
-  userId: number,
-) => {
+export const removeUserFromGroup = async (groupId: string, userId: number) => {
   try {
-    const response = await fetch("/api/group/remove-user", {
+    const response = await fetch("/api/survey_builder/group/remove-user", {
       method: "DELETE",
 
       body: JSON.stringify({ userId, groupId }),
@@ -56,38 +53,6 @@ export const removeUserFromGroup = async (
         errorMessage,
         response.status,
         "removeUserFromGroup",
-        true,
-        errorData.details,
-        errorData.errors
-      );
-      throw err;
-    }
-
-    return response.json();
-  } catch (error) {
-    if (!(error instanceof CustomError)) {
-      throw new CustomError("Network error", 500);
-    }
-    throw error;
-  }
-};
-
-
-export const getUserGroup = async () => {
-  try {
-    const response = await fetch("/api/survey_builder/group", {
-      method: "GET",
-    });
-
-    if (!response.ok) {
-      const errorData: CustomError = await response.json();
-
-      const errorMessage = errorData.message ?? "Unknown Error Occurred";
-
-      const err = new CustomError(
-        errorMessage,
-        response.status,
-        "getUserGroup",
         true,
         errorData.details,
         errorData.errors

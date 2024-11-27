@@ -1,6 +1,7 @@
 import { NextResponse,NextRequest } from "next/server";
 import { workspaceBuilderRoutes } from "./workspace/handler";
 import { surveyBuilderRoutes } from "./survey/handler";
+import { groupBuilderRoutes } from "./group/handler";
 
 export const handleSurveyBuilderRoutes = async (req: NextRequest) => {
   try {
@@ -12,6 +13,9 @@ export const handleSurveyBuilderRoutes = async (req: NextRequest) => {
 
     if (pathName.startsWith("/api/survey_builder/workspace")) {
       return await workspaceBuilderRoutes(req);
+    }
+    if (pathName.startsWith("/api/survey_builder/group")) {
+      return await groupBuilderRoutes(req);
     }
 
     return NextResponse.json(

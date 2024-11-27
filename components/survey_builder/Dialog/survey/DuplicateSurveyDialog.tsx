@@ -2,7 +2,7 @@ import { useDuplicateSurvey } from "@/hooks/survey_builder/survey";
 import { RootState } from "@/store/store";
 import { newSurveySchema } from "@/utils/validations/survey";
 import { validateWithSchema } from "@/utils/validations/validations";
-import { Dialog } from "@headlessui/react";
+import { Dialog, DialogPanel } from "@headlessui/react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -29,7 +29,7 @@ const DuplicateSurveyDialog: React.FC<DuplicateSurveyDialogProps> = ({
   const [workspaceId, setWorkspaceId] = useState<number | null>(null);
   const [errors, setErrors] = useState<Record<string, string> | null>(null);
 
-  const { handleDuplicateSurvey, isError, errorState, isSuccess } =
+  const { handleDuplicateSurvey, isError, errorState, isSuccess,isPending } =
     useDuplicateSurvey();
 
   const handleSave = async (e: React.FormEvent) => {
@@ -68,9 +68,12 @@ const DuplicateSurveyDialog: React.FC<DuplicateSurveyDialogProps> = ({
         aria-hidden="true"
       />
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <Dialog.Panel className="bg-[#1e1e1e] rounded-md py-5 w-[300px]">
+        <DialogPanel
+          transition
+          className="w-[300px] max-w-md rounded-xl bg-white/5 p-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
+        >
           <form onSubmit={handleSave}>
-            <div className="flex w-full items-center border-b border-b-gray-500 pb-2 px-2">
+            <div className="flex w-full items-center pb-2 px-2">
               <button type="button" onClick={onClose}>
                 <Image
                   src="/assets/icons/close.svg"
@@ -79,7 +82,7 @@ const DuplicateSurveyDialog: React.FC<DuplicateSurveyDialogProps> = ({
                   height={20}
                 />
               </button>
-              <span className="flex flex-1 justify-center text-white">
+              <span className="flex flex-1 justify-center text-white font-semibold">
                 Duplicate Survey
               </span>
             </div>
@@ -99,7 +102,10 @@ const DuplicateSurveyDialog: React.FC<DuplicateSurveyDialogProps> = ({
               )}
             </div>
 
-            <div className="border-b border-b-gray-500 p-[2rem]">
+            <div className="border-b border-b-gray-500  p-[2rem] pt-[1rem]">
+              <span className="flex flex-1 justify-center text-white font-semibold  text-center mb-2">
+                Duplicate To
+              </span>
               <select
                 value={workspaceId ?? ""}
                 onChange={(e) => setWorkspaceId(Number(e.target.value))}
@@ -128,23 +134,31 @@ const DuplicateSurveyDialog: React.FC<DuplicateSurveyDialogProps> = ({
               </div>
             )}
 
-            <div className="flex justify-end gap-5 mt-4 px-4">
+            <div className="flex justify-end gap-5 mt-4 px-4 font-semibold text-white">
               <button
-                className="bg-[#2f2b7226] py-2 px-4 rounded"
+                className="bg-red-700 py-2 px-4 rounded"
                 type="button"
-                onClick={onClose}
+                onClick={() => {
+                  setSurveyTitle("");
+                  onClose();
+                }}
               >
                 Cancel
               </button>
               <button
-                className="bg-[#2c2f31] transition-all py-2 px-4 rounded"
+                disabled={isPending}
+                className="flex justify-center items-center bg-blue-600 transition-all py-2 px-4 rounded"
                 type="submit"
               >
-                Duplicate
+                {isPending ? (
+                  <span className="loading loading-spinner loading-sm"></span>
+                ) : (
+                  "Save"
+                )}
               </button>
             </div>
           </form>
-        </Dialog.Panel>
+        </DialogPanel>
       </div>
     </Dialog>
   );

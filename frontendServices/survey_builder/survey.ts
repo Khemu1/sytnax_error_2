@@ -1,19 +1,19 @@
 import { CustomError } from "@/middleware/CustomError";
-import { SurveyModel, UpdateSurveyTitleResponse } from "@/types/survey";
+import {
+  SurveyModel,
+  SurveySettings,
+} from "@/types/survey";
 
 export const updateSurveyTitle = async (
   name: string,
   workspaceId: string,
   surveyId: string
-): Promise<UpdateSurveyTitleResponse> => {
+): Promise<SurveyModel> => {
   try {
     const response = await fetch(
       `/api/survey_builder/survey/${surveyId}/update-name`,
       {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify({ workspaceId, name }),
       }
     );
@@ -34,7 +34,7 @@ export const updateSurveyTitle = async (
       throw err;
     }
 
-    const data: UpdateSurveyTitleResponse = await response.json();
+    const data = await response.json();
     return data;
   } catch (error) {
     console.error(error);
@@ -49,11 +49,14 @@ export const duplicateSurvey = async (
   targetWorkspaceId: number
 ): Promise<SurveyModel> => {
   try {
-    const response = await fetch(`/api/survey/${surveyId}/duplicate`, {
-      method: "POST",
+    const response = await fetch(
+      `/api/survey_builder/survey/${surveyId}/duplicate`,
+      {
+        method: "POST",
 
-      body: JSON.stringify({ workspaceId, title, targetWorkspaceId }),
-    });
+        body: JSON.stringify({ workspaceId, title, targetWorkspaceId }),
+      }
+    );
 
     if (!response.ok) {
       const errorData: CustomError = await response.json();
@@ -118,7 +121,7 @@ export const moveSurveyToWorkspace = async (
   workspaceId: string,
   surveyId: string,
   targetWorkspaceId: string
-): Promise<{ targetWorkspaceId: string }> => {
+): Promise<{ soruceWorkspaceId:string, surveyId:string, targetWorkspaceId: string }> => {
   try {
     const response = await fetch(
       `/api/survey_builder/survey/${surveyId}/move`,
@@ -280,6 +283,44 @@ export const updateSurveyUrl = async (
         errorMessage,
         response.status,
         "getSurveyError",
+        true,
+        errorData.details,
+        errorData.errors
+      );
+      throw err;
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+export const updateSurveySettings = async (
+  workspaceId: string,
+  surveyId: string,
+  settings: SurveySettings
+) => {
+  try {
+    const response = await fetch(
+      `/api/survey_builder/survey/${surveyId}/update-settings`,
+      {
+        method: "PATCH",
+        body: JSON.stringify({ workspaceId, settings }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorData: CustomError = await response.json();
+
+      const errorMessage = errorData.message ?? "Unknown Error Occurred";
+
+      const err = new CustomError(
+        errorMessage,
+        response.status,
+        "updateSruveySettingsError",
         true,
         errorData.details,
         errorData.errors

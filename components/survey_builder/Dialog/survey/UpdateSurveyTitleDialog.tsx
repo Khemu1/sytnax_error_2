@@ -30,7 +30,7 @@ const UpdateSurveyTitleDialog: React.FC<UpdateSurveyTitleDialogProps> = ({
     currentSurveyState.currentSurvey?.name || ""
   );
   const [errors, setErros] = useState<Record<string, string> | null>(null);
-  const { handleUpdateSurvey, isError, errorState, isSuccess } =
+  const { handleUpdateSurvey, isError, errorState, isSuccess,isPending } =
     useUpdateSurvey();
 
   const handleSave = async (e: React.FormEvent) => {
@@ -75,10 +75,13 @@ const UpdateSurveyTitleDialog: React.FC<UpdateSurveyTitleDialogProps> = ({
         aria-hidden="true"
       />
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <DialogPanel className="bg-[#1e1e1e] rounded-md py-5 w-[300px]">
+        <DialogPanel
+          transition
+          className=" max-w-md rounded-xl bg-white/5 p-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0 w-[300px]"
+        >
           <div className="">
             <form onSubmit={handleSave} className="">
-              <div className="flex w-full items-center border-b border-b-gray-500 pb-2 px-2">
+              <div className="flex w-full items-center  pb-2 px-2">
                 <button type="button" className="" onClick={onClose}>
                   <Image
                     src="/assets/icons/close.svg"
@@ -87,7 +90,7 @@ const UpdateSurveyTitleDialog: React.FC<UpdateSurveyTitleDialogProps> = ({
                     height={20}
                   />
                 </button>
-                <span className="flex flex-1 justify-center text-white">
+                <span className="flex flex-1 justify-center text-white font-semibold">
                   Rename Survey
                 </span>
               </div>
@@ -108,20 +111,27 @@ const UpdateSurveyTitleDialog: React.FC<UpdateSurveyTitleDialogProps> = ({
                 </div>
               )}
 
-              <div className="flex justify-end gap-5 mt-4 px-4">
+              <div className="flex justify-end gap-5 mt-4 px-4 font-semibold text-white">
                 <button
-                  className=" bg-[#2f2b7226] py-2 px-4 rounded"
+                  className="bg-red-700 py-2 px-4 rounded"
                   type="button"
-                  onClick={onClose}
+                  onClick={() => {
+                    setName("");
+                    onClose();
+                  }}
                 >
                   Cancel
                 </button>
                 <button
-                  disabled={isSubmitting}
-                  className=" bg-[#2c2f31] transition-all  py-2 px-4 rounded"
+                  disabled={isPending}
+                  className="flex justify-center items-center bg-blue-600 transition-all py-2 px-4 rounded"
                   type="submit"
                 >
-                  Save
+                  {isPending ? (
+                    <span className="loading loading-spinner loading-sm"></span>
+                  ) : (
+                    "Save"
+                  )}
                 </button>
               </div>
             </form>

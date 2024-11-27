@@ -8,13 +8,10 @@ import { WorkSpaceModel } from "@/types/survey";
 
 const Workspaces = () => {
   const dispatch = useDispatch();
-  const workspaces = useSelector(
-    //todo : call the selector once
-    (state: RootState) => state.workspace.workspaces
-  );
-  const currentWorkspace = useSelector(
-    (state: RootState) => state.currentWorkspace.currentWorkspace
-  );
+  const { currentWorkspace, workspaces } = useSelector((state: RootState) => ({
+    currentWorkspace: state.currentWorkspace.currentWorkspace,
+    workspaces: state.workspace.workspaces,
+  }));
 
   useEffect(() => {
     if (workspaces.length > 0 && !currentWorkspace) {
@@ -36,7 +33,7 @@ const Workspaces = () => {
 
   return (
     <div className="flex flex-col w-full gap-2">
-      {workspaces.map((workspace) => (
+      {workspaces.map((workspace: WorkSpaceModel) => (
         <Workspace
           key={workspace.id}
           selected={currentWorkspace?.id === workspace.id}

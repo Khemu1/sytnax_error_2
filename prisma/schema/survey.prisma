@@ -5,7 +5,7 @@ enum GradesVisibility {
 }
 model Survey {
   id          String             @id @default(cuid())
-  workspaceId String             @unique
+  workspaceId String             
   name        String
   startTime        String?
   endTime          String?

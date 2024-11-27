@@ -17,3 +17,5 @@ workers_dev = false  # Disable workers.dev for production
 route = "https://my-worker.alghost2004.workers.dev/*"  # Set to your domain or workers.dev URL
 account_id = "3aefa2f7b2725c6cb66ee51308a568d821d3f"  # Replace with your actual Cloudflare account ID
 
+[observability.logs]
+enabled = true

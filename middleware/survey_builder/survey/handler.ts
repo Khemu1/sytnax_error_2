@@ -6,11 +6,13 @@ import {
   checkSurveyTitle,
   validateNewSurvey,
   checkSurveyForDuplicatingOrMoving,
+  validateSurveySettings,
 } from "./index";
 import {
   authenticateUser,
   checkDashBoardRoles,
 } from "@/middleware/auth/authMiddleware";
+import { SurveySettings } from "@/types/survey";
 
 /**
  * This method performs common checks for all the survey routes
@@ -23,16 +25,16 @@ const performCommonSurveyChecks = async (
   authUser: NextResponse,
   surveyId?: string
 ) => {
-  // Parse body only once here and pass it along
   const body = (await req.json()) as {
     name: string;
     workspaceId: string;
     surveyId: string;
     targetWorkspaceId: string;
+    settings: SurveySettings;
   };
-  body.surveyId = surveyId ?? body.surveyId; // Optional surveyId, if provided
+  body.surveyId = surveyId ?? body.surveyId;
 
-  // Perform checks for workspace existence and membership
+  // perform checks for workspace existence and membership
   const workspaceExists = await checkWorkspaceExistsForSurvey(
     req,
     authUser,
@@ -82,13 +84,26 @@ const handleDeleteSurvey = async (req: NextRequest, authUser: NextResponse) => {
 };
 
 const handleUpdateSurvey = async (req: NextRequest, authUser: NextResponse) => {
-  const surveyId = req.nextUrl.pathname.split("/")[4]; // Extract surveyId from the path
-  const { checkMemberShip, surveyExists, body } =
-    await performCommonSurveyChecks(req, authUser, surveyId);
-  if (!surveyExists) {
-    return NextResponse.json({ message: "Survey not found" }, { status: 404 });
-  }
-  return await checkSurveyTitle(req, checkMemberShip, body.name); // Pass body here
+  const surveyId = req.nextUrl.pathname.split("/")[4];
+  const { checkMemberShip, body } = await performCommonSurveyChecks(
+    req,
+    authUser,
+    surveyId
+  );
+  return await checkSurveyTitle(req, checkMemberShip, body.name);
+};
+
+const handleUpdateSurveySettings = async (
+  req: NextRequest,
+  authUser: NextResponse
+) => {
+  const surveyId = req.nextUrl.pathname.split("/")[4];
+  const { checkMemberShip, body } = await performCommonSurveyChecks(
+    req,
+    authUser,
+    surveyId
+  );
+  return await validateSurveySettings(req, checkMemberShip, body.settings);
 };
 
 const handleDuplicateOrMoveSurvey = async (
@@ -148,6 +163,12 @@ export const surveyBuilderRoutes = async (req: NextRequest) => {
           ) {
             return await handleUpdateSurvey(req, authUser);
           }
+          if (
+            pathName ===
+            `/api/survey_builder/survey/${surveyId}/update-settings`
+          ) {
+            return await handleUpdateSurveySettings(req, authUser);
+          }
           break;
         default:
           return NextResponse.json(
@@ -157,9 +178,6 @@ export const surveyBuilderRoutes = async (req: NextRequest) => {
       }
     }
 
-    // Handle duplication and moving of surveys
-    console.log("pathName", pathName);
-    console.log("moveOrDuplicateSurveyRegexPath", moveOrDuplicateSurveyRegexPath.test(pathName));
     if (moveOrDuplicateSurveyRegexPath.test(pathName)) {
       switch (method) {
         case "PATCH":
@@ -188,10 +206,6 @@ export const surveyBuilderRoutes = async (req: NextRequest) => {
       { status: 404 }
     );
   } catch (error) {
-    console.error(error);
-    return NextResponse.json(
-      { message: "Internal server error" },
-      { status: 500 }
-    );
+    throw error;
   }
 };

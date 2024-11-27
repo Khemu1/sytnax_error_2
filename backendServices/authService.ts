@@ -31,24 +31,27 @@ export const signInService = async (data: SignInProps) => {
         userRole: true,
       },
     });
-
     if (!user) {
       throw new CustomError("Invalid Credentials", 404, "Sign in Error", true);
     }
-    const response = await fetch("http://localhost:8787/decrypt-password", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        hashedPassword: user.passwordHash,
-        password: data.password,
-      }),
-    });
+    const response = await fetch(
+      "https://my-worker.alghost2004.workers.dev//decrypt-password",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          hashedPassword: user.passwordHash,
+          password: data.password,
+        }),
+      }
+    );
     const result = (await response.json()) as Promise<boolean>;
     if (!result) {
       throw new CustomError("Invalid Credentials", 404, "Sign in Error", true);
     }
+    console.log("res", result);
     // get user own group
     const userGroup = await prisma.group.findFirst({
       where: { ownerId: user.id },

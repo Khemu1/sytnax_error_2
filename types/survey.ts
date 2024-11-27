@@ -47,7 +47,6 @@ export interface UserModel {
   updatedAt?: Date;
   groupId: string;
   workspaces?: WorkSpaceModel[];
-  userGroups?: UserGroupModel[];
   createdGroup: GroupModel;
 }
 
@@ -55,7 +54,6 @@ export interface UserGroupModel {
   userId: number;
   groupId: string;
   createdAt?: string;
-  updatedAt?: string;
   user: {
     username: string;
   };
@@ -295,4 +293,12 @@ export interface UpdateSurveyUrlProps {
   surveyId: string;
   url: string;
   currentLang: "de" | "en";
+}
+
+export interface SurveySettings {
+  questionsPerPage: number | null;
+  duration: number | null;
+  startTime: string | null;
+  endTime: string | null;
+  gradesVisibility: "hidden" | "visible" | "visibleAfterSurveyCloses" | null;
 }

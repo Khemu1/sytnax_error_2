@@ -19,19 +19,15 @@ import {
   updateWorkspaceSurvey,
 } from "@/store/slices/survey/workspaceSlice";
 import { SurveyModel } from "@/types/survey";
-import { Dispatch, UnknownAction } from "@reduxjs/toolkit";
+import { Dispatch } from "@reduxjs/toolkit";
 
 export const addSurveyF = async (
-  currentWorkspaceId: string,
   newSurvey: SurveyModel,
-  dispatch: Dispatch<UnknownAction>
+  dispatch: Dispatch
 ) => {
   try {
-    console.log(newSurvey.workspace, currentWorkspaceId);
-    if (newSurvey.workspaceId === currentWorkspaceId) {
-      dispatch(addSurveyToCurrentWorkspace(newSurvey));
-      dispatch(addSurvey(newSurvey));
-    }
+    dispatch(addSurveyToCurrentWorkspace(newSurvey));
+    dispatch(addSurvey(newSurvey));
     dispatch(addSurveyToWorkspace(newSurvey));
   } catch (error) {
     console.error("Error adding survey:", error);
@@ -60,26 +56,12 @@ export const deleteSurveyF = async (
 
 export const updateSurveyF = async (
   survey: SurveyModel,
-  currentSurveyId: string,
-  surveyWorkspaceId: string,
-  currentWorkspaceId: string,
   dispatch: Dispatch
 ) => {
   try {
-    console.log(
-      "updating survey",
-      survey,
-      currentSurveyId,
-      surveyWorkspaceId,
-      currentWorkspaceId
-    );
-    if (currentWorkspaceId === surveyWorkspaceId) {
-      dispatch(updateCurrentWorkspaceSurveys(survey));
-    }
-    if (currentSurveyId === survey.id) {
-      dispatch(updateCurrentSurvey(survey));
-    }
     dispatch(updateSurveys(survey));
+    dispatch(updateCurrentSurvey(survey));
+    dispatch(updateCurrentWorkspaceSurveys(survey));
     dispatch(updateWorkspaceSurvey(survey));
   } catch (error) {
     console.error("Error updating survey title:", error);
@@ -107,17 +89,12 @@ export const moveSurveyF = async (
   surveyId: string,
   sourceWorkspaceId: string,
   targetWorkspaceId: string,
-  currentWorkspaceId: string,
-  survey: SurveyModel,
   dispatch: Dispatch
 ) => {
   try {
-    console.log(currentWorkspaceId, sourceWorkspaceId);
-    if (currentWorkspaceId === sourceWorkspaceId) {
-      dispatch(deleteCurrnetWorkspaceSurvey(surveyId));
-      dispatch(clearCurrentSurvey());
-    }
+    dispatch(clearCurrentSurvey());
     dispatch(deleteSurvey(surveyId));
+    dispatch(deleteCurrnetWorkspaceSurvey(surveyId));
     dispatch(
       moveSurveyToAnotherWorkspace({
         surveyId,
@@ -125,10 +102,6 @@ export const moveSurveyF = async (
         targetWorkspaceId,
       })
     );
-    if (currentWorkspaceId === targetWorkspaceId) {
-      dispatch(addSurveyToCurrentWorkspace(survey));
-      dispatch(addSurvey(survey));
-    }
   } catch (error) {
     console.error("Error moving survey:", error);
   }

@@ -23,7 +23,7 @@ const Toast: React.FC<ToastProps> = ({
           type === "success" ? "bg-blue-600" : "bg-red-600"
         } text-white`}
       >
-        <span>{message}</span>
+        <span className="flex justify-center">{message}</span>
       </div>
     </div>
   );

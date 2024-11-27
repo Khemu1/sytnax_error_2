@@ -11,6 +11,7 @@ import { signInService } from "@/backendServices/authService";
 export const POST = async (req: NextRequest) => {
   try {
     const body = (await req.json()) as SignInProps;
+    console.log("body", body);
     const user = await signInService(body);
 
     const token = await generateAccessTokens({

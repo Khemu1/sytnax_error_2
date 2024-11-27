@@ -1,9 +1,12 @@
 import { Dialog, DialogPanel } from "@headlessui/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import DateSelector from "../../surveys/DateSelector";
 import { RootState } from "@/store/store";
 import { useSelector } from "react-redux";
-import { formatDate } from "@/utils";
+import { surveySettingsSchema } from "@/utils/validations/survey";
+import { validateWithSchema } from "@/utils/validations/validations";
+import { useUpdateSurveySettings } from "@/hooks/survey_builder/survey";
+import { SurveySettings } from "@/types/survey";
 interface SurveySettingsProps {
   isOpen: boolean;
   onClose: () => void;
@@ -16,31 +19,46 @@ const SurveySettingsDialog: React.FC<SurveySettingsProps> = ({
   const currentSurvey = useSelector(
     (state: RootState) => state.currentSurvey.currentSurvey
   );
-  const [surveyDetails, setSurveyDetails] = useState({
+  const [surveySettings, setSurveySettings] = useState({
     startTime: currentSurvey?.startTime
       ? new Date(currentSurvey.startTime)
       : null,
     endTime: currentSurvey?.endTime ? new Date(currentSurvey.endTime) : null,
     questionsPerPage: currentSurvey?.questionsPerPage ?? 5,
     duration: currentSurvey?.duration ?? 5,
-    gradesVisibility: currentSurvey?.gradesVisibility ?? "Hidden",
+    gradesVisibility: currentSurvey?.gradesVisibility ?? "hidden",
   });
 
+  const [validationErrors, setValidationErrors] = useState<Record<
+    string,
+    string
+  > | null>(null);
+
+  const {
+    errorState: addApiErros,
+    handleUpdateSurveySettings,
+    isPending,
+    isSuccess,
+  } = useUpdateSurveySettings();
+
   const handleGradesChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSurveyDetails((prev) => ({
+    setSurveySettings((prev) => ({
       ...prev,
-      gradesVisibility: event.target.value,
+      gradesVisibility: event.target.value as
+        | "hidden"
+        | "visible"
+        | "visibleAfterSurveyCloses",
     }));
   };
-  const handleStartTimeChange = (newStartTime: Date) => {
-    setSurveyDetails((prev) => ({
+  const handleStartTimeChange = (newStartTime: Date | null) => {
+    setSurveySettings((prev) => ({
       ...prev,
       startTime: newStartTime,
     }));
   };
 
-  const handleEndTimeChange = (newEndTime: Date) => {
-    setSurveyDetails((prev) => ({
+  const handleEndTimeChange = (newEndTime: Date | null) => {
+    setSurveySettings((prev) => ({
       ...prev,
       endTime: newEndTime,
     }));
@@ -48,38 +66,75 @@ const SurveySettingsDialog: React.FC<SurveySettingsProps> = ({
   const handleQuestionsPerPageChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    setSurveyDetails((prev) => ({
+    setSurveySettings((prev) => ({
       ...prev,
       questionsPerPage: Number(event.target.value),
     }));
   };
 
   const handleDurationChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSurveyDetails((prev) => ({
+    setSurveySettings((prev) => ({
       ...prev,
       duration: Number(event.target.value),
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!surveyDetails.startTime || !surveyDetails.endTime) {
-      alert("Please select a start and end time.");
-      return;
+  useEffect(() => {
+    if (isSuccess) {
+      onClose();
     }
-    const formattedStartTime = formatDate(surveyDetails.startTime)!;
-    const formattedEndTime = formatDate(surveyDetails.endTime)!;
-    const startString = `${formattedStartTime.year}-${formattedStartTime.month}-${formattedStartTime.day} ${formattedStartTime.hours}:${formattedStartTime.minutes} ${formattedStartTime.period}`;
-    const endString = `${formattedEndTime.year}-${formattedEndTime.month}-${formattedEndTime.day} ${formattedEndTime.hours}:${formattedEndTime.minutes} ${formattedEndTime.period}`;
+  }, [isSuccess]);
 
-    console.log(startString, endString);
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    try {
+      e.preventDefault();
 
-    const startDate = new Date(startString);
-    const endDate = new Date(endString);
+      // Validate the settings using the schema
+      surveySettingsSchema().parse({ ...surveySettings });
 
-    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-      alert("Invalid date or time format.");
-      return;
+      // Initialize the settings object
+      const settings: SurveySettings = {
+        questionsPerPage: null,
+        duration: null,
+        startTime: null,
+        endTime: null,
+        gradesVisibility: null,
+      };
+
+      if (surveySettings.gradesVisibility !== currentSurvey?.gradesVisibility) {
+        settings.gradesVisibility = surveySettings.gradesVisibility;
+      }
+
+      if (surveySettings.duration !== currentSurvey?.duration) {
+        settings.duration = surveySettings.duration;
+      }
+
+      if (surveySettings.questionsPerPage !== currentSurvey?.questionsPerPage) {
+        settings.questionsPerPage = surveySettings.questionsPerPage;
+      }
+
+      if (
+        surveySettings.startTime &&
+        surveySettings.startTime !== new Date(currentSurvey?.startTime ?? "")
+      ) {
+        settings.startTime = surveySettings.startTime.toISOString();
+      }
+
+      if (
+        surveySettings.endTime &&
+        surveySettings.endTime !== new Date(currentSurvey?.endTime ?? "")
+      ) {
+        settings.endTime = surveySettings.endTime.toISOString();
+      }
+
+      handleUpdateSurveySettings({
+        workspaceId: currentSurvey!.workspaceId,
+        surveyId: currentSurvey!.id,
+        settings,
+      });
+    } catch (error) {
+      setValidationErrors(validateWithSchema(error));
+      console.error(validationErrors);
     }
   };
 
@@ -90,7 +145,10 @@ const SurveySettingsDialog: React.FC<SurveySettingsProps> = ({
         aria-hidden="true"
       />
       <div className="fixed inset-0 flex items-center justify-center p-4 overflow-y-scroll">
-        <DialogPanel className="bg-base-100 rounded-md py-5 w-[350px]  ">
+        <DialogPanel
+          transition
+          className="w-full max-w-md rounded-xl bg-white/5 p-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
+        >
           <h2 className="text-center font-semibold text-white text-xl mb-4">
             Survey{"'"}s Settings
           </h2>
@@ -111,9 +169,14 @@ const SurveySettingsDialog: React.FC<SurveySettingsProps> = ({
                   placeholder="Enter Questions Per Page"
                   min={1}
                   max={10}
-                  value={surveyDetails.questionsPerPage}
+                  value={surveySettings.questionsPerPage}
                   onChange={handleQuestionsPerPageChange}
                 />
+                <p className="text-red-500 font-semibold w-[250px] h-[10px]">
+                  {validationErrors?.questionsPerPage ??
+                    addApiErros?.questionsPerPage ??
+                    ""}
+                </p>
               </div>
               <div>
                 <label
@@ -128,9 +191,12 @@ const SurveySettingsDialog: React.FC<SurveySettingsProps> = ({
                   name="duration"
                   className="w-full  text-white border-none outline-none p-2 rounded-md"
                   min={5}
-                  value={surveyDetails.duration}
+                  value={surveySettings.duration}
                   onChange={handleDurationChange}
                 />
+                <p className="text-red-500 font-semibold w-[250px] h-[10px]">
+                  {validationErrors?.duration ?? addApiErros?.duration ?? ""}
+                </p>
               </div>
             </div>
 
@@ -142,17 +208,24 @@ const SurveySettingsDialog: React.FC<SurveySettingsProps> = ({
               <div className="mb-4 ml-2">
                 <h2 className="text-white font-semibold">Start Time</h2>
                 <DateSelector
-                  selectedDate={surveyDetails.startTime}
+                  selectedDate={surveySettings.startTime}
                   onDateChange={handleStartTimeChange}
                 />
+                <p className="text-red-500 font-semibold w-[250px] h-[10px]">
+                  {" "}
+                  {validationErrors?.startTime ?? addApiErros?.startTime ?? ""}
+                </p>
               </div>
 
               <div className="mb-4 ml-2">
                 <h2 className="text-white font-semibold">End Time</h2>
                 <DateSelector
-                  selectedDate={surveyDetails.endTime}
+                  selectedDate={surveySettings.endTime}
                   onDateChange={handleEndTimeChange}
                 />
+                <p className="text-red-500 font-semibold w-[250px] h-[10px]">
+                  {validationErrors?.endTime ?? addApiErros?.endTime ?? ""}
+                </p>
               </div>
             </div>
 
@@ -164,8 +237,8 @@ const SurveySettingsDialog: React.FC<SurveySettingsProps> = ({
                     <input
                       type="radio"
                       name="gradesVisibility"
-                      value="Hidden"
-                      checked={surveyDetails.gradesVisibility === "hidden"}
+                      value="hidden"
+                      checked={surveySettings.gradesVisibility === "hidden"}
                       onChange={handleGradesChange}
                       className="mr-2 w-max"
                     />
@@ -177,8 +250,8 @@ const SurveySettingsDialog: React.FC<SurveySettingsProps> = ({
                     <input
                       type="radio"
                       name="gradesVisibility"
-                      value="Visible"
-                      checked={surveyDetails.gradesVisibility === "visible"}
+                      value="visible"
+                      checked={surveySettings.gradesVisibility === "visible"}
                       onChange={handleGradesChange}
                       className="mr-2 w-max"
                     />
@@ -192,7 +265,7 @@ const SurveySettingsDialog: React.FC<SurveySettingsProps> = ({
                       name="gradesVisibility"
                       value="visibleAfterSurveyCloses"
                       checked={
-                        surveyDetails.gradesVisibility ===
+                        surveySettings.gradesVisibility ===
                         "visibleAfterSurveyCloses"
                       }
                       onChange={handleGradesChange}
@@ -201,6 +274,11 @@ const SurveySettingsDialog: React.FC<SurveySettingsProps> = ({
                     Show After Survey Closes
                   </label>
                 </div>
+                <p>
+                  {validationErrors?.gradesVisibility ??
+                    addApiErros?.gradesVisibility ??
+                    ""}
+                </p>
               </div>
             </div>
 
@@ -212,10 +290,15 @@ const SurveySettingsDialog: React.FC<SurveySettingsProps> = ({
                 Close
               </button>
               <button
+                disabled={isPending}
+                className="flex justify-center items-center bg-blue-600 transition-all py-2 px-4 rounded"
                 type="submit"
-                className="bg-blue-500 text-white p-2 rounded-md"
               >
-                Save
+                {isPending ? (
+                  <span className="loading loading-spinner loading-sm"></span>
+                ) : (
+                  "Save"
+                )}
               </button>
             </div>
           </form>

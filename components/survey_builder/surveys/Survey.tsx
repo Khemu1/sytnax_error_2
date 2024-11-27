@@ -12,6 +12,7 @@ import SurveySettingsDialog from "../Dialog/survey/SurveySettingsDialog";
 import { setCurrentSurvey } from "@/store/slices/survey/currentSurveySlice";
 import { getSurveyStatus } from "@/utils";
 import { useDispatch } from "react-redux";
+import Toast from "@/components/skeletons/Toast";
 const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isUpdateDialogOpen, setUpdateDialogOpen] = useState(false);
@@ -24,6 +25,10 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
     survey.startTime,
     survey.endTime
   );
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "error";
+  } | null>(null);
   const dispatch = useDispatch();
 
   const { handleDeleteSurvey } = useDeleteSurvey();
@@ -44,12 +49,12 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
         setMoveDialogOpen(true);
         break;
       case "duplicate":
-        setDuplicateDialogOpen(true);
+        setDuplicateDialogOpen(false);
         break;
       case "settings":
         dispatch(setCurrentSurvey(survey));
         setSettingsDialogOpen(true);
-        
+
         break;
     }
   };
@@ -104,7 +109,7 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
             </p>
           </Link>
 
-          <div className="flex flex-col justify-start sm:w-[40%] bg-[#1e2a38a1] p-4 gap-3 font-semibold">
+          <div className="flex flex-col justify-start sm:w-[40%] bg-[#1e2a38a1] p-4 gap-3 font-semibold sm:overflow-y-scroll">
             {/* Toggle Menu Button */}
             <div className="flex justify-end">
               <button
@@ -158,28 +163,7 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
             )}
 
             {/* Survey Details */}
-            <div className="flex flex-col gap-2">
-              {/* Start and End Time */}
-              <div className="text-sm">
-                {startTime && (
-                  <div>
-                    <strong>Start Time:</strong> {startTime}
-                  </div>
-                )}
-                {endTime && (
-                  <div>
-                    <strong>End Time:</strong> {endTime}
-                  </div>
-                )}
-                <div
-                  className={`${
-                    isActive ? "text-green-500" : "text-red-600"
-                  } py-2 text-base`}
-                >
-                  {isActive ? "Active" : "Inactive"}
-                </div>
-              </div>
-
+            <div className="flex flex-col">
               {/* Grades Visibility */}
               <div className="text-sm py-2">
                 {survey.gradesVisibility === "hidden"
@@ -187,6 +171,33 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
                   : survey.gradesVisibility === "visible"
                   ? "Visible Grades"
                   : "Visible Grades After Closing"}
+              </div>
+              <div className="text-sm py-2">
+                Duration: {survey.duration} Mins
+              </div>
+              {/* Start and End Time */}
+              <div className="flex flex-col gap-1">
+                {startTime && endTime && (
+                  <div className="flex flex-col text-sm gap-2">
+                    <div className="flex flex-col gap-1">
+                      <strong>Start Time:</strong>
+                      <span className="text-[12px]">{startTime}</span>
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <strong>End Time:</strong>
+                      <span className="text-[12.1px] ">{endTime}</span>
+                    </div>
+                  </div>
+                )}
+
+                <div
+                  className={`${
+                    isActive ? "text-green-500" : "text-red-600"
+                  } py-2 text-base`}
+                >
+                  {isActive ? "Active" : "Inactive"}
+                </div>
               </div>
 
               {/* Actions */}
@@ -197,7 +208,20 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
                 >
                   Settings
                 </button>
-                <button className="py-2">Copy Link</button>
+                <button
+                  className="py-2"
+                  onClick={() => {
+                    window.navigator.clipboard.writeText(
+                      `${process.env.NEXT_PUBLIC_BASE_URL}/quiz/${survey.id}`
+                    );
+                    setToast({
+                      message: "Link copied to clipboard",
+                      type: "success",
+                    });
+                  }}
+                >
+                  Share Quiz
+                </button>
               </div>
             </div>
           </div>
@@ -227,6 +251,13 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
         <SurveySettingsDialog
           isOpen={isSettingsDialogOpen}
           onClose={handleCloseDialogs}
+        />
+      )}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
         />
       )}
     </>

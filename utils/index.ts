@@ -56,7 +56,7 @@ export const getSurveyStatus = (
   const startTime = new Date(_startTime);
   const endTime = new Date(_endTime);
 
-  const convertToEgyptTime = (date: Date) => {
+  const convertToEgyptTime = (date: Date): string => {
     // Convert the provided date to Africa/Cairo timezone and format it
     const formatter = new Intl.DateTimeFormat("en-US", {
       timeZone: "Africa/Cairo",
@@ -65,23 +65,10 @@ export const getSurveyStatus = (
       day: "2-digit",
       hour: "2-digit",
       minute: "2-digit",
-      second: "2-digit",
-      hour12: false, // Use 24-hour format
+      hour12: true,
     });
 
-    const formattedDate = formatter.format(date);
-
-    // Split formatted date into components
-    const [month, day, year] = formattedDate.split(", ")[0].split("/");
-    const [hour, minute, second] = formattedDate.split(", ")[1].split(":");
-
-    // Construct a new Date object in the Cairo time zone
-    const egyptDate = new Date(
-      `${year}-${month}-${day}T${hour}:${minute}:${second}+02:00`
-    );
-
-    // Return the ISO string representation
-    return egyptDate.toISOString();
+    return formatter.format(date);
   };
 
   const egyptStartTime = convertToEgyptTime(startTime);
@@ -176,6 +163,32 @@ export function formatDateToCustomString(date: Date): string {
 
   // Combine time and date in the desired format
   return `${timeString} ${dateString}`;
+}
+
+/**
+ * filters an object based on allowed keys and removes undefined values.
+ *
+ * @param obj - The input object to filter.
+ * @param allowedKeys - The array of keys that are allowed in the result.
+ * @returns A new object containing only the allowed keys with non-null values.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function filterObject<T extends Record<string, any>>(
+  obj: Partial<T>,
+  allowedKeys: (keyof T)[]
+): Partial<T> {
+  return Object.keys(obj)
+    .filter((key): key is Extract<keyof T, string> =>
+      allowedKeys.includes(key as keyof T)
+    )
+    .reduce((acc, key) => {
+      const typedKey = key as Extract<keyof T, string>;
+      const value = obj[typedKey];
+      if (value !== null && value !== undefined) {
+        acc[typedKey] = value;
+      }
+      return acc;
+    }, {} as Partial<T>);
 }
 
 // export function clearSlices(dispatch: Dispatch) {

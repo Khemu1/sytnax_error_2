@@ -18,7 +18,6 @@ export const addGroupMemberF = async (
       addMember({
         ...member,
         createdAt: formatDate(member.createdAt),
-        updatedAt: formatDate(member.updatedAt),
       })
     );
   } catch (error) {

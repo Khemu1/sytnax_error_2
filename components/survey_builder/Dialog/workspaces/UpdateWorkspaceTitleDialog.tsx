@@ -23,8 +23,13 @@ const UpdateWorkspaceTitleDialog: React.FC<
 
   const [workspaceName, setworkspaceName] = useState("");
   const [errors, setErros] = useState<Record<string, string> | null>(null);
-  const { handleUpdateWorkspaceName, isError, errorState, isSuccess } =
-    useUpdateWorkspaceName();
+  const {
+    handleUpdateWorkspaceName,
+    isError,
+    errorState,
+    isSuccess,
+    isPending,
+  } = useUpdateWorkspaceName();
 
   const handleSave = async (e: React.FormEvent) => {
     setErros(null);
@@ -77,7 +82,10 @@ const UpdateWorkspaceTitleDialog: React.FC<
         aria-hidden="true"
       />
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <DialogPanel className="bg-base-100 rounded-md py-5 w-[300px]">
+        <DialogPanel
+          transition
+          className="w-full max-w-md rounded-xl bg-white/5 p-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
+        >
           <div className="">
             <form onSubmit={handleSave} className="">
               <div className="flex w-full items-center pb-2 px-2">
@@ -94,7 +102,7 @@ const UpdateWorkspaceTitleDialog: React.FC<
                 </span>
               </div>
 
-              <div className="border-b border-b-[#0000004f] p-[2rem]">
+              <div className="border-b border-b-gray-500 p-[2rem]">
                 <input
                   type="text"
                   value={workspaceName}
@@ -120,10 +128,15 @@ const UpdateWorkspaceTitleDialog: React.FC<
                   Cancel
                 </button>
                 <button
-                  className="bg-blue-600 transition-all py-2 px-4 rounded"
+                  disabled={isPending}
+                  className="flex justify-center items-center bg-blue-600 transition-all py-2 px-4 rounded"
                   type="submit"
                 >
-                  Save
+                  {isPending ? (
+                    <span className="loading loading-spinner loading-sm"></span>
+                  ) : (
+                    "Save"
+                  )}
                 </button>
               </div>
             </form>

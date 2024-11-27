@@ -45,7 +45,10 @@ const SearchDialog: React.FC<SearchDialogProps> = ({ isOpen, onClose }) => {
         aria-hidden="true"
       />
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <DialogPanel className="bg-base-100 rounded-md py-5 w-full h-full">
+        <DialogPanel
+          transition
+          className="w-full max-w-md rounded-xl bg-white/5 p-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
+        >
           <div>
             <form className="">
               <div className="flex gap-5 border-b border-b-gray-500 p-[2rem]">
@@ -90,7 +93,7 @@ const SearchDialog: React.FC<SearchDialogProps> = ({ isOpen, onClose }) => {
                       ))
                     ) : (
                       <div className="text-sm text-gray-400">
-                        No workspace Found
+                        No workspaces Found
                       </div>
                     )}
                   </div>
@@ -112,7 +115,7 @@ const SearchDialog: React.FC<SearchDialogProps> = ({ isOpen, onClose }) => {
                       ))
                     ) : (
                       <div className="text-sm text-gray-400">
-                        No Survey Found
+                        No Surveys Found
                       </div>
                     )}
                   </div>
