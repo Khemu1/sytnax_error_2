@@ -20,6 +20,7 @@ import {
 import { CustomError } from "@/middleware/CustomError";
 import {
   addSurveyF,
+  deleteSurveyF,
   moveSurveyF,
   updateSurveyF,
 } from "@/utils/survey_builder/survey";
@@ -238,12 +239,13 @@ export const useMoveSurvey = () => {
 };
 
 export const useChangeSurveyStatus = () => {
+  const dispatch = useDispatch();
   const [errorState, setErrorState] = useState<Record<string, string> | null>(
     null
   );
 
   const mutation = useMutation<
-    void,
+    SurveyModel,
     CustomError | unknown,
     {
       surveyId: string;
@@ -255,7 +257,10 @@ export const useChangeSurveyStatus = () => {
 
       return await updateSurveyStatus(workspaceId, surveyId);
     },
-
+    onSuccess: async (survey) => {
+      await updateSurveyF(survey, dispatch);
+      setErrorState(null);
+    },
     onError: (err: CustomError | unknown) => {
       const message =
         err instanceof CustomError
@@ -283,22 +288,23 @@ export const useChangeSurveyStatus = () => {
 };
 
 export const useDeleteSurvey = () => {
+  const dispatch = useDispatch();
   const [errorState, setErrorState] = useState<Record<string, string> | null>(
     null
   );
 
   const mutation = useMutation<
-    void,
+    { workspaceId: string; surveyId: string },
     CustomError | unknown,
-    {
-      surveyId: string;
-      workspaceId: string;
-    }
+    { workspaceId: string; surveyId: string }
   >({
     mutationFn: async ({ surveyId, workspaceId }) => {
       setErrorState(null);
 
-      await deleteSurveyFromWorkspace(workspaceId, surveyId);
+      return await deleteSurveyFromWorkspace(workspaceId, surveyId);
+    },
+    onSuccess: async ({ surveyId, workspaceId }) => {
+      await deleteSurveyF(surveyId, workspaceId, dispatch);
     },
     onError: (err: CustomError | unknown) => {
       const message =

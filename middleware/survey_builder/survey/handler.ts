@@ -169,6 +169,12 @@ export const surveyBuilderRoutes = async (req: NextRequest) => {
           ) {
             return await handleUpdateSurveySettings(req, authUser);
           }
+          if (
+            pathName === `/api/survey_builder/survey/${surveyId}/update-status`
+          ) {
+            const { checkMemberShip } = await performCommonSurveyChecks(req, authUser);
+            return checkMemberShip;
+          }
           break;
         default:
           return NextResponse.json(

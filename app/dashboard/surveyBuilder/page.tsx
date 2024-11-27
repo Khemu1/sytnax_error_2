@@ -24,7 +24,12 @@ import GlobalError from "@/app/global-error";
 
 const SurveyBuilder = () => {
   const [isMobileAsideOpen, setIsMobileAsideOpen] = useState(false);
-  const { workspaces: data, isLoading, isError,errorState:apiError } = useGetWorkspaces();
+  const {
+    workspaces: data,
+    isLoading,
+    isError,
+    errorState: apiError,
+  } = useGetWorkspaces();
   const dispatch = useDispatch();
   const routeTo = useRouter();
 
@@ -52,7 +57,7 @@ const SurveyBuilder = () => {
   const [isCreateWorkspaceOpen, setIsCreateWorkspaceOpen] = useState(false);
 
   const [isGroupProfileOpen, setIsGroupProfileOpen] = useState(false);
-  const { handleDeleteWorkspace } = useDeleteWorkspace();
+  const { handleDeleteWorkspace,isPending } = useDeleteWorkspace();
 
   const deleteWorkspace = async (workspaceId: string) => {
     try {
@@ -60,13 +65,7 @@ const SurveyBuilder = () => {
         return;
       }
       await handleDeleteWorkspace({ workspaceId });
-      console.log("sending");
       setMenuOpen(false);
-      // todo : add the toast later
-      // setToast({
-      //   message: `Workspace deleted successfully.`,
-      //   type: "success",
-      // });
     } catch (error) {
       console.error("Error deleting workspace:", error);
     }
@@ -100,7 +99,6 @@ const SurveyBuilder = () => {
       dispatch(setWorkspaces(data.allWorkspaces));
     }
     if (data && data.group) {
-      console.log("group", data.group);
       dispatch(setGroup(data.group));
     }
   }, [data, dispatch]);
@@ -112,10 +110,10 @@ const SurveyBuilder = () => {
 
       if (!authState.isAuthenticated) {
         dispatch(logout());
-        routeTo.push("/authportal");
       }
+
       if (role !== 1 && role !== 2) {
-        routeTo.push("/authportal");
+        routeTo.push("/");
       }
     } else {
       routeTo.push("/authportal");
@@ -193,7 +191,7 @@ const SurveyBuilder = () => {
         }`}
       >
         <button
-          className="text-white flex justify-center bg-blue-600 mb-5 h-max"
+          className="text-white flex justify-center bg-blue-600 mb-5 h-max text-2xl py-2"
           onClick={() => setIsMobileAsideOpen(false)}
         >
           Close SideBar
@@ -242,7 +240,7 @@ const SurveyBuilder = () => {
               </p>
 
               <button
-                className="p-[.5px] bg-[#292c2e] cursor-pointer transition-all hover:bg-[#6272a4] rounded-md "
+                className="p-[.5px] bg-[#292c2e] cursor-pointer transition-all hover:bg-[#6272a4] rounded-md relative "
                 onClick={toggleMenu}
                 ref={toggleButtonRef}
               >
@@ -256,7 +254,7 @@ const SurveyBuilder = () => {
               </button>
               {menuOpen && (
                 <div
-                  className="flex w-[150px] flex-col text-left right-0 top-[30px] text-sm absolute font-semibold bg-[#0e0e0e] p-2 rounded-md shadow-md z-10"
+                  className="flex w-[200px] flex-col text-left  top-[30px] text-sm absolute font-semibold bg-[#0e0e0e] p-2 rounded-md shadow-md z-10"
                   ref={workspaceChangeMenuRef}
                 >
                   <span
@@ -265,14 +263,19 @@ const SurveyBuilder = () => {
                   >
                     Rename Workspace
                   </span>
-                  <span
+                  <button
+                    disabled={isPending}
                     className="survey_card_buttons text-red-600"
                     onClick={() => {
                       deleteWorkspace(currentWorkspace?.id);
                     }}
                   >
-                    Delete
-                  </span>
+                    {isPending ? (
+                      <span className="loading loading-spinner loading-sm"></span>
+                    ) : (
+                      "Delete"
+                    )}
+                  </button>
                 </div>
               )}
             </div>

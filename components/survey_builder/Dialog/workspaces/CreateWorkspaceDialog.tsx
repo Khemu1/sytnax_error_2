@@ -17,7 +17,7 @@ const CreateWorkspaceDialog: React.FC<CreateWorkspaceDialogProps> = ({
   const [workspaceTitle, setWorkspaceTitle] = useState("");
   const [errors, setErrors] = useState<Record<string, string> | null>(null);
 
-  const { handleCreateWorkspace, isError, errorState, isSuccess,isPending } =
+  const { handleCreateWorkspace, isError, errorState, isSuccess, isPending } =
     useCreateWorkspace();
 
   const handleSave = async (e: React.FormEvent) => {
@@ -52,7 +52,7 @@ const CreateWorkspaceDialog: React.FC<CreateWorkspaceDialogProps> = ({
       <div className="fixed inset-0 flex items-center justify-center p-4">
         <DialogPanel
           transition
-          className="w-full max-w-md rounded-xl bg-white/5 p-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
+          className="w-[300px] max-w-md rounded-xl bg-white/5 p-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
         >
           {" "}
           <form onSubmit={handleSave}>

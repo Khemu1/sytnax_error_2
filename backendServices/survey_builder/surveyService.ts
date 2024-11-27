@@ -10,7 +10,7 @@ export const addSurveyService = async (
   name: string
 ): Promise<SurveyModel> => {
   try {
-    console.log("name", name);  
+    console.log("name", name);
     console.log("workspaceId", workspaceId);
     const survey = await prisma.survey.create({
       data: {
@@ -96,6 +96,21 @@ export const updateSurveySettingsService = async (
       },
     });
 
+    return survey;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const updateSurveyStatusService = async (surveyId: string) => {
+  try {
+    const survey = await prisma.survey.update({
+      where: { id: surveyId },
+      data: {
+        startTime: null,
+        endTime: null,
+      },
+    });
     return survey;
   } catch (error) {
     throw error;

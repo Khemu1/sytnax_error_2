@@ -40,7 +40,6 @@ export async function checkWorkspaceExists(
 ) {
   try {
     const workspaceId = req.nextUrl.pathname.split("/")[4]; // Adjust index based on your route structure
-    console.log("Extracted workspaceId:", workspaceId);
 
     if (!workspaceId) {
       return NextResponse.json(
@@ -67,7 +66,6 @@ export async function checkWorkspaceExists(
       res.headers.get("User-Group-Ids") ?? ""
     );
     repsonse.headers.set("User-Id", res.headers.get("User-Id")!);
-    console.log("workspace response", repsonse);
     return repsonse;
   } catch (error) {
     throw error;
@@ -81,8 +79,6 @@ export const checkGroupMembershipForWorkspace = async (
   try {
     const rawUserId = res.headers.get("User-Id");
     const rawWorkspace = res.headers.get("workspace");
-    console.log("rawUserId", rawUserId);
-    console.log("rawWorkspace", rawWorkspace);
     if (!rawUserId || !rawWorkspace) {
       throw new CustomError(
         "missing user id or workspace",
@@ -93,6 +89,7 @@ export const checkGroupMembershipForWorkspace = async (
     }
     let groupMembers: number[] = [];
     const userGroupIdsHeader = res.headers.get("User-Group-Ids");
+    console.log("userGroupIdsHeader", userGroupIdsHeader);
     if (userGroupIdsHeader && userGroupIdsHeader.trim() !== "") {
       try {
         groupMembers = JSON.parse(userGroupIdsHeader) as number[];
@@ -115,14 +112,14 @@ export const checkGroupMembershipForWorkspace = async (
     }
 
     const response = NextResponse.next();
-    
+
     response.headers.set("User-Group-Ids", JSON.stringify(groupMembers));
     response.headers.set("workspace", JSON.stringify(workspace));
-
+    // if it's the creator
     if (workspace.userId === userId) {
       return response;
     }
-
+    // if it's a group memeber
     if (groupMembers.includes(userId)) {
       return response;
     }

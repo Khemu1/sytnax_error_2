@@ -90,24 +90,22 @@ export const checkGroupMembershipForWorkspace = async (
         false
       );
     }
-    let groupMembers: number[] = [];
-    const userGroupIdsHeader = res.headers.get("User-Group-Ids");
-    if (userGroupIdsHeader && userGroupIdsHeader.trim() !== "") {
-      try {
-        groupMembers = JSON.parse(userGroupIdsHeader) as number[];
-        if (!Array.isArray(groupMembers)) {
-          throw new Error("Invalid group members");
-        }
-      } catch (parseError) {
-        console.error("Failed to parse User-Group-Ids header:", parseError);
-        return NextResponse.json(
-          { message: "Invalid User-Group-Ids header format" },
-          { status: 400 }
-        );
-      }
-    }
     const userId = +rawUserId;
     const workspace: WorkSpaceModel = JSON.parse(rawWorkspace);
+    const ownerId = workspace.userId;
+
+    const groupMembers = await prisma.group.findFirst({
+      where: {
+        ownerId,
+      },
+      include: {
+        UserGroup: {
+          select: {
+            userId: true,
+          },
+        },
+      },
+    });
 
     if (isNaN(userId) || !workspace || typeof workspace.userId !== "number") {
       throw new CustomError("Invalid User-Id or workspace data", 400);
@@ -117,16 +115,13 @@ export const checkGroupMembershipForWorkspace = async (
 
     response.headers.set("User-Group-Ids", JSON.stringify(groupMembers));
     response.headers.set("workspace", JSON.stringify(workspace));
-    console.log("group membership check for survey done");
 
     if (workspace.userId === userId) {
       return response;
     }
-
-    if (groupMembers.includes(userId)) {
+    if (groupMembers?.UserGroup.find((group) => group.userId === userId)) {
       return response;
     }
-
     throw new CustomError("You don't have access to this workspace", 403);
   } catch (error) {
     console.error("Error in checkGroupMembershipForWorkspace:", error);
@@ -147,7 +142,7 @@ export async function checkSurveyTitle(
       "workspace",
       JSON.stringify(res.headers.get("workspace"))
     );
-    console.log("name checking done")
+    console.log("name checking done");
     return response;
   } catch (error) {
     if (error instanceof ZodError) {

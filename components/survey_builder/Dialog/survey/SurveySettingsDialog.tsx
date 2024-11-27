@@ -87,9 +87,9 @@ const SurveySettingsDialog: React.FC<SurveySettingsProps> = ({
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     try {
+      setValidationErrors(null);
       e.preventDefault();
 
-      // Validate the settings using the schema
       surveySettingsSchema().parse({ ...surveySettings });
 
       // Initialize the settings object
@@ -211,7 +211,7 @@ const SurveySettingsDialog: React.FC<SurveySettingsProps> = ({
                   selectedDate={surveySettings.startTime}
                   onDateChange={handleStartTimeChange}
                 />
-                <p className="text-red-500 font-semibold w-[250px] h-[10px]">
+                <p className="text-red-500 font-semibold w-[250px] mt-2">
                   {" "}
                   {validationErrors?.startTime ?? addApiErros?.startTime ?? ""}
                 </p>
@@ -223,7 +223,7 @@ const SurveySettingsDialog: React.FC<SurveySettingsProps> = ({
                   selectedDate={surveySettings.endTime}
                   onDateChange={handleEndTimeChange}
                 />
-                <p className="text-red-500 font-semibold w-[250px] h-[10px]">
+                <p className="text-red-500 font-semibold w-[250px] mt-2">
                   {validationErrors?.endTime ?? addApiErros?.endTime ?? ""}
                 </p>
               </div>

@@ -61,7 +61,7 @@ export const authenticateUser = async () => {
       response.headers.set("User-Group", accessTokenData.groupId);
       response.headers.set(
         "User-Group-Ids",
-        accessTokenData.groupMemebers.toString()
+        JSON.stringify(accessTokenData.groupMemebers)
       );
 
       return response;
@@ -100,13 +100,12 @@ export const authenticateUser = async () => {
         newAccessToken,
         accessCookieOptions
       );
-      // response.cookies.set("User-Id", refreshTokenData.id as string);
       response.headers.set("User-Id", refreshTokenData.id.toString());
       response.headers.set("User-Role", refreshTokenData.role.toString());
       response.headers.set("User-Group", refreshTokenData.groupId);
       response.headers.set(
         "User-Group-Ids",
-        refreshTokenData.groupMemebers.toString()
+        JSON.stringify(refreshTokenData.groupMemebers)
       );
 
       return response;

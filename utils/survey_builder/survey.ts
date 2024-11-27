@@ -36,19 +36,17 @@ export const addSurveyF = async (
 
 export const deleteSurveyF = async (
   surveyId: string,
-  currnetWorkspaceId: string,
   surveyWorkspaceId: string,
   dispatch: Dispatch
 ) => {
   try {
-    if (currnetWorkspaceId === surveyWorkspaceId) {
-      dispatch(deleteCurrnetWorkspaceSurvey(surveyId));
-      dispatch(clearCurrentSurvey());
-    }
+    dispatch(clearCurrentSurvey());
+    dispatch(deleteSurvey(surveyId));
+    dispatch(deleteCurrnetWorkspaceSurvey(surveyId));
     dispatch(
       deleteWorkspaceSurvey({ surveyId, workspaceId: surveyWorkspaceId })
     );
-    dispatch(deleteSurvey(surveyId));
+
   } catch (error) {
     console.error("Error deleting survey:", error);
   }

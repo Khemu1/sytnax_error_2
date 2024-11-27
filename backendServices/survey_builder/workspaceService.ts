@@ -6,12 +6,12 @@ const prisma = new PrismaClient().$extends(withAccelerate());
 
 export const getWorkSpacesService = async (userId: number) => {
   try {
-    console.log("userId", userId);
     // getting groups that user is in
     const userGroups = await prisma.userGroup.findMany({
       where: { userId },
       select: { groupId: true },
     });
+    console.log("userGroups", userGroups);
 
     const userGroupAndGroupMembers = await prisma.group.findFirst({
       where: { ownerId: userId },
@@ -29,14 +29,14 @@ export const getWorkSpacesService = async (userId: number) => {
     });
     const updatedGroup = {
       ...userGroupAndGroupMembers,
-      groupMembers:  userGroupAndGroupMembers?.UserGroup ?? [] ,
+      groupMembers: userGroupAndGroupMembers?.UserGroup ?? [],
       UserGroup: undefined,
     };
 
     const groupIds = userGroups
       .map((group) => group.groupId)
       .filter((groupId) => groupId !== userGroupAndGroupMembers?.id);
-
+    console.log;
     const myWorkspaces = await prisma.workspace.findMany({
       where: { userId },
       include: {
@@ -48,7 +48,7 @@ export const getWorkSpacesService = async (userId: number) => {
       where: {
         WorkspaceGroup: {
           some: {
-            id: { in: groupIds },
+            groupId: { in: groupIds },
           },
         },
         id: { notIn: myWorkspaces.map((ws) => ws.id) },

@@ -66,7 +66,7 @@ const workspaceSlice = createSlice({
       action: PayloadAction<{ surveyId: string; workspaceId: string }>
     ) => {
       const workspace = state.workspaces.find(
-        (ws) => +ws.id === +action.payload.workspaceId
+        (ws) => ws.id === action.payload.workspaceId
       );
 
       if (workspace && workspace.surveys) {
@@ -75,7 +75,7 @@ const workspaceSlice = createSlice({
         );
 
         state.workspaces = state.workspaces.map((ws) =>
-          +ws.id === +action.payload.workspaceId
+          ws.id === action.payload.workspaceId
             ? { ...ws, surveys: updatedSurveys }
             : ws
         );

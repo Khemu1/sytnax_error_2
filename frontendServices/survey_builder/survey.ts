@@ -1,8 +1,5 @@
 import { CustomError } from "@/middleware/CustomError";
-import {
-  SurveyModel,
-  SurveySettings,
-} from "@/types/survey";
+import { SurveyModel, SurveySettings } from "@/types/survey";
 
 export const updateSurveyTitle = async (
   name: string,
@@ -85,10 +82,10 @@ export const duplicateSurvey = async (
 export const updateSurveyStatus = async (
   workspaceId: string,
   surveyId: string
-): Promise<void> => {
+): Promise<SurveyModel> => {
   console.log("updateSurveyStatus", workspaceId, surveyId);
   try {
-    const response = await fetch(`/api/survey/${surveyId}/update-status`, {
+    const response = await fetch(`/api/survey_builder/survey/${surveyId}/update-status`, {
       method: "PATCH",
       body: JSON.stringify({ workspaceId }),
     });
@@ -121,7 +118,11 @@ export const moveSurveyToWorkspace = async (
   workspaceId: string,
   surveyId: string,
   targetWorkspaceId: string
-): Promise<{ soruceWorkspaceId:string, surveyId:string, targetWorkspaceId: string }> => {
+): Promise<{
+  soruceWorkspaceId: string;
+  surveyId: string;
+  targetWorkspaceId: string;
+}> => {
   try {
     const response = await fetch(
       `/api/survey_builder/survey/${surveyId}/move`,
@@ -158,7 +159,7 @@ export const moveSurveyToWorkspace = async (
 export const deleteSurveyFromWorkspace = async (
   workspaceId: string,
   surveyId: string
-): Promise<void> => {
+): Promise<{ workspaceId: string; surveyId: string }> => {
   try {
     const response = await fetch(
       `/api/survey_builder/survey/${surveyId}/delete`,

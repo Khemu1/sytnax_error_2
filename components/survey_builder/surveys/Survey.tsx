@@ -1,4 +1,7 @@
-import { useDeleteSurvey } from "@/hooks/survey_builder/survey";
+import {
+  useChangeSurveyStatus,
+  useDeleteSurvey,
+} from "@/hooks/survey_builder/survey";
 import { RootState } from "@/store/store";
 import { SurveyProps } from "@/types/survey";
 import Image from "next/image";
@@ -31,7 +34,9 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
   } | null>(null);
   const dispatch = useDispatch();
 
-  const { handleDeleteSurvey } = useDeleteSurvey();
+  const { handleDeleteSurvey, isPending } = useDeleteSurvey();
+  const { handleUpdateSurveyStatus, isPending: isPendingStatus } =
+    useChangeSurveyStatus();
 
   const currentWorkspace = useSelector(
     (state: RootState) => state.currentWorkspace.currentWorkspace
@@ -153,12 +158,17 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
                 >
                   Duplicate
                 </span>
-                <span
+                <button
                   className="block py-1 px-3 text-red-600 hover:bg-gray-700 rounded-md cursor-pointer"
                   onClick={handleDelete}
+                  disabled={isPending}
                 >
-                  Delete
-                </span>
+                  {isPending ? (
+                    <span className="loading loading-spinner loading-sm"></span>
+                  ) : (
+                    "Delete"
+                  )}
+                </button>
               </div>
             )}
 
@@ -186,7 +196,7 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
 
                     <div className="flex flex-col gap-1">
                       <strong>End Time:</strong>
-                      <span className="text-[12.1px] ">{endTime}</span>
+                      <span className="text-[12px] ">{endTime}</span>
                     </div>
                   </div>
                 )}
@@ -198,12 +208,30 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
                 >
                   {isActive ? "Active" : "Inactive"}
                 </div>
+                {isActive && (
+                  <button
+                    disabled={isPendingStatus}
+                    className="text-left py-2 text-base text-red-600  "
+                    onClick={async () =>
+                      await handleUpdateSurveyStatus({
+                        surveyId: survey.id,
+                        workspaceId: survey.workspaceId,
+                      })
+                    }
+                  >
+                    {isPendingStatus ? (
+                      <span className="loading loading-spinner loading-sm"></span>
+                    ) : (
+                      "Deactivate"
+                    )}
+                  </button>
+                )}
               </div>
 
               {/* Actions */}
-              <div className="flex justify-between flex-wrap gap-1">
+              <div className="flex justify-between flex-wrap gap-1 items-center">
                 <button
-                  className="py-2  "
+                  className="py-2 "
                   onClick={() => handleOpenDialog("settings")}
                 >
                   Settings
