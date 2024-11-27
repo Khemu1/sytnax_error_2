@@ -10,7 +10,7 @@ node_modules
 .worker-next
 # testing
 /coverage
-/my-worker
+
 # next.js
 /.next/
 /out/
