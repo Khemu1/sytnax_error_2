@@ -104,7 +104,6 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
     <>
       <div className="survey">
         <div className="flex sm:flex-row flex-col w-full h-full">
-          {/* Survey Name & Link */}
           <Link
             href={`/survey/${currentWorkspace?.id}/${survey.id}/build`}
             className="flex item sm:h-full pl-2 sm:border-r cursor-pointer sm:border-r-gray-700 sm:w-[60%]  h-[100px] sm:border-b-0  border-b border-b-gray-700"
@@ -115,7 +114,6 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
           </Link>
 
           <div className="flex flex-col justify-start sm:w-[40%] bg-[#1e2a38a1] p-4 gap-3 font-semibold sm:overflow-y-scroll">
-            {/* Toggle Menu Button */}
             <div className="flex justify-end">
               <button
                 ref={toggleButtonRef}
@@ -228,7 +226,6 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
                 )}
               </div>
 
-              {/* Actions */}
               <div className="flex justify-between flex-wrap gap-1 items-center">
                 <button
                   className="py-2 "
@@ -256,7 +253,6 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
         </div>
       </div>
 
-      {/* Dialogs */}
       {isUpdateDialogOpen && (
         <UpdateSurveyTitleDialog
           isOpen={isUpdateDialogOpen}

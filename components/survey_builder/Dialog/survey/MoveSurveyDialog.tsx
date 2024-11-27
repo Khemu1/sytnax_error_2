@@ -1,7 +1,14 @@
 import { useMoveSurvey } from "@/hooks/survey_builder/survey";
 import { RootState } from "@/store/store";
 import { validateWithSchema } from "@/utils/validations/validations";
-import { Dialog, DialogPanel, Select } from "@headlessui/react";
+import {
+  Dialog,
+  DialogPanel,
+  Combobox,
+  ComboboxInput,
+  ComboboxOptions,
+  ComboboxOption,
+} from "@headlessui/react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -15,20 +22,20 @@ const MoveSurveyDialog: React.FC<MoveSurveyDialogProps> = ({
   isOpen,
   onClose,
 }) => {
-  const currentWorkspace = useSelector(
-    (state: RootState) => state.currentWorkspace.currentWorkspace
+  const { currentWorkspace, workspaces, currentSurvey, auth } = useSelector(
+    (state: RootState) => ({
+      currentWorkspace: state.currentWorkspace.currentWorkspace,
+      workspaces: state.workspace.workspaces,
+      currentSurvey: state.currentSurvey.currentSurvey,
+      auth: state.auth,
+    })
   );
-  const workspaces = useSelector(
-    (state: RootState) => state.workspace.workspaces
-  );
-  const currentSurvey = useSelector(
-    (state: RootState) => state.currentSurvey.currentSurvey
-  );
-  const [errors, setErrors] = useState<Record<string, string> | null>(null);
 
+  const [errors, setErrors] = useState<Record<string, string> | null>(null);
   const [targetWorkspaceId, setTargetWorkspaceId] = useState<string | null>(
     null
   );
+  const [query, setQuery] = useState("");
   const { handleMoveSurvey, isError, errorState, isSuccess, isPending } =
     useMoveSurvey();
 
@@ -38,7 +45,6 @@ const MoveSurveyDialog: React.FC<MoveSurveyDialogProps> = ({
 
       if (!targetWorkspaceId || !currentSurvey?.id || !currentWorkspace?.id) {
         setErrors({ chooseWorkspace: "Please Choose a Workspace" });
-
         return;
       }
 
@@ -59,6 +65,17 @@ const MoveSurveyDialog: React.FC<MoveSurveyDialogProps> = ({
     }
   }, [isSuccess]);
 
+  // Filter workspaces based on user input and criteria
+  const filteredWorkspaces = workspaces.filter((workspace) => {
+    const isDifferentWorkspace = workspace.id !== currentWorkspace?.id;
+    const isOwnedByUser = workspace.userId === auth.userId;
+    const matchesQuery = workspace.name
+      .toLowerCase()
+      .includes(query.toLowerCase());
+
+    return isDifferentWorkspace && isOwnedByUser && matchesQuery;
+  });
+
   return (
     <Dialog open={isOpen} onClose={onClose} className="relative z-50">
       <div
@@ -68,7 +85,7 @@ const MoveSurveyDialog: React.FC<MoveSurveyDialogProps> = ({
       <div className="fixed inset-0 flex items-center justify-center p-4">
         <DialogPanel
           transition
-          className="w-[300px] max-w-md rounded-xl bg-white/5 p-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
+          className="w-[350px] max-w-md rounded-xl bg-white/5 p-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
         >
           <form onSubmit={handleSave} className="w-full">
             <div className="flex w-full items-center pb-2 px-2">
@@ -85,48 +102,66 @@ const MoveSurveyDialog: React.FC<MoveSurveyDialogProps> = ({
               </span>
             </div>
 
-            <div className="border-b border-b-gray-500 p-[2rem]">
-              <Select
-                value={targetWorkspaceId || ""}
-                onChange={(e) => setTargetWorkspaceId(e.target.value)}
-                aria-label={"Select Workspace"}
-                className="w-full bg-[#2a2a2a] border-none outline-none p-2 rounded-md"
+            <div className="w-full border-b border-b-gray-500 p-[2rem] relative">
+              <p className="text-center mb-2">
+                You can only move surveys to the user{"'"}s workspace
+              </p>
+
+              {/* Combobox */}
+              <Combobox
+                value={targetWorkspaceId}
+                onChange={setTargetWorkspaceId}
               >
-                <option value="" disabled>
-                  Select Workspace
-                </option>
-                {workspaces.map((workspace) => {
-                  if (workspace.id !== currentWorkspace!.id) {
-                    return (
-                      <option key={workspace.id} value={workspace.id}>
-                        {workspace.name}
-                      </option>
-                    );
-                  }
-                  return null;
-                })}
-              </Select>
+                <div className="relative">
+                  <ComboboxInput
+                    className="w-full rounded-lg border-none bg-white/5 py-1.5 px-3 text-sm text-white outline-none placeholder-gray-400"
+                    onChange={(event) => setQuery(event.target.value)}
+                    placeholder="Write workspace name"
+                    displayValue={(workspaceId) =>
+                      workspaces.find((w) => w.id === workspaceId)?.name || ""
+                    }
+                  />
+                  <ComboboxOptions className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-lg bg-gray-800 py-1 text-sm shadow-lg">
+                    {filteredWorkspaces.length === 0 ? (
+                      <div className="p-2 text-gray-400">
+                        No workspace found
+                      </div>
+                    ) : (
+                      filteredWorkspaces.map((workspace) => (
+                        <ComboboxOption
+                          key={workspace.id}
+                          value={workspace.id}
+                          className={({ active }) =>
+                            `cursor-pointer select-none rounded-md px-3 py-2 ${
+                              active
+                                ? "bg-blue-600 text-white"
+                                : "text-gray-300"
+                            }`
+                          }
+                        >
+                          <span className="block truncate">
+                            {workspace.name}
+                          </span>
+                        </ComboboxOption>
+                      ))
+                    )}
+                  </ComboboxOptions>
+                </div>
+              </Combobox>
+
               {((isError && errorState) ||
                 (errors && errors.chooseWorkspace)) && (
                 <div className="text-red-600 text-sm mt-2 px-4 text-center">
-                  {errorState?.chooseWorkspace}
+                  {errorState?.chooseWorkspace || errors?.chooseWorkspace}
                 </div>
               )}
             </div>
-
-            {isError && errorState && (
-              <div className="text-red-600 text-sm mt-2 px-4">
-                {errorState.message}
-              </div>
-            )}
 
             <div className="flex justify-end gap-5 mt-4 px-4 font-semibold text-white">
               <button
                 className="bg-red-700 py-2 px-4 rounded"
                 type="button"
-                onClick={() => {
-                  onClose();
-                }}
+                onClick={onClose}
               >
                 Cancel
               </button>

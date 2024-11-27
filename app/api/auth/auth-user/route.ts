@@ -43,7 +43,7 @@ export const POST = async () => {
       }
 
       return NextResponse.json({
-        id: accessTokenData.id,
+        userId: accessTokenData.id,
         role: accessTokenData.role,
         username: accessTokenData.username,
         groupMemebers: accessTokenData.groupMemebers,
@@ -78,7 +78,7 @@ export const POST = async () => {
       });
 
       const response = NextResponse.json({
-        id: refreshTokenData.id,
+        userId: refreshTokenData.id,
         role: refreshTokenData.role,
         username: refreshTokenData.username,
         groupMemebers: refreshTokenData.groupMemebers,

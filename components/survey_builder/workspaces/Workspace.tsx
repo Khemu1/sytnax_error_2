@@ -14,7 +14,7 @@ const Workspace: React.FC<WorkspaceProps> = ({
       className={`workspace flex  ${selected ? "workspace_selected" : ""}`}
       onClick={() => onSelect(workspace)}
     >
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 w-full">
         <div>
           <Image
             src="/assets/icons/folder.svg"
@@ -23,7 +23,7 @@ const Workspace: React.FC<WorkspaceProps> = ({
             height={20}
           />
         </div>
-        <p className="font-semibold text-ellipsis overflow-hidden px-2 text-nowrap whitespace-nowrap text-white">
+        <p className="w-full font-semibold text-ellipsis overflow-hidden px-2 text-nowrap whitespace-nowrap text-white">
           {workspace.name}
         </p>
       </div>
