@@ -105,7 +105,7 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
       <div className="survey">
         <div className="flex sm:flex-row flex-col w-full h-full">
           <Link
-            href={`/survey/${currentWorkspace?.id}/${survey.id}/build`}
+            href={`/dashboard/surveyBuilder/build/${currentWorkspace?.id}/${survey.id}`}
             className="flex item sm:h-full pl-2 sm:border-r cursor-pointer sm:border-r-gray-700 sm:w-[60%]  h-[100px] sm:border-b-0  border-b border-b-gray-700"
           >
             <p className="m-auto text-[#859fd1] font-semibold text-ellipsis overflow-hidden px-2 text-nowrap whitespace-nowrap">

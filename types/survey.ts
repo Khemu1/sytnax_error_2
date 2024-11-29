@@ -1,3 +1,5 @@
+import { QuestionModel } from "./buildSurvey";
+
 export interface AuthSliceProps {
   id: number | null;
   username: string | null;
@@ -25,9 +27,7 @@ export interface SurveyPreviewModel {
   workspace: number;
   createdAt?: Date;
   updatedAt?: Date;
-  welcomePart?: WelcomePartModel;
-  questions: GenericTextModel[];
-  ending: DefaultEndingModel | CustomEndingModel;
+  questions: QuestionModel[];
 }
 
 export interface GroupModel {
@@ -123,176 +123,6 @@ export interface UpdateWorkspaceDescriptionResponse {
 export interface UpdateWorkspaceOwnerResponse {
   ownerId: number;
   updatedAt: Date;
-}
-
-export interface InputSwitchFieldProps {
-  editorId?: string;
-  label: string;
-  value: string;
-  onChange?: (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => void;
-  switchChecked?: boolean;
-  onSwitchChange?: (checked: boolean) => void;
-  placeholder?: string;
-  disabled?: boolean;
-  isSubmitting?: boolean;
-  hasSwitch: boolean;
-  required: boolean;
-  errorMessage?: string;
-  type: string;
-  border: boolean;
-}
-
-export interface FileUploaderProps {
-  filePath?: string;
-  file: File | null | undefined;
-  setFile: (file: File | null) => void;
-  title: string;
-  initialImage?: string;
-}
-
-export interface WelcomePartModel {
-  id: number;
-  surveyId: number;
-  label: string;
-  description?: string;
-  imageUrl?: string;
-  buttonText?: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-export interface EndPartModel {
-  id: number;
-  surveyId: number;
-  label: string;
-  description?: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-export interface welcomePartOptions {
-  isLabelEnabled: boolean;
-  isDescriptionEnabled: boolean;
-  isImageUploadEnabled: boolean;
-}
-
-export interface GenericTextModel {
-  id: number;
-  surveyId: number;
-  label: string;
-  description?: string;
-  answerFormat: "text" | "regex";
-  imageUrl?: string;
-  required?: boolean;
-  hideQuestionNumber?: boolean;
-  createdAt?: Date;
-  updatedAt?: Date;
-  generalText?: GeneralTextModel;
-  generalRegex?: GeneralRegexModel;
-}
-
-export interface GeneralTextModel {
-  id: number;
-  questionId: number;
-  min: number;
-  max: number;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-export interface GeneralRegexModel {
-  id: number;
-  questionId: number;
-  regex: string;
-  regexErrorMessage: string;
-  regexPlaceHolder?: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-export interface NewWelcomePart {
-  surveyId: number;
-  label?: string;
-  imageUrl?: string;
-  description?: string;
-  buttonText?: string;
-}
-
-export interface DefaultEndingModel {
-  id: number;
-  surveyId: number;
-  label: string;
-  type: "custom" | "default";
-  description?: string;
-  imageUrl?: string;
-  shareSurvey?: boolean;
-  defaultEnding?: boolean;
-  reloadOrRedirect?: boolean;
-  buttonText?: string;
-  redirectToWhat?:
-    | "Results Link"
-    | "Another Link"
-    | "Survey Link (Reaload the Survey)";
-  anotherLink?: string;
-  autoReload?: boolean;
-  reloadTimeInSeconds?: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface CustomEndingModel {
-  id: number;
-  surveyId: number;
-  redirectUrl: string;
-  type: "custom" | "default";
-  label?: string;
-  description?: string;
-  shareSurvey?: boolean;
-  defaultEnding?: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface NewCustomEnding {
-  surveyId: number;
-  redirectUrl: string;
-  label?: string;
-  description?: string;
-  shareSurvey?: boolean;
-  defaultEnding?: boolean;
-}
-
-export interface NewDefaultEnding {
-  surveyId: number;
-  label: string;
-  description?: string;
-  shareSurvey?: boolean;
-  imageUrl?: string;
-  defaultEnding?: boolean;
-  reloadOrRedirect?: boolean;
-  buttonText?: string;
-  redirectToWhat?: string;
-  anotherLinkText?: string;
-  autoReload?: boolean;
-  reloadTimeInSeconds?: number;
-}
-
-export interface DefaultEndingOptions {
-  isDescriptionEnabled: boolean;
-  isImageUploadEnabled: boolean;
-  shareSurvey: boolean;
-  defaultEnding: boolean;
-  reloadOrRedirectButton: boolean;
-  autoReload: boolean;
-}
-
-export interface UpdateSurveyUrlProps {
-  workspaceId: string;
-  surveyId: string;
-  url: string;
-  currentLang: "de" | "en";
 }
 
 export interface SurveySettings {

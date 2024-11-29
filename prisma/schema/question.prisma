@@ -3,7 +3,7 @@ model Question {
   surveyId       String
   label          String
   description    String?
-  required       Boolean            @default(false)
+  allowMultipleAnswers Boolean @default(false)
   createdAt      DateTime           @default(now())
   updatedAt      DateTime           @updatedAt
   points         Int                @default(1)

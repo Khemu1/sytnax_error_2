@@ -9,7 +9,7 @@ import Nav from "./Nav";
 const Holder: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const pathName = usePathname();
   const noHeaderFooterPaths = ["/signin"];
-  const noFooterPaths = ["/admin", "/signin"];
+  const noFooterPaths = ["/admin", "/signin", "/dashboard/survey_builder"];
 
   const shouldHideNav = noHeaderFooterPaths.some((path) =>
     pathName.startsWith(path)

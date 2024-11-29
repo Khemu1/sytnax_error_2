@@ -8,6 +8,8 @@ import workspaceReducer from "./slices/survey/workspaceSlice";
 import currentWorkspaceReducer from "./slices/survey/currentWorkspaceSlice";
 import currentSurveyReducer from "./slices/survey/currentSurveySlice";
 import userGroupReducer from "./slices/survey/userGroup";
+import questionsReducer from "./slices/survey/questionsSlice";
+import questionReducer from "./slices/survey/questionSlice";
 
 
 export const store = configureStore({
@@ -21,6 +23,8 @@ export const store = configureStore({
     currentWorkspace: currentWorkspaceReducer,
     currentSurvey: currentSurveyReducer,
     userGroup: userGroupReducer,
+    questions: questionsReducer,
+    question : questionReducer,
   },
 });
 

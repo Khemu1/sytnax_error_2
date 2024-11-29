@@ -10,7 +10,8 @@ node_modules
 .worker-next
 # testing
 /coverage
-
+main.prisma
+my-worker
 # next.js
 /.next/
 /out/

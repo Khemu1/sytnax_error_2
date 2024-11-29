@@ -122,7 +122,6 @@ const NewCourse = () => {
         });
         return;
       }
-      // Clear previous validation errors
       setValidationErrors(null);
       const form = new FormData();
       Object.entries(submitData).forEach(([key, value]) => {

@@ -39,18 +39,8 @@
   }
 }
 
-@font-face {
-  font-family: "Xeroda"; /* Give your font a name */
-  src: url("/app/fonts/XerodaRegular-p7dwr.otf") format("otf"),
-    url("/app/fonts/XerodaRegular-p7dwr.otf") format("otf");
-}
-
 * {
   box-sizing: border-box;
-  /* padding: 0;
-  margin: 0; */
-  font-family: Arial, Helvetica, sans-serif !important;
-  /* font-family: "Xeroda" !important; */
 }
 html {
   @apply bg-base-200;

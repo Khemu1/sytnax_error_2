@@ -9,7 +9,6 @@ export type EditorInstance = {
 export interface EditorComponentProps {
   editorRef: React.MutableRefObject<EditorInstance | null>;
   id: string;
-  title: string;
   initialValue?: string;
   editContent?: string;
 }
@@ -17,7 +16,6 @@ export interface EditorComponentProps {
 const EditorComponent: React.FC<EditorComponentProps> = ({
   editorRef,
   id,
-  title,
   initialValue = `<p>This is the initial content of the editor.</p>`,
 }) => {
   useEffect(() => {
@@ -28,9 +26,6 @@ const EditorComponent: React.FC<EditorComponentProps> = ({
 
   return (
     <div className="flex flex-col gap-5">
-      <label htmlFor={id} className="font-semibold text-xl">
-        {title}
-      </label>
       <TinyMCEEditor
         
         id={id}
