@@ -1,4 +1,14 @@
-import { object, string, array } from "zod";
+import { object, string, array, boolean, number } from "zod";
+
+export const questionOptionsSchema = () => {
+  return object({
+    isDescriptionEnabled: boolean({ message: "Missing Description Option" }),
+    isImageUploadEnabled: boolean({ message: "Missing image Option" }),
+    allowMultipleAnswers: boolean({
+      message: "Missing Multiple Answers Option",
+    }),
+  });
+};
 
 export const newQuestionSchema = (options: {
   isDescriptionEnabled: boolean;
@@ -40,6 +50,9 @@ export const newQuestionSchema = (options: {
             "Invalid image format. Only jpg, png, gif, bmp, and webp are allowed",
         }
       ),
+    points: number()
+      .min(1, { message: "Minimum number of points is 1" })
+      .max(100, { message: "Maximum points exceeded" }),
 
     answers: array(string())
       .nonempty({ message: "Answers can't be empty" })

@@ -97,7 +97,7 @@ const Preview: React.FC<PreviewProps> = ({
                 key={index}
                 className="flex items-center justify-start gap-2 w-[300px]"
               >
-                <div className="rounded-lg w-full bg-blue-700 p-3 text-white shadow-lg hover:bg-blue-600 transition-all duration-300 transform hover:scale-105 cursor-pointer">
+                <div className="rounded-lg w-full bg-blue-500 p-3 text-white shadow-lg hover:bg-blue-600 transition-all duration-300 transform hover:scale-105 cursor-pointer">
                   <span className="font-semibold">
                     {String.fromCharCode(65 + index)}.
                   </span>{" "}

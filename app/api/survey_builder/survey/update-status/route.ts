@@ -2,13 +2,9 @@ import { updateSurveyStatusService } from "@/backendServices/survey_builder/surv
 import { errorHandler } from "@/middleware/CustomError";
 import { NextRequest, NextResponse } from "next/server";
 
-interface Props {
-  params: Promise<{ surveyId: string }>;
-}
-
-export const PATCH = async (_request: NextRequest, { params }: Props) => {
+export const PATCH = async (req: NextRequest) => {
   try {
-    const { surveyId } = await params;
+    const { surveyId } = await req.json();
     const survey = await updateSurveyStatusService(surveyId);
     return NextResponse.json(survey, { status: 200 });
   } catch (error) {

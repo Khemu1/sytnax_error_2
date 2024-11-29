@@ -2,9 +2,11 @@ import { CustomError } from "@/middleware/CustomError";
 
 export const addQuestion = async (
   question: FormData,
+  workspaceId: string,
+  surveyId: string
 ) => {
   try {
-    const response = await fetch(`/api/question/add`, {
+    const response = await fetch(`/api/survey_builder/question/${workspaceId}/${surveyId}`, {
       method: "POST",
       body: question,
     });

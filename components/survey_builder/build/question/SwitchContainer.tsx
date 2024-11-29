@@ -2,6 +2,7 @@ import { Switch } from "@headlessui/react";
 import React from "react";
 
 export interface SwitchContainerProps {
+  id?: string;
   isRequired: boolean;
   setIsRequired: (isRequired: boolean) => void;
   label: string;
@@ -9,6 +10,7 @@ export interface SwitchContainerProps {
 }
 
 const SwitchContainer: React.FC<SwitchContainerProps> = ({
+  id,
   isRequired,
   setIsRequired,
   label,
@@ -30,6 +32,9 @@ const SwitchContainer: React.FC<SwitchContainerProps> = ({
           } inline-block h-4 w-4 transform rounded-full bg-white transition`}
         />
       </Switch>
+      {id && id === "multipleAnswers" && isRequired && (
+        <span className="text-sm ">Only 2 correct answers are allowed</span>
+      )}
       {errorMessage && (
         <p className="text-[#ff484f] font-semibold bg-[#4f000a] mt-2 py-1 px-2 rounded-md">
           {errorMessage}

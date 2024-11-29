@@ -3,7 +3,7 @@ export interface QuestionModel {
   surveyId: string;
   label: string;
   description?: string;
-  image?: {
+  questionImage?: {
     id: string;
     imgurId: string;
     url: string;
@@ -16,12 +16,8 @@ export interface QuestionModel {
   allowMultipleAnswers: boolean;
 }
 export interface NewQuestionModel {
-  id: string;
-  surveyId: string;
   label: string;
   description?: string;
-  createdAt?: string;
-  updatedAt?: string;
   points: number;
   correctAnswers: string[];
   answers: string[];
@@ -29,6 +25,24 @@ export interface NewQuestionModel {
   isImageUploadEnabled: boolean;
   isDescriptionEnabled: boolean;
   previewImageUrl: string;
+}
+
+export interface NewQuestionModelBackend {
+  question: {
+    label: string;
+    description?: string;
+    createdAt?: string;
+    updatedAt?: string;
+    points: number;
+    correctAnswers: string[];
+    answers: string[];
+    previewImageUrl: string;
+  };
+  options: {
+    allowMultipleAnswers: boolean;
+    isImageUploadEnabled: boolean;
+    isDescriptionEnabled: boolean;
+  };
 }
 
 interface CorrectAnswerModel {
@@ -68,7 +82,7 @@ interface SubmittedAnswerModel {
 export interface InputSwitchFieldProps {
   editorId?: string;
   label: string;
-  value: string;
+  value: string | number;
   onChange?: (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void;

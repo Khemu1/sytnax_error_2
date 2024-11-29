@@ -17,4 +17,5 @@ model Survey {
   workspace   Workspace          @relation(fields: [workspaceId], references: [id])
   submissions SurveySubmission[]
   questions   Question[]
+  
 }

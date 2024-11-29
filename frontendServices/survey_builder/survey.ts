@@ -7,13 +7,10 @@ export const updateSurveyTitle = async (
   surveyId: string
 ): Promise<SurveyModel> => {
   try {
-    const response = await fetch(
-      `/api/survey_builder/survey/${surveyId}/update-name`,
-      {
-        method: "PATCH",
-        body: JSON.stringify({ workspaceId, name }),
-      }
-    );
+    const response = await fetch(`/api/survey_builder/survey/update-name`, {
+      method: "PATCH",
+      body: JSON.stringify({ workspaceId, name, surveyId }),
+    });
 
     if (!response.ok) {
       const errorData: CustomError = await response.json();
@@ -46,14 +43,16 @@ export const duplicateSurvey = async (
   targetWorkspaceId: number
 ): Promise<SurveyModel> => {
   try {
-    const response = await fetch(
-      `/api/survey_builder/survey/${surveyId}/duplicate`,
-      {
-        method: "POST",
+    const response = await fetch(`/api/survey_builder/survey/duplicate`, {
+      method: "POST",
 
-        body: JSON.stringify({ workspaceId, title, targetWorkspaceId }),
-      }
-    );
+      body: JSON.stringify({
+        workspaceId,
+        title,
+        targetWorkspaceId,
+        surveyId,
+      }),
+    });
 
     if (!response.ok) {
       const errorData: CustomError = await response.json();
@@ -85,9 +84,9 @@ export const updateSurveyStatus = async (
 ): Promise<SurveyModel> => {
   console.log("updateSurveyStatus", workspaceId, surveyId);
   try {
-    const response = await fetch(`/api/survey_builder/survey/${surveyId}/update-status`, {
+    const response = await fetch(`/api/survey_builder/survey/update-status`, {
       method: "PATCH",
-      body: JSON.stringify({ workspaceId }),
+      body: JSON.stringify({ workspaceId, surveyId }),
     });
 
     if (!response.ok) {
@@ -124,13 +123,10 @@ export const moveSurveyToWorkspace = async (
   targetWorkspaceId: string;
 }> => {
   try {
-    const response = await fetch(
-      `/api/survey_builder/survey/${surveyId}/move`,
-      {
-        method: "PATCH",
-        body: JSON.stringify({ workspaceId, surveyId, targetWorkspaceId }),
-      }
-    );
+    const response = await fetch(`/api/survey_builder/survey/move`, {
+      method: "PATCH",
+      body: JSON.stringify({ workspaceId, surveyId, targetWorkspaceId }),
+    });
 
     if (!response.ok) {
       const errorData: CustomError = await response.json();
@@ -161,13 +157,10 @@ export const deleteSurveyFromWorkspace = async (
   surveyId: string
 ): Promise<{ workspaceId: string; surveyId: string }> => {
   try {
-    const response = await fetch(
-      `/api/survey_builder/survey/${surveyId}/delete`,
-      {
-        method: "DELETE",
-        body: JSON.stringify({ workspaceId }),
-      }
-    );
+    const response = await fetch(`/api/survey_builder/survey/delete`, {
+      method: "DELETE",
+      body: JSON.stringify({ workspaceId, surveyId }),
+    });
 
     if (!response.ok) {
       const errorData: CustomError = await response.json();
@@ -232,12 +225,10 @@ export const getSurvey = async (
   surveyId: string
 ): Promise<SurveyModel> => {
   try {
-    const response = await fetch(
-      `/api/survey_builder/survey/builder/${workspaceId}/${surveyId}`,
-      {
-        method: "GET",
-      }
-    );
+    const response = await fetch(`/api/survey_builder/survey/builder`, {
+      method: "POST",
+      body: JSON.stringify({ workspaceId, surveyId }),
+    });
 
     if (!response.ok) {
       const errorData: CustomError = await response.json();
@@ -305,13 +296,10 @@ export const updateSurveySettings = async (
   settings: SurveySettings
 ) => {
   try {
-    const response = await fetch(
-      `/api/survey_builder/survey/${surveyId}/update-settings`,
-      {
-        method: "PATCH",
-        body: JSON.stringify({ workspaceId, settings }),
-      }
-    );
+    const response = await fetch(`/api/survey_builder/survey/update-settings`, {
+      method: "PATCH",
+      body: JSON.stringify({ workspaceId, settings, surveyId }),
+    });
 
     if (!response.ok) {
       const errorData: CustomError = await response.json();

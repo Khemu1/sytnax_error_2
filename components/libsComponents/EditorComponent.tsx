@@ -11,9 +11,11 @@ export interface EditorComponentProps {
   id: string;
   initialValue?: string;
   editContent?: string;
+  title: string;
 }
 
 const EditorComponent: React.FC<EditorComponentProps> = ({
+  title,
   editorRef,
   id,
   initialValue = `<p>This is the initial content of the editor.</p>`,
@@ -26,8 +28,8 @@ const EditorComponent: React.FC<EditorComponentProps> = ({
 
   return (
     <div className="flex flex-col gap-5">
+      <label className="font-semibold">{title}</label>
       <TinyMCEEditor
-        
         id={id}
         apiKey={process.env.NEXT_PUBLIC_EDITOR_KEY}
         onInit={(_, editor) => {

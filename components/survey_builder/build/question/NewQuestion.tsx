@@ -14,9 +14,15 @@ import { useDispatch, useSelector } from "react-redux";
 import Image from "next/image";
 import { RootState } from "@/store/store";
 import ImageUploadField from "./ImageUploadField";
-import { returnFileAndUrl } from "@/utils/survey_builder/build/questions";
+import {
+  returnFileAndUrl,
+  transformDataIntoFormData,
+} from "@/utils/survey_builder/build/questions";
 import PreviewGenericTextArea from "../edit/question/PreviewGenericTextArea";
-import { newQuestionSchema } from "@/utils/validations/question";
+import {
+  newQuestionSchema,
+  questionOptionsSchema,
+} from "@/utils/validations/question";
 
 import "@/styles/surveyBuilder.css";
 import SwitchContainer from "./SwitchContainer";
@@ -40,6 +46,7 @@ const NewQuestion: React.FC<NewQuestionDialogProps> = ({ isOpen, onClose }) => {
     allowMultipleAnswers,
     answers,
     correctAnswers,
+    points,
   } = useSelector((state: RootState) => ({
     label: state.question.label,
     description: state.question.description,
@@ -50,6 +57,7 @@ const NewQuestion: React.FC<NewQuestionDialogProps> = ({ isOpen, onClose }) => {
     allowMultipleAnswers: state.question.allowMultipleAnswers,
     answers: state.question.answers,
     correctAnswers: state.question.correctAnswers,
+    points: state.question.points,
   }));
 
   const [file, setFile] = useState<File | null>(null);
@@ -58,13 +66,15 @@ const NewQuestion: React.FC<NewQuestionDialogProps> = ({ isOpen, onClose }) => {
     string,
     string
   > | null>(null);
+
   const isFormInvalid =
     isSubmitting ||
     label?.trim().length === 0 ||
     (isImageUploadEnabled && file === null) ||
     (isDescriptionEnabled && description?.trim().length === 0) ||
     answers.length < 2 ||
-    correctAnswers.length === 0;
+    correctAnswers.length === 0 ||
+    +points < 1;
 
   const [isPreview, setIsPreview] = useState(false);
   const handleSwitchChange = (
@@ -101,7 +111,7 @@ const NewQuestion: React.FC<NewQuestionDialogProps> = ({ isOpen, onClose }) => {
     setValidationErrors(null);
     try {
       setIsSubmitting(true);
-      const options = {
+      const preopOptions = {
         isDescriptionEnabled,
         isImageUploadEnabled,
         allowMultipleAnswers,
@@ -113,13 +123,25 @@ const NewQuestion: React.FC<NewQuestionDialogProps> = ({ isOpen, onClose }) => {
         label,
         answers,
         correctAnswers,
+        points,
       };
+      const options = questionOptionsSchema().parse(preopOptions);
 
       const question = newQuestionSchema(options).parse(data);
-      console.log("Question:", question);
+
+      const completeQuestion = {
+        question,
+        options,
+      };
+      const formData = new FormData();
+      transformDataIntoFormData(completeQuestion, formData);
+      console.log("QuestionC:", completeQuestion);
+      console.log("Question:", formData);
     } catch (error) {
       setValidationErrors(validateWithSchema(error));
       console.error("Error:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -255,17 +277,32 @@ const NewQuestion: React.FC<NewQuestionDialogProps> = ({ isOpen, onClose }) => {
                     errorMessage={validationErrors?.imageFile}
                   />
                   <SwitchContainer
+                    id="multipleAnswers"
                     isRequired={allowMultipleAnswers}
                     setIsRequired={() =>
                       handleSwitchChange("allowMultipleChoice")
                     }
                     label="Allow Multiple Choice"
                   />
-                  {allowMultipleAnswers && (
-                    <span className="text-sm">
-                      Only <strong>2</strong> correct answers are allowed
-                    </span>
-                  )}
+
+                  <InputSwitchField
+                    label="Points"
+                    value={!isNaN(Number(points)) ? Number(points) : 1}
+                    onChange={(e) =>
+                      dispatch(
+                        updateCurrentQuestion({
+                          points: Number(e.target.value),
+                        })
+                      )
+                    }
+                    placeholder="Points"
+                    required={false}
+                    hasSwitch={false}
+                    switchChecked={true}
+                    type="number"
+                    border={true}
+                    errorMessage={validationErrors?.points}
+                  />
                   <QuestionAnswers
                     answers={answers}
                     correctAnswers={correctAnswers}

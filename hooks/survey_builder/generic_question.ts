@@ -1,9 +1,13 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { addQuestion, deleteQuestion, duplicateQuestion, editQuestion } from "@/frontendServices/survey_builder/generic_question";
-import { GenericTextModel } from "@/types/survey";
+import {
+  addQuestion,
+  deleteQuestion,
+  duplicateQuestion,
+  editQuestion,
+} from "@/frontendServices/survey_builder/generic_question";
+import { QuestionModel } from "@/types/buildSurvey";
 import { CustomError } from "@/middleware/CustomError";
-
 
 export const useAddQuestion = () => {
   const [errorState, setErrorState] = useState<Record<
@@ -12,23 +16,21 @@ export const useAddQuestion = () => {
   > | null>(null);
 
   const mutation = useMutation<
-    GenericTextModel,
+    QuestionModel,
     CustomError | unknown,
     {
       question: FormData;
+      workspaceId: string;
+      surveyId: string;
     }
   >({
-    mutationFn: async ({
-      question
-    }) => {
+    mutationFn: async ({ question, workspaceId, surveyId }) => {
       setErrorState(null);
 
-      const response = await addQuestion(
-        question,
-      );
+      const response = await addQuestion(question, workspaceId, surveyId);
       return response;
     },
-    onSuccess: async (newQuestion: GenericTextModel) => {
+    onSuccess: async (newQuestion: QuestionModel) => {
       console.log("newQuestion", newQuestion);
     },
     onError: (err: CustomError | unknown) => {
@@ -73,16 +75,10 @@ export const useDeleteQuestion = () => {
       workspaceAndSurvey: FormData;
     }
   >({
-    mutationFn: async ({
-      questionId,
-      workspaceAndSurvey,
-    }) => {
+    mutationFn: async ({ questionId, workspaceAndSurvey }) => {
       setErrorState(null);
 
-      const response = await deleteQuestion(
-        questionId,
-        workspaceAndSurvey,
-      );
+      const response = await deleteQuestion(questionId, workspaceAndSurvey);
       return response;
     },
     onSuccess: async (data: { questionId: number }) => {
@@ -122,7 +118,7 @@ export const useDuplicateQuestion = () => {
 
   const mutation = useMutation<
     {
-      question: GenericTextModel;
+      question: QuestionModel;
     },
     CustomError | unknown,
     {
@@ -130,19 +126,13 @@ export const useDuplicateQuestion = () => {
       workspaceAndSurvey: FormData;
     }
   >({
-    mutationFn: async ({
-      questionId,
-      workspaceAndSurvey,
-    }) => {
+    mutationFn: async ({ questionId, workspaceAndSurvey }) => {
       setErrorState(null);
 
-      const response = await duplicateQuestion(
-        questionId,
-        workspaceAndSurvey,
-      );
+      const response = await duplicateQuestion(questionId, workspaceAndSurvey);
       return response;
     },
-    onSuccess: async (data: { question: GenericTextModel }) => {
+    onSuccess: async (data: { question: QuestionModel }) => {
       console.log("duplicated", data.question);
     },
     onError: (err: CustomError | unknown) => {
@@ -179,7 +169,7 @@ export const useEditQuestion = () => {
 
   const mutation = useMutation<
     {
-      question: GenericTextModel;
+      question: QuestionModel;
     },
     CustomError | unknown,
     {
@@ -187,19 +177,13 @@ export const useEditQuestion = () => {
       questionData: FormData;
     }
   >({
-    mutationFn: async ({
-      questionId,
-      questionData,
-    }) => {
+    mutationFn: async ({ questionId, questionData }) => {
       setErrorState(null);
 
-      const response = await editQuestion(
-        questionId,
-        questionData,
-      );
+      const response = await editQuestion(questionId, questionData);
       return response;
     },
-    onSuccess: async (data: { question: GenericTextModel }) => {
+    onSuccess: async (data: { question: QuestionModel }) => {
       console.log("edited", data.question);
     },
     onError: (err: CustomError | unknown) => {

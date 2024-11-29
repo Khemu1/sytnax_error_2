@@ -116,3 +116,24 @@ export const updateSurveyStatusService = async (surveyId: string) => {
     throw error;
   }
 };
+
+export const returnSurveyForBuilderService = async (surveyId: string) => {
+  try {
+    const survey = await prisma.survey.findUnique({
+      where: { id: surveyId },
+      include: {
+        questions: {
+          include: {
+            correctAnswers: true,
+            answers: true,
+            questionImage: true,
+          },
+        },
+      },
+    });
+    return survey;
+  } catch (error) {
+    throw error;
+  }
+};
+

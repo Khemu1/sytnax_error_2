@@ -1,0 +1,8 @@
+model QuestionImage {
+  id         String   @id @default(cuid())
+  questionId String   @unique 
+  imgurId    String
+  url        String
+
+  question   Question?  @relation(fields: [questionId], references: [id])
+}

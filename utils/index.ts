@@ -191,7 +191,3 @@ export function filterObject<T extends Record<string, any>>(
     }, {} as Partial<T>);
 }
 
-// export function clearSlices(dispatch: Dispatch) {
-//   dispatch(resetSharedFormSliceFields());
-//   dispatch(resetGenericTextSliceFields());
-// }

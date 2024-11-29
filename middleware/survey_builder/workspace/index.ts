@@ -16,11 +16,13 @@ export const validateNewWorkSpace = async (
 ) => {
   try {
     const data = await req.json();
+    console.log("data", data);
     const schema = newWorkspaceSchema();
-    schema.parse(data);
+    schema.parse(data.name);
 
     const response = NextResponse.next();
     response.headers.set("User-Id", res.headers.get("User-Id")!);
+    console.log("heading to controller");
     return response;
   } catch (error) {
     throw new CustomError(
@@ -60,10 +62,11 @@ export async function checkWorkspaceExists(
     }
 
     const repsonse = NextResponse.next();
-    repsonse.headers.set("workspace", JSON.stringify(workspace));
     repsonse.headers.set(
-      "User-Group-Ids",
-      res.headers.get("User-Group-Ids") ?? ""
+      "workspace",
+      JSON.stringify(
+        JSON.stringify({ workspaceId: workspace.id, userId: workspace.userId })
+      )
     );
     repsonse.headers.set("User-Id", res.headers.get("User-Id")!);
     return repsonse;

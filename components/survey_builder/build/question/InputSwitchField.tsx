@@ -63,7 +63,10 @@ const InputSwitchField: React.FC<InputSwitchFieldProps> = ({
             />
           )}
           {type === "editor" && (
-            <EditorComponent id={`${editorId}-editor`} value={value} />
+            <EditorComponent
+              id={`${editorId}-editor`}
+              value={value.toString()}
+            />
           )}
           {type === "number" && (
             <input
@@ -72,7 +75,8 @@ const InputSwitchField: React.FC<InputSwitchFieldProps> = ({
               onChange={onChange}
               className={`bg-[#2a2a2a] text-white p-2 rounded-sm mt-2 w-[100px] ${
                 errorMessage ? "input_error_border" : "input_border"
-              }`}
+                }`}
+              min={1}
               placeholder={placeholder}
               disabled={isSubmitting}
               required={required}

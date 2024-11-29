@@ -44,9 +44,11 @@ export async function checkWorkspaceExistsForSurvey(
 ) {
   try {
     if (!workspaceId) {
-      return NextResponse.json(
-        { message: "Workspace ID is required" },
-        { status: 400 }
+      throw new CustomError(
+        "workspace It doesn't exists",
+        400,
+        "workspace check for survey",
+        false
       );
     }
     const workspace = await prisma.workspace.findUnique({
@@ -55,20 +57,21 @@ export async function checkWorkspaceExistsForSurvey(
 
     if (!workspace) {
       console.error("Workspace not found for ID:", workspaceId);
-      return NextResponse.json(
-        { message: "Workspace not found" },
-        { status: 404 }
+      throw new CustomError(
+        "workspace not found",
+        404,
+        "workspace check for survey",
+        true
       );
     }
 
     const repsonse = NextResponse.next();
-    repsonse.headers.set("workspace", JSON.stringify(workspace));
     repsonse.headers.set(
-      "User-Group-Ids",
-      res.headers.get("User-Group-Ids") ?? ""
+      "workspace",
+      JSON.stringify({ workspaceId: workspace.id, userId: workspace.userId })
     );
+    console.log("added workspace to headers");
     repsonse.headers.set("User-Id", res.headers.get("User-Id")!);
-    console.log("workspace existing for survey done");
     return repsonse;
   } catch (error) {
     throw error;
@@ -166,23 +169,23 @@ export const checkSurveyExists = async (
 ) => {
   try {
     if (!surveyId) {
-      return NextResponse.json(
-        { message: "Survey ID is required" },
-        { status: 400 }
+      throw new CustomError(
+        "Survey Id not doesn't exists",
+        400,
+        "survey check",
+        false
       );
     }
+
     const survey = await prisma.survey.findUnique({
       where: { id: surveyId },
     });
 
     if (!survey) {
       console.error("Survey not found for ID:", surveyId);
-      return NextResponse.json(
-        { message: "Survey not found" },
-        { status: 404 }
-      );
+      throw new CustomError("Survey not found", 404, "survey check", true);
     }
-
+    console.log("survey check completed");
     const repsonse = NextResponse.next();
     repsonse.headers.set("survey", JSON.stringify(survey));
     repsonse.headers.set(

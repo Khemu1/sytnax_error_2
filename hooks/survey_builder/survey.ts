@@ -8,14 +8,12 @@ import {
   updateSurveySettings,
   updateSurveyStatus,
   updateSurveyTitle,
-  updateSurveyUrl,
 } from "@/frontendServices/survey_builder/survey";
 import { useState } from "react";
 import {
   SurveyModel,
   SurveySettings,
   UpdateSurveyTitleProps,
-  UpdateSurveyUrlProps,
 } from "@/types/survey";
 import { CustomError } from "@/middleware/CustomError";
 import {
@@ -69,55 +67,6 @@ export const useUpdateSurvey = () => {
 
   return {
     handleUpdateSurvey,
-    isError,
-    isSuccess,
-    errorState,
-    isPending,
-  };
-};
-
-export const useUpdateSurveyUrl = () => {
-  const [errorState, setErrorState] = useState<Record<string, string> | null>(
-    null
-  );
-  const mutation = useMutation<
-    SurveyModel,
-    CustomError | unknown,
-    UpdateSurveyUrlProps
-  >({
-    mutationFn: async ({
-      workspaceId,
-      surveyId,
-      url,
-    }: UpdateSurveyUrlProps) => {
-      setErrorState(null);
-
-      return await updateSurveyUrl(workspaceId, surveyId, url);
-    },
-
-    onError: (err: CustomError | unknown) => {
-      const message =
-        err instanceof CustomError
-          ? err.errors || { message: err.message }
-          : { message: "Unknown Error" };
-
-      setErrorState(message);
-      console.error("Error updating survey title:", err);
-    },
-    onSettled: () => {
-      console.log("Mutation has either succeeded or failed");
-    },
-  });
-
-  const {
-    mutateAsync: handleUpdateSurveyUrl,
-    isError,
-    isSuccess,
-    isPending,
-  } = mutation;
-
-  return {
-    handleUpdateSurveyUrl,
     isError,
     isSuccess,
     errorState,
@@ -386,16 +335,22 @@ export const useGetSurvey = (workspaceId: string, surveyId: string) => {
     null
   );
 
+  // Check if workspaceId and surveyId are valid before running the query
+  const shouldFetch = workspaceId && surveyId;
+
   const {
     data: survey,
     isError,
     isLoading,
   } = useQuery<SurveyModel, CustomError>({
-    queryKey: ["getSurvey", workspaceId, surveyId],
+    queryKey: shouldFetch ? ["getSurvey", workspaceId, surveyId] : [],
     queryFn: async () => {
       try {
-        setErrorState(null);
+        if (!shouldFetch) {
+          throw new Error("Missing workspaceId or surveyId");
+        }
 
+        setErrorState(null);
         const survey = await getSurvey(workspaceId, surveyId);
         return survey;
       } catch (error) {

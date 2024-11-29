@@ -2,16 +2,12 @@ import { moveSuveryService } from "@/backendServices/survey_builder/surveyServic
 import { errorHandler } from "@/middleware/CustomError";
 import { NextRequest, NextResponse } from "next/server";
 
-interface Props {
-  params: Promise<{ surveyId: string }>;
-}
-
-export const PATCH = async (req: NextRequest, { params }: Props) => {
+export const PATCH = async (req: NextRequest) => {
   try {
-    const { surveyId } = await params;
-    const { targetWorkspaceId, workspaceId } = (await req.json()) as {
+    const { targetWorkspaceId, workspaceId, surveyId } = (await req.json()) as {
       targetWorkspaceId: string;
       workspaceId: string;
+      surveyId: string;
     };
     await moveSuveryService(surveyId, targetWorkspaceId);
     return NextResponse.json(

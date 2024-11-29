@@ -3,15 +3,12 @@ import { errorHandler } from "@/middleware/CustomError";
 import { SurveySettings } from "@/types/survey";
 import { NextRequest, NextResponse } from "next/server";
 
-interface Props {
-  params: Promise<{ surveyId: string }>;
-}
 
-export const PATCH = async (request: NextRequest, { params }: Props) => {
+export const PATCH = async (request: NextRequest) => {
   try {
-    const { surveyId } = await params;
-    const { settings } = (await request.json()) as {
+    const { settings, surveyId } = (await request.json()) as {
       settings: SurveySettings;
+      surveyId: string;
     };
     const survey = await updateSurveySettingsService(surveyId, settings);
     return NextResponse.json( survey , { status: 200 });
