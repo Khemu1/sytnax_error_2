@@ -105,7 +105,7 @@ const SearchDialog: React.FC<SearchDialogProps> = ({ isOpen, onClose }) => {
                     {surveys.length ? (
                       surveys.map((survey, index) => (
                         <Link
-                          href={`/survey/${survey.workspace}/${survey.id}/build`}
+                          href={`/dashboard/surveyBuilder/build/${survey.workspaceId}/${survey.id}`}
                           key={index}
                           className="p-2 cursor-pointer hover:bg-gray-700 rounded-md"
                           onClick={() => setTitle(survey.name)}

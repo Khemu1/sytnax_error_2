@@ -2,8 +2,6 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { NewQuestionModel } from "../../../types/buildSurvey";
 
 const initialState: NewQuestionModel = {
-  id: "0",
-  surveyId: "0",
   label: "",
   description: "",
   points: 1,
