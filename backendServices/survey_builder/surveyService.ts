@@ -1,14 +1,11 @@
-import { SurveyModel, SurveySettings } from "@/types/survey";
+import {  SurveySettings } from "@/types/survey";
 import { filterObject } from "@/utils";
 import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
 
 const prisma = new PrismaClient().$extends(withAccelerate());
 
-export const addSurveyService = async (
-  workspaceId: string,
-  name: string
-): Promise<SurveyModel> => {
+export const addSurveyService = async (workspaceId: string, name: string) => {
   try {
     console.log("name", name);
     console.log("workspaceId", workspaceId);
@@ -125,7 +122,7 @@ export const returnSurveyForBuilderService = async (surveyId: string) => {
         questions: {
           include: {
             correctAnswers: true,
-            answers: true,
+            questionAnswers: true,
             questionImage: true,
           },
         },
@@ -136,4 +133,3 @@ export const returnSurveyForBuilderService = async (surveyId: string) => {
     throw error;
   }
 };
-

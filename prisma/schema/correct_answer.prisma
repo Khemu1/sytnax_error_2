@@ -1,8 +1,8 @@
 model CorrectAnswer {
-  id         String   @id @default(cuid())
-  questionId String
-  answer     String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  question   Question @relation(fields: [questionId], references: [id])
+  id          String         @id @default(cuid())
+  questionId  String
+  answerId    String                    
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  question    Question        @relation(fields: [questionId], references: [id])
 }

@@ -167,6 +167,7 @@ input:focus {
 }
 .custom-preview > * {
   width: 100%;
+  @apply overflow-hidden text-ellipsis;
 }
 
 .ck.ck-reset.ck-list {

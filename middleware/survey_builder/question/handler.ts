@@ -9,29 +9,16 @@ import {
   checkGroupMemberShipForQuestion,
   vlidateForNewQuestion,
 } from ".";
+import { parseAndValidateNewQuestionFormData } from "@/utils/survey_builder/question";
+import { NewQuestionModel, QuestionOptions } from "@/types/buildSurvey";
 
-interface Props {
-  params: Promise<{
-    workspaceId: string;
-    surveyId: string;
-  }>;
-}
-export const questionBuilderRoutes = async (
-  req: NextRequest,
-  { params }: Props
-) => {
+export const questionBuilderRoutes = async (req: NextRequest) => {
   try {
     const authUser = await authenticateUser();
     await checkDashBoardRoles(authUser);
+
     const rawFormData = await req.formData();
-    const formData = {
-      question: rawFormData.get("question")!,
-      options: rawFormData.get("options")!,
-    };
-    const { workspaceId, surveyId } = (await params) as {
-      workspaceId: string;
-      surveyId: string;
-    };
+    const formData = parseAndValidateNewQuestionFormData(rawFormData);
     const method = req.method;
     const pathName = req.nextUrl.pathname;
 
@@ -42,23 +29,23 @@ export const questionBuilderRoutes = async (
             return await handleAddQuestion(
               req,
               authUser,
-              surveyId,
-              workspaceId,
-              {}
+              formData.surveyId,
+              formData.workspaceId,
+              formData
             );
           }
           break;
 
         default:
           return NextResponse.json(
-            { message: "Method not allowed" },
+            { message: "Question Method not allowed" },
             { status: 405 }
           );
       }
     }
 
     return NextResponse.json(
-      { message: " Group Method Not found" },
+      { message: "Question Method Not found" },
       { status: 404 }
     );
   } catch (error) {
@@ -95,7 +82,12 @@ const handleAddQuestion = async (
   authUser: NextResponse,
   surveyId: string,
   workspaceId: string,
-  formData: { question: FormDataEntryValue; options: FormDataEntryValue }
+  formData: {
+    question: NewQuestionModel;
+    options: QuestionOptions;
+    workspaceId: string;
+    surveyId: string;
+  }
 ) => {
   const { checkMemberShip } = await performCommonQuestionChecks(
     req,
@@ -103,6 +95,5 @@ const handleAddQuestion = async (
     surveyId,
     workspaceId
   );
-  console.log("formData", formData);
-  // return await vlidateForNewQuestion(req, checkMemberShip, formData);
+  return await vlidateForNewQuestion(req, checkMemberShip, formData);
 };

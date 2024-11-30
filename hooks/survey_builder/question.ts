@@ -8,8 +8,11 @@ import {
 } from "@/frontendServices/survey_builder/generic_question";
 import { QuestionModel } from "@/types/buildSurvey";
 import { CustomError } from "@/middleware/CustomError";
+import { addQuestionF } from "@/utils/survey_builder/build/questions";
+import { useDispatch } from "react-redux";
 
 export const useAddQuestion = () => {
+  const dispatch = useDispatch();
   const [errorState, setErrorState] = useState<Record<
     string,
     string | undefined
@@ -20,18 +23,17 @@ export const useAddQuestion = () => {
     CustomError | unknown,
     {
       question: FormData;
-      workspaceId: string;
-      surveyId: string;
     }
   >({
-    mutationFn: async ({ question, workspaceId, surveyId }) => {
+    mutationFn: async ({ question }) => {
       setErrorState(null);
 
-      const response = await addQuestion(question, workspaceId, surveyId);
+      const response = await addQuestion(question);
       return response;
     },
-    onSuccess: async (newQuestion: QuestionModel) => {
+    onSuccess: (newQuestion: QuestionModel) => {
       console.log("newQuestion", newQuestion);
+      addQuestionF(newQuestion, dispatch);
     },
     onError: (err: CustomError | unknown) => {
       const message =

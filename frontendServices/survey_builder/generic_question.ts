@@ -1,12 +1,8 @@
 import { CustomError } from "@/middleware/CustomError";
 
-export const addQuestion = async (
-  question: FormData,
-  workspaceId: string,
-  surveyId: string
-) => {
+export const addQuestion = async (question: FormData) => {
   try {
-    const response = await fetch(`/api/survey_builder/question/${workspaceId}/${surveyId}`, {
+    const response = await fetch(`/api/survey_builder/question`, {
       method: "POST",
       body: question,
     });
@@ -37,7 +33,7 @@ export const addQuestion = async (
 
 export const deleteQuestion = async (
   questionId: number,
-  worksapceAndSurvey: FormData,
+  worksapceAndSurvey: FormData
 ) => {
   try {
     const response = await fetch(`/api/question/delete/${questionId}`, {
@@ -71,7 +67,7 @@ export const deleteQuestion = async (
 
 export const duplicateQuestion = async (
   questionId: number,
-  worksapceAndSurvey: FormData,
+  worksapceAndSurvey: FormData
 ) => {
   try {
     const response = await fetch(`/api/question/duplicate/${questionId}`, {
@@ -103,10 +99,7 @@ export const duplicateQuestion = async (
   }
 };
 
-export const editQuestion = async (
-  questionId: number,
-  question: FormData,
-) => {
+export const editQuestion = async (questionId: number, question: FormData) => {
   try {
     const response = await fetch(`/api/question/edit/${questionId}`, {
       method: "PUT",

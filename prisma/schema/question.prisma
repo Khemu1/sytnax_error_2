@@ -4,12 +4,12 @@ model Question {
   label                 String
   description           String?
   allowMultipleAnswers  Boolean          @default(false)
-  createdAt             DateTime         @default(now())
-  updatedAt             DateTime         @updatedAt
+  createdAt             DateTime?         @default(now())
+  updatedAt             DateTime?         @updatedAt
   points                Int              @default(1)
   survey                Survey           @relation(fields: [surveyId], references: [id])
   correctAnswers        CorrectAnswer[]
-  answers               AnsweredQuestion[]
+  questionAnswers       QuestionAnswer[]
 
   questionImage         QuestionImage?  
 }

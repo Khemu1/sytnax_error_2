@@ -2,14 +2,23 @@ import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
 import { CustomError } from "@/middleware/CustomError";
-import { WorkSpaceModel } from "@/types/survey";
 import { validateWithSchema } from "@/utils/validations/validations";
-import { returnQuestionData } from "@/utils/survey_builder/build/questions";
 import {
   newQuestionSchema,
   questionOptionsSchema,
 } from "@/utils/validations/question";
+import { NewQuestionModel, QuestionOptions } from "@/types/buildSurvey";
 const prisma = new PrismaClient().$extends(withAccelerate());
+
+// for some damn reason, it won't set the headers without the this method
+const setResponseHeaders = (
+  res: NextResponse,
+  headers: Record<string, string>
+) => {
+  Object.entries(headers).forEach(([key, value]) =>
+    res.headers.set(key, value)
+  );
+};
 
 export const checkDoesWorkspaceExistForQuestion = async (
   req: NextRequest,
@@ -17,6 +26,10 @@ export const checkDoesWorkspaceExistForQuestion = async (
   workspaceId: string
 ) => {
   try {
+    if (!workspaceId) {
+      throw new CustomError("Workspace ID is required", 400, "question");
+    }
+
     const workspace = await prisma.workspace.findUnique({
       where: { id: workspaceId },
     });
@@ -25,11 +38,16 @@ export const checkDoesWorkspaceExistForQuestion = async (
       console.error("Workspace not found for ID:", workspaceId);
       throw new CustomError("Workspace not found", 404, "question");
     }
+
     const response = NextResponse.next();
-    response.headers.set("workspace", JSON.stringify(workspace));
-    response.headers.set("User-Id", res.headers.get("User-Id")!);
+    setResponseHeaders(response, {
+      workspace: JSON.stringify({ workspaceId, userId: workspace.userId }),
+      "User-Id": res.headers.get("User-Id")!,
+    });
+
     return response;
   } catch (error) {
+    console.error("Error in checkDoesWorkspaceExistForQuestion:", error);
     throw error;
   }
 };
@@ -41,6 +59,14 @@ export const checkDoesSurveyExistForQuestion = async (
   workspaceId: string
 ) => {
   try {
+    if (!surveyId || !workspaceId) {
+      throw new CustomError(
+        "Survey ID and Workspace ID are required",
+        400,
+        "question"
+      );
+    }
+
     const survey = await prisma.survey.findUnique({
       where: {
         id: surveyId,
@@ -49,16 +75,21 @@ export const checkDoesSurveyExistForQuestion = async (
     });
 
     if (!survey) {
+      console.error(
+        `Survey not found for ID: ${surveyId} in workspace: ${workspaceId}`
+      );
       throw new CustomError("Survey not found for workspace", 404, "question");
     }
+
     const response = NextResponse.next();
-    response.headers.set(
-      "workspace",
-      JSON.stringify(res.headers.get("workspace"))
-    );
-    response.headers.set("User-Id", res.headers.get("User-Id")!);
+    setResponseHeaders(response, {
+      workspace: res.headers.get("workspace")!,
+      "User-Id": res.headers.get("User-Id")!,
+    });
+
     return response;
   } catch (error) {
+    console.error("Error in checkDoesSurveyExistForQuestion:", error);
     throw error;
   }
 };
@@ -70,19 +101,51 @@ export const checkGroupMemberShipForQuestion = async (
   try {
     const rawUserId = res.headers.get("User-Id");
     const rawWorkspace = res.headers.get("workspace");
+
     if (!rawUserId || !rawWorkspace) {
+      console.error("Missing headers:", {
+        "User-Id": rawUserId,
+        workspace: rawWorkspace,
+      });
       throw new CustomError(
-        "missing user id or workspace",
+        "Missing user ID or workspace",
         400,
         "workspace middleware",
         false
       );
     }
-    const userId = +rawUserId;
-    const workspace: WorkSpaceModel = JSON.parse(rawWorkspace);
-    const ownerId = workspace.userId;
 
-    // if it's the owner
+    const userId = +rawUserId;
+    console.log("Parsed User ID:", userId);
+
+    let workspace: { workspaceId: string; userId: number };
+    try {
+      workspace = JSON.parse(rawWorkspace);
+    } catch (parseError) {
+      console.error("Error parsing rawWorkspace:", parseError, rawWorkspace);
+      throw new CustomError(
+        "Invalid workspace format in headers",
+        400,
+        "workspace middleware",
+        false
+      );
+    }
+
+    if (!workspace.userId) {
+      console.error("Workspace is missing userId:", workspace);
+      throw new CustomError(
+        "Workspace does not contain userId",
+        400,
+        "workspace middleware",
+        false
+      );
+    }
+
+    console.log("Workspace:", workspace);
+    const ownerId = workspace.userId;
+    console.log("Owner ID:", ownerId, "User ID:", userId);
+
+    // If it's the owner
     if (ownerId === userId) {
       return res;
     }
@@ -106,23 +169,27 @@ export const checkGroupMemberShipForQuestion = async (
 
     throw new CustomError("You don't have access to this workspace", 403);
   } catch (error) {
-    console.error("Error in checkGroupMembershipForWorkspace:", error);
+    console.error("Error in checkGroupMembershipForQuestion:", error);
     throw error;
   }
 };
 
+
 export const vlidateForNewQuestion = async (
-  req: NextRequest,
+  _req: NextRequest,
   res: NextResponse,
-  data: { question: FormDataEntryValue; options: FormDataEntryValue }
+  data: {
+    question: NewQuestionModel;
+    options: QuestionOptions;
+    workspaceId: string;
+    surveyId: string;
+  }
 ) => {
   try {
-    // const formData = returnQuestionData(data);
-    // questionOptionsSchema().parse(formData);
-    // newQuestionSchema(formData.options!).parse(formData.question);
+    questionOptionsSchema().parse(data.options);
+    newQuestionSchema(data.options).parse(data.question);
+
     const response = NextResponse.next();
-    response.headers.set("User-Id", res.headers.get("User-Id")!);
-    // response.headers.set("question", JSON.stringify(formData));
     return response;
   } catch (error) {
     throw new CustomError(

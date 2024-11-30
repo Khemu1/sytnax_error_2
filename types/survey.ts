@@ -16,7 +16,7 @@ export interface SurveyModel {
   duration: number;
   questionsPerPage: number;
   updatedAt?: Date;
-  workspace?: WorkSpaceModel;
+  questions: QuestionModel[];
 }
 
 export interface SurveyPreviewModel {

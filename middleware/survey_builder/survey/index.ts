@@ -19,6 +19,7 @@ export const validateNewSurvey = async (
   name: string
 ) => {
   try {
+    console.log("validating new survey", name);
     const schema = newSurveySchema();
     schema.parse({ name });
 

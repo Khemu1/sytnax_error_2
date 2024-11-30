@@ -1,8 +1,8 @@
 model QuestionImage {
   id         String   @id @default(cuid())
-  questionId String   @unique 
-  imgurId    String
+  questionId String   @unique   
+  imgurId    String   @unique   
+  deleteHash String   
   url        String
-
-  question   Question?  @relation(fields: [questionId], references: [id])
+  question   Question  @relation(fields: [questionId], references: [id])
 }

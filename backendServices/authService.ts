@@ -34,19 +34,25 @@ export const signInService = async (data: SignInProps) => {
     if (!user) {
       throw new CustomError("Invalid Credentials", 404, "Sign in Error", true);
     }
-    const response = await fetch(
-      "https://my-worker.alghost2004.workers.dev//decrypt-password",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          hashedPassword: user.passwordHash,
-          password: data.password,
-        }),
-      }
-    );
+    const workerUrl = process.env.DECRYPTION_WORKER_URL as string;
+    if (!workerUrl) {
+      throw new CustomError(
+        "Service is Unavailable at the current time ",
+        404,
+        "Sign in Error",
+        true
+      );
+    }
+    const response = await fetch(workerUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        hashedPassword: user.passwordHash,
+        password: data.password,
+      }),
+    });
     const result = (await response.json()) as Promise<boolean>;
     if (!result) {
       throw new CustomError("Invalid Credentials", 404, "Sign in Error", true);

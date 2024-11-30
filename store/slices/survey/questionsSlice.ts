@@ -2,11 +2,11 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { QuestionModel } from "../../../types/buildSurvey";
 
 interface QuestionsState {
-  items: QuestionModel[]; // Renamed 'questions' to 'items'
+  items: QuestionModel[];
 }
 
 const initialState: QuestionsState = {
-  items: [], // Updated here
+  items: [],
 };
 
 const questionsSlice = createSlice({

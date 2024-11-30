@@ -16,9 +16,8 @@ export const validateNewWorkSpace = async (
 ) => {
   try {
     const data = await req.json();
-    console.log("data", data);
     const schema = newWorkspaceSchema();
-    schema.parse(data.name);
+    schema.parse({ name: data.name });
 
     const response = NextResponse.next();
     response.headers.set("User-Id", res.headers.get("User-Id")!);

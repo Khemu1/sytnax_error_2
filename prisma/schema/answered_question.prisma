@@ -7,5 +7,4 @@ model AnsweredQuestion {
   createdAt    DateTime         @default(now())
   updatedAt    DateTime         @updatedAt
   submission   SurveySubmission @relation(fields: [submissionId], references: [id])
-  question     Question         @relation(fields: [questionId], references: [id])
 }

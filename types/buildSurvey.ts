@@ -26,6 +26,11 @@ export interface NewQuestionModel {
   isDescriptionEnabled: boolean;
   previewImageUrl: string;
 }
+export interface QuestionOptions {
+  isDescriptionEnabled: boolean;
+  isImageUploadEnabled: boolean;
+  allowMultipleAnswers: boolean;
+}
 
 export interface NewQuestionModelBackend {
   question: {
@@ -36,13 +41,15 @@ export interface NewQuestionModelBackend {
     points: number;
     correctAnswers: string[];
     answers: string[];
-    previewImageUrl: string;
+    imageUrl?: string;
   };
   options: {
     allowMultipleAnswers: boolean;
     isImageUploadEnabled: boolean;
     isDescriptionEnabled: boolean;
   };
+  workspaceId: string;
+  surveyId: string;
 }
 
 interface CorrectAnswerModel {

@@ -1,4 +1,7 @@
+import { addQuestion } from "@/store/slices/survey/questionsSlice";
+import { QuestionModel } from "@/types/buildSurvey";
 import { filterObject } from "@/utils";
+import { Dispatch } from "@reduxjs/toolkit";
 
 export const returnFileAndUrl = (
   file: File | null
@@ -42,4 +45,13 @@ export const returnQuestionData = (formData: {
   options: FormDataEntryValue;
 }) => {
   return filterObject(formData, ["question", "options"]);
+};
+
+export const addQuestionF = (question: QuestionModel, dispatch: Dispatch) => {
+  try {
+    console.log("Adding question:", question);
+    dispatch(addQuestion(question));
+  } catch (error) {
+    throw error;
+  }
 };
