@@ -1,6 +1,6 @@
 import { Dialog, DialogPanel } from "@headlessui/react";
 import React, { useState, useEffect } from "react";
-import InputSwitchField from "./InputSwitchField";
+import InputSwitchField from "../InputSwitchField";
 import {
   resetCurrentQuestion,
   updateCurrentQuestion,
@@ -13,20 +13,20 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import Image from "next/image";
 import { RootState } from "@/store/store";
-import ImageUploadField from "./ImageUploadField";
+import ImageUploadField from "../ImageUploadField";
 import {
   returnFileAndUrl,
   transformDataIntoFormData,
 } from "@/utils/survey_builder/build/questions";
-import PreviewGenericTextArea from "../edit/question/PreviewGenericTextArea";
+import PreviewGenericTextArea from "../../edit/question/PreviewGenericTextArea";
 import {
   newQuestionSchema,
   questionOptionsSchema,
 } from "@/utils/validations/question";
 
 import "@/styles/surveyBuilder.css";
-import SwitchContainer from "./SwitchContainer";
-import QuestionAnswers from "./QuestionAnswers";
+import SwitchContainer from "../SwitchContainer";
+import QuestionAnswers from "../QuestionAnswers";
 import { validateWithSchema } from "@/utils/validations/validations";
 import { useAddQuestion } from "@/hooks/survey_builder/question";
 import Toast from "@/components/skeletons/Toast";
@@ -79,7 +79,7 @@ const NewQuestion: React.FC<NewQuestionDialogProps> = ({ isOpen, onClose }) => {
     message: string;
     type: "success" | "error";
   } | null>(null);
-
+  console.log("in new question", label);
   const handleSwitchChange = (
     field: "description" | "imageUpload" | "allowMultipleChoice"
   ) => {
@@ -111,7 +111,14 @@ const NewQuestion: React.FC<NewQuestionDialogProps> = ({ isOpen, onClose }) => {
     (isDescriptionEnabled && description?.trim().length === 0) ||
     answers.length < 2 ||
     correctAnswers.length === 0 ||
-    +points < 1;
+    +points < 1 ||
+    (allowMultipleAnswers && correctAnswers.length < 2) ||
+    (allowMultipleAnswers &&
+      answers.length === 2 &&
+      correctAnswers.length === 1) ||
+    (allowMultipleAnswers &&
+      answers.length === 2 &&
+      correctAnswers.length === 2);
 
   const handleFileChange = async (file: File | null) => {
     const { file: _file, url } = await returnFileAndUrl(file);
@@ -188,10 +195,11 @@ const NewQuestion: React.FC<NewQuestionDialogProps> = ({ isOpen, onClose }) => {
       });
     }
     setTimeout(() => {
-      onClose();
       dispatch(resetCurrentQuestion());
+      onClose();
     }, 2000);
   }, [isSuccess]);
+
   return (
     <>
       <Dialog
@@ -351,6 +359,7 @@ const NewQuestion: React.FC<NewQuestionDialogProps> = ({ isOpen, onClose }) => {
                       removeCorrectAnswer={(answer) =>
                         dispatch(removeCorrectAnswer(answer))
                       }
+                      zodError={validationErrors}
                     />
                   </div>
                   <div className="flex justify-end gap-5 items-center p-4 text-white font-semibold">

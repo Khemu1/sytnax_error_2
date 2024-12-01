@@ -1,4 +1,3 @@
-"use client";
 import Image from "next/image";
 import { useState } from "react";
 import "@/styles/formStyle.module.css";
@@ -10,6 +9,7 @@ interface QuestionAnswersProps {
   removeAnswer: (answer: string) => void;
   addCorrectAnswer: (answer: string) => void;
   removeCorrectAnswer: (answer: string) => void;
+  zodError: Record<string, string> | null;
 }
 
 const QuestionAnswers: React.FC<QuestionAnswersProps> = ({
@@ -19,12 +19,16 @@ const QuestionAnswers: React.FC<QuestionAnswersProps> = ({
   removeAnswer,
   addCorrectAnswer,
   removeCorrectAnswer,
+  zodError,
 }) => {
+  console.log("answers", answers);
+  console.log("correctAnswers", correctAnswers);
   const [answer, setAnswer] = useState("");
   const [validationErrors, setValidationErrors] = useState<Record<
     string,
     string
   > | null>(null);
+  console.log("correctAnswers", correctAnswers);
 
   const toggleCorrectAnswer = (answer: string) => {
     if (correctAnswers.includes(answer)) {
@@ -79,6 +83,13 @@ const QuestionAnswers: React.FC<QuestionAnswersProps> = ({
           <p className={`${validationErrors?.answers ? "error_message" : ""} `}>
             {validationErrors?.answers}
           </p>
+
+          {zodError?.answers && (
+            <p className="error_message">{zodError.answers}</p>
+          )}
+          {zodError?.correctAnswers && (
+            <p className="error_message">{zodError.correctAnswers}</p>
+          )}
         </div>
       </div>
       <div>
@@ -91,8 +102,8 @@ const QuestionAnswers: React.FC<QuestionAnswersProps> = ({
                 className={`flex justify-between w-full items-center cursor-pointer font-semibold ${
                   correctAnswers.includes(answer)
                     ? "bg-green-600 text-white"
-                    : "bg-[#42484b]"
-                } rounded-md p-1`}
+                    : "bg-[#42484b9c]"
+                } rounded-md p-1 pl-2 transition-all`}
               >
                 <div className="flex items-center flex-1 ">{answer}</div>{" "}
                 <button

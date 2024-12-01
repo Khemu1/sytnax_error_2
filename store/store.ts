@@ -10,6 +10,7 @@ import currentSurveyReducer from "./slices/survey/currentSurveySlice";
 import userGroupReducer from "./slices/survey/userGroup";
 import questionsReducer from "./slices/survey/questionsSlice";
 import questionReducer from "./slices/survey/questionSlice";
+import editQuestionReducer from "./slices/survey/editQuestionSlice";
 
 
 export const store = configureStore({
@@ -17,14 +18,14 @@ export const store = configureStore({
     auth: authReducer,
     dashboard: dashboardReducer,
     dialog: dialogReducer,
-
     survey: surveyReducer,
     workspace: workspaceReducer,
     currentWorkspace: currentWorkspaceReducer,
     currentSurvey: currentSurveyReducer,
     userGroup: userGroupReducer,
     questions: questionsReducer,
-    question : questionReducer,
+    question: questionReducer,
+    editQuestion: editQuestionReducer,
   },
 });
 

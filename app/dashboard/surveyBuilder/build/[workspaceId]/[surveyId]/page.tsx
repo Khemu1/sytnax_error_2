@@ -1,6 +1,6 @@
 "use client";
 
-import NewQuestion from "@/components/survey_builder/build/question/NewQuestion";
+import NewQuestion from "@/components/survey_builder/build/question/dialogs/NewQuestion";
 import Questions from "@/components/survey_builder/build/Questions";
 import { useGetSurvey } from "@/hooks/survey_builder/survey";
 import { setCurrentSurvey } from "@/store/slices/survey/currentSurveySlice";

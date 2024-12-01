@@ -1,0 +1,11 @@
+#:schema node_modules/wrangler/config-schema.json
+name = "general-worker"
+main = "src/index.ts"
+compatibility_date = "2024-11-27"
+
+[vars]
+SENDGRID_API_KEY = "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"
+SENDGRID_SENDER_EMAIL = "stxerror2004@gmail.com"
+
+# binding = "MY_INDEX"
+# index_name = "my-index"

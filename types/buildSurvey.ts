@@ -7,13 +7,24 @@ export interface QuestionModel {
     id: string;
     imgurId: string;
     url: string;
+    deleteHash: boolean;
   };
   createdAt?: string;
   updatedAt?: string;
   points: number;
   correctAnswers: CorrectAnswerModel[];
-  answers: AnswersModel[];
+  questionAnswers: AnswersModel[];
   allowMultipleAnswers: boolean;
+}
+
+export interface EditQuestionModel extends QuestionModel {
+  previewImageUrl: string;
+  deletedAnswers: AnswersModel[];
+  deletedCorrectAnswers: Partial<CorrectAnswerModel>[];
+  addedAnswers: string[];
+  addedCorrectAnswers: string[];
+  isDescriptionEnabled: boolean;
+  isImageUploadEnabled: boolean;
 }
 export interface NewQuestionModel {
   label: string;
@@ -52,20 +63,19 @@ export interface NewQuestionModelBackend {
   surveyId: string;
 }
 
-interface CorrectAnswerModel {
+export interface CorrectAnswerModel {
   id: string;
   questionId: string;
-  answer: string;
+  answerId: string;
+  value: string;
   createdAt?: string;
   updatedAt?: string;
 }
 
-interface AnswersModel {
+export interface AnswersModel {
   id: string;
   questionId: string;
   answer: string;
-  isCorrect: boolean;
-  point: number;
   createdAt?: string;
   updatedAt?: string;
 }

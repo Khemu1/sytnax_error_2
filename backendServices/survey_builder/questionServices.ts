@@ -54,6 +54,7 @@ export const addQuestionService = async (
             data: {
               questionId: newQuestion.id,
               answerId: matchedAnswer.id,
+              value: correctValue,
             },
           });
         })
@@ -61,8 +62,6 @@ export const addQuestionService = async (
       let questionImage;
       if (options.isImageUploadEnabled && question.imageUrl) {
         const imageData = await handleImageUpload(question.imageUrl);
-        console.log("Image data:", imageData);
-        console.log("Question ID:", newQuestion.id);
         questionImage = await prisma.questionImage.create({
           data: {
             questionId: newQuestion.id,
@@ -76,7 +75,7 @@ export const addQuestionService = async (
       return {
         ...newQuestion,
         correctAnswers,
-        answers:createdAnswers,
+        questionAnswers: createdAnswers,
         image: questionImage,
       };
     });

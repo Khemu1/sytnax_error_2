@@ -18,7 +18,6 @@ const Preview: React.FC<PreviewProps> = ({
   answers,
 }) => {
   const [res, setRes] = useState<"pc" | "mobile">("pc");
-
   return (
     <div className="flex flex-col w-full min-h-full gap-5 items-start relative main_text bg-gray-900 p-6 rounded-lg">
       <div className="hidden sm:flex absolute left-1/2 top-5 transform -translate-x-1/2 gap-4 z-10">
@@ -62,7 +61,7 @@ const Preview: React.FC<PreviewProps> = ({
 
       {/* Preview Area */}
       <div
-        className={`flex flex-col min-h-full transition-all mx-auto overflow-y-auto relative items-center justify-center px-8 py-6 bg-gray-800 text-xl rounded-md shadow-md ${
+        className={`flex flex-col gap-4 min-h-full transition-all mx-auto overflow-y-auto relative items-center justify-center px-8 py-6 bg-gray-800 text-xl rounded-md shadow-md ${
           res === "pc" ? "w-full h-auto" : "w-[375px] h-auto"
         }`}
       >
@@ -86,7 +85,7 @@ const Preview: React.FC<PreviewProps> = ({
           {label && <LabelPreivew label={label} />}
         </div>
 
-        <div className="w-full mt-4">
+        <div className="w-full ">
           {description && <DescriptionPreivew description={description} />}
         </div>
 
@@ -97,7 +96,7 @@ const Preview: React.FC<PreviewProps> = ({
                 key={index}
                 className="flex items-center justify-start gap-2 w-[300px]"
               >
-                <div className="rounded-lg w-full bg-blue-500 p-3 text-white shadow-lg hover:bg-blue-600 transition-all duration-300 transform hover:scale-105 cursor-pointer">
+                <div className="rounded-lg w-full bg-blue-500 p-3 text-white shadow-lg hover:bg-green-600 transition-all duration-300 transform  cursor-pointer">
                   <span className="font-semibold">
                     {String.fromCharCode(65 + index)}.
                   </span>{" "}

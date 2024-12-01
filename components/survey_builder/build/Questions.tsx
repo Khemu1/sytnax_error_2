@@ -4,20 +4,49 @@ import Image from "next/image";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import EditQuestion from "./question/dialogs/EditQuestion";
 
 const Questions = () => {
-  const { questions, currentSuvey } = useSelector((state: RootState) => ({
+  const { questions, currentSurvey } = useSelector((state: RootState) => ({
     questions: state.questions.items,
-    currentSuvey: state.currentSurvey.currentSurvey,
+    currentSurvey: state.currentSurvey.currentSurvey,
   }));
 
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
-  const navigateTo = useRouter();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [currentQuestion, setCurrentQuestion] = useState<QuestionModel | null>(
+    null
+  );
+
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const onClose = useCallback(() => {
+    if (!currentSurvey) return;
+
+    router.push(pathname, { scroll: false });
+
+    setIsDialogOpen(false);
+    setCurrentQuestion(null);
+  }, [router, currentSurvey]);
+
+  const openQuestionDialog = useCallback(
+    (question: QuestionModel) => {
+      if (!currentSurvey || !question) return;
+
+      const currentUrl = `${pathname}`;
+      const queryParams = `?edit=true&id=${question.id}`;
+      router.push(currentUrl + queryParams, { scroll: false });
+
+      setIsDialogOpen(true);
+      setCurrentQuestion(question);
+    },
+    [router, currentSurvey]
+  );
 
   const toggleMenu = useCallback((id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-
     setOpenMenuId((prevId) => (prevId === id ? null : id));
   }, []);
 
@@ -39,25 +68,42 @@ const Questions = () => {
     };
   }, [handleClickOutside]);
 
+  useEffect(() => {
+    // Make sure questions are available before performing any logic
+    if (questions && questions.length > 0) {
+      const questionIdFromUrl = searchParams.get("id");
+      const question = questions.find(
+        (question) => question.id === questionIdFromUrl
+      );
+      if (questionIdFromUrl && question) {
+        setIsDialogOpen(true);
+        setCurrentQuestion(question);
+      } else {
+        setOpenMenuId(null);
+        onClose();
+      }
+    }
+  }, [questions, searchParams]);
+
+  if (questions.length < 1)
+    return (
+      <div className="flex w-full font-semibold justify-center items-center ">
+        Start Adding Questions
+      </div>
+    );
   return (
-    <div className="flex flex-col gap-4 p-4 h-[600px] overflow-y-scroll">
-      {questions?.length > 0 &&
-        questions.map((question: QuestionModel, index: number) => (
+    <>
+      <div className="flex flex-col gap-4 p-4 h-[600px] overflow-y-scroll">
+        {questions.map((question, index) => (
           <div
             key={question.id}
-            className="flex justify-between p-2 bg-[#42484b5b] rounded-md hover:bg-[#42484b86] transition-all relative"
-            onClick={() => {
-              const currentUrl = `/dashboard/surveyBuilder/build/${
-                currentSuvey!.workspaceId
-              }/${currentSuvey!.id}`;
-              const queryParams = `?edit=true&id=${question.id}`;
-              navigateTo.push(currentUrl + queryParams, { scroll: false });
-            }}
+            className="cursor-pointer flex justify-between p-2 bg-[#42484b5b] rounded-md hover:bg-[#42484b86] transition-all relative"
+            onClick={() => openQuestionDialog(question)}
           >
             <div className="flex gap-4">
               <div className="flex gap-2">
                 <Image
-                  src={"/assets/icons/text.svg"}
+                  src="/assets/icons/text.svg"
                   alt="Question Icon"
                   width={30}
                   height={30}
@@ -83,13 +129,24 @@ const Questions = () => {
 
             {openMenuId === question.id && (
               <div className="question-menu flex flex-col text-left right-0 text-sm absolute top-10 bg-[#0e0e0e] p-2 rounded-md shadow-md z-10">
-                <span className="survey_card_buttons">Duplicate</span>
-                <span className="survey_card_buttons text-red-600">Delete</span>
+                <button className="survey_card_buttons">Duplicate</button>
+                <button className="survey_card_buttons text-red-600">
+                  Delete
+                </button>
               </div>
             )}
           </div>
         ))}
-    </div>
+      </div>
+      {isDialogOpen && currentQuestion && (
+        <EditQuestion
+          isOpen={isDialogOpen}
+          onClose={onClose}
+          question={currentQuestion}
+          workspaceId={currentSurvey!.workspaceId}
+        />
+      )}
+    </>
   );
 };
 
