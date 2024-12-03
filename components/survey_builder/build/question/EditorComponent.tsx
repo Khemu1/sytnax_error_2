@@ -20,40 +20,23 @@ import {
   Highlight,
   Font,
 } from "ckeditor5";
-import { useDispatch } from "react-redux";
-import { updateCurrentQuestion } from "@/store/slices/survey/questionSlice";
-import { updateCurrentEditQuestion } from "@/store/slices/survey/editQuestionSlice";
 
 export interface EditorComponentProps {
   id: string;
   value?: string;
+  onChange: (e: string) => void;
 }
 
 const EditorComponent: React.FC<EditorComponentProps> = ({
-  id,
   value = "<p>This is the initial content of the editor.</p>",
+  onChange,
 }) => {
-  const dispatch = useDispatch();
-
   const handleEditorChange = (_event: unknown, editor: ClassicEditor) => {
     const content = editor.getData();
-    if (id.toLowerCase().includes("edit")) {
-      if (id.toLowerCase().includes("description-")) {
-        dispatch(updateCurrentEditQuestion({ description: content }));
-        return;
-      }
-      if (id.toLowerCase().includes("label-")) {
-        dispatch(updateCurrentEditQuestion({ label: content }));
-        return;
-      }
+    if (!onChange) {
+      alert("onChange is not defined");
     }
-    if (id.toLowerCase().includes("description-")) {
-      dispatch(updateCurrentQuestion({ description: content }));
-    }
-    if (id.toLowerCase().includes("label-")) {
-      dispatch(updateCurrentQuestion({ label: content }));
-    }
-    console.log(id.toLowerCase().includes("edit"));
+    onChange(content);
   };
 
   return (

@@ -22,6 +22,7 @@ const InputSwitchField: React.FC<InputSwitchFieldProps> = ({
   errorMessage,
   type,
   border,
+  onChangeEditor,
 }) => {
   return (
     <div
@@ -66,6 +67,7 @@ const InputSwitchField: React.FC<InputSwitchFieldProps> = ({
             <EditorComponent
               id={`${editorId}-editor`}
               value={value.toString()}
+              onChange={onChangeEditor}
             />
           )}
           {type === "number" && (
@@ -75,7 +77,7 @@ const InputSwitchField: React.FC<InputSwitchFieldProps> = ({
               onChange={onChange}
               className={`bg-[#2a2a2a] text-white p-2 rounded-sm mt-2 w-[100px] ${
                 errorMessage ? "input_error_border" : "input_border"
-                }`}
+              }`}
               min={1}
               placeholder={placeholder}
               disabled={isSubmitting}

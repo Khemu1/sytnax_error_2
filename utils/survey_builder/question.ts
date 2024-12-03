@@ -46,7 +46,6 @@ export function parseAndValidateEditQuestionFormData(rawFormData: FormData) {
   const optionsRaw = rawFormData.get("options");
   const workspaceIdRaw = rawFormData.get("workspaceId");
   const surveyIdRaw = rawFormData.get("surveyId");
-  const rawOldToggleValue = rawFormData.get("oldToggleValue");
 
   if (!questionRaw) {
     throw new CustomError("Missing 'question' field", 400, "new question");
@@ -60,27 +59,18 @@ export function parseAndValidateEditQuestionFormData(rawFormData: FormData) {
   if (!surveyIdRaw) {
     throw new CustomError("Missing 'surveyId' field", 400, "new question");
   }
-  if (!rawOldToggleValue) {
-    throw new CustomError(
-      "Missing 'oldToggleValue' field",
-      400,
-      "new question"
-    );
-  }
 
   try {
     const question = JSON.parse(String(questionRaw)) as EditQuestionModel;
     const options = JSON.parse(String(optionsRaw)) as QuestionOptions;
     const workspaceId = JSON.parse(String(workspaceIdRaw)) as string;
     const surveyId = JSON.parse(String(surveyIdRaw)) as string;
-    const oldToggleValue = JSON.parse(String(rawOldToggleValue)) as boolean;
 
     return {
       question,
       options,
       workspaceId,
       surveyId,
-      oldToggleValue,
     };
   } catch (error) {
     throw error;

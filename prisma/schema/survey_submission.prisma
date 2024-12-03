@@ -4,6 +4,6 @@ model SurveySubmission {
   createdAt   DateTime           @default(now())
   updatedAt   DateTime           @updatedAt
   totalPoints Int                @default(0)
-  survey      Survey             @relation(fields: [surveyId], references: [id])
+  survey      Survey             @relation(fields: [surveyId], references: [id],onDelete: Cascade)
   answers     AnsweredQuestion[]
 }

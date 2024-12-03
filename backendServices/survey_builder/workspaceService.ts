@@ -101,6 +101,7 @@ export const addWorkSpaceService = async (userId: number, name: string) => {
 
 export const deleteWorkspaceService = async (workspaceId: string) => {
   try {
+    // todo later on delete delete the question images first to clear imgur
     await prisma.workspace.delete({
       where: { id: workspaceId },
     });

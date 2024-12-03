@@ -125,6 +125,9 @@ export const returnSurveyForBuilderService = async (surveyId: string) => {
             questionAnswers: true,
             questionImage: true,
           },
+          orderBy: {
+            createdAt: "asc",
+          },
         },
       },
     });

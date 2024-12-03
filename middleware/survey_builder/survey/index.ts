@@ -110,9 +110,8 @@ export const checkGroupMembershipForSurvey = async (
         },
       },
     });
-
     if (isNaN(userId) || !workspace || typeof workspace.userId !== "number") {
-      throw new CustomError("Invalid User-Id or workspace data", 400);
+      throw new CustomError("Invalid User-Id or workspace data", 403, "survey");
     }
 
     const response = NextResponse.next();
@@ -126,7 +125,11 @@ export const checkGroupMembershipForSurvey = async (
     if (groupMembers?.UserGroup.find((group) => group.userId === userId)) {
       return response;
     }
-    throw new CustomError("You don't have access to this workspace", 403);
+    throw new CustomError(
+      "You don't have access to this workspace",
+      403,
+      "workspace"
+    );
   } catch (error) {
     console.error("Error in checkGroupMembershipForWorkspace:", error);
     throw error;

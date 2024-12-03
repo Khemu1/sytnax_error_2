@@ -6,5 +6,5 @@ model AnsweredQuestion {
   point        Int              @default(0)
   createdAt    DateTime         @default(now())
   updatedAt    DateTime         @updatedAt
-  submission   SurveySubmission @relation(fields: [submissionId], references: [id])
+  submission   SurveySubmission @relation(fields: [submissionId], references: [id],onDelete: Cascade)
 }

@@ -10,6 +10,5 @@ model Question {
   survey                Survey           @relation(fields: [surveyId], references: [id])
   correctAnswers        CorrectAnswer[]
   questionAnswers       QuestionAnswer[]
-
   questionImage         QuestionImage?  
 }

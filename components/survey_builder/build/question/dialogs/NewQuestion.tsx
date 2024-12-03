@@ -190,13 +190,17 @@ const NewQuestion: React.FC<NewQuestionDialogProps> = ({ isOpen, onClose }) => {
         message: "Question added successfully.",
         type: "success",
       });
+      setTimeout(() => {
+        dispatch(resetCurrentQuestion());
+        onClose();
+      }, 2000);
     }
-    setTimeout(() => {
-      dispatch(resetCurrentQuestion());
-      onClose();
-    }, 2000);
   }, [isSuccess]);
 
+  useEffect(() => {
+    console.log("ememememem", label);
+  }, [label]);
+  console.log("in new questions");
   return (
     <>
       <Dialog
@@ -275,13 +279,11 @@ const NewQuestion: React.FC<NewQuestionDialogProps> = ({ isOpen, onClose }) => {
                   </div>
                   <div className="flex flex-col gap-6 px-4">
                     <InputSwitchField
-                      editorId="label"
+                      editorId="label-new"
                       label="Label"
                       value={label}
-                      onChange={(e) =>
-                        dispatch(
-                          updateCurrentQuestion({ label: e.target.value })
-                        )
+                      onChangeEditor={(e: string) =>
+                        dispatch(updateCurrentQuestion({ label: e }))
                       }
                       switchChecked={true}
                       placeholder="Label"
@@ -292,13 +294,11 @@ const NewQuestion: React.FC<NewQuestionDialogProps> = ({ isOpen, onClose }) => {
                       errorMessage={validationErrors?.label}
                     />
                     <InputSwitchField
-                      editorId="description"
+                      editorId="description-new"
                       label="Description"
                       value={description ?? ""}
-                      onChange={(e) =>
-                        dispatch(
-                          updateCurrentQuestion({ description: e.target.value })
-                        )
+                      onChangeEditor={(e: string) =>
+                        dispatch(updateCurrentQuestion({ description: e }))
                       }
                       switchChecked={isDescriptionEnabled}
                       onSwitchChange={() => handleSwitchChange("description")}
@@ -328,6 +328,7 @@ const NewQuestion: React.FC<NewQuestionDialogProps> = ({ isOpen, onClose }) => {
                     />
 
                     <InputSwitchField
+                      onChangeEditor={() => console.log("changed")}
                       label="Points"
                       value={!isNaN(Number(points)) ? Number(points) : 1}
                       onChange={(e) =>

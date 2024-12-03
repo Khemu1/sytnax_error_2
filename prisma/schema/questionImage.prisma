@@ -4,5 +4,5 @@ model QuestionImage {
   imgurId    String   @unique   
   deleteHash String   
   url        String
-  question   Question  @relation(fields: [questionId], references: [id])
+  question   Question  @relation(fields: [questionId], references: [id],onDelete: Cascade)
 }

@@ -202,7 +202,6 @@ const EditQuestion: React.FC<NewQuestionDialogProps> = ({
         workspaceId: workspaceId,
         surveyId: currentQuestion.surveyId,
         questionId: currentQuestion.id,
-        oldToggleValue: currentQuestion.allowMultipleAnswers,
       };
       const formData = new FormData();
       transformDataIntoFormData(completeQuestion, formData);
@@ -337,10 +336,8 @@ const EditQuestion: React.FC<NewQuestionDialogProps> = ({
                       editorId="label-edit"
                       label="Label"
                       value={label}
-                      onChange={(e) =>
-                        dispatch(
-                          updateCurrentEditQuestion({ label: e.target.value })
-                        )
+                      onChangeEditor={(e: string) =>
+                        dispatch(updateCurrentEditQuestion({ label: e }))
                       }
                       switchChecked={true}
                       placeholder="Label"
@@ -354,13 +351,6 @@ const EditQuestion: React.FC<NewQuestionDialogProps> = ({
                       editorId="description-edit"
                       label="Description"
                       value={description ?? ""}
-                      onChange={(e) =>
-                        dispatch(
-                          updateCurrentEditQuestion({
-                            description: e.target.value,
-                          })
-                        )
-                      }
                       switchChecked={isDescriptionEnabled}
                       onSwitchChange={() => handleSwitchChange("description")}
                       placeholder="Description"
@@ -369,6 +359,9 @@ const EditQuestion: React.FC<NewQuestionDialogProps> = ({
                       type="editor"
                       border={false}
                       errorMessage={validationErrors?.description}
+                      onChangeEditor={(e: string) =>
+                        dispatch(updateCurrentEditQuestion({ description: e }))
+                      }
                     />
                     <ImageUploadField
                       file={file}
@@ -406,6 +399,7 @@ const EditQuestion: React.FC<NewQuestionDialogProps> = ({
                       type="number"
                       border={true}
                       errorMessage={validationErrors?.points}
+                      onChangeEditor={() => console.log("changed")}
                     />
                     <QuestionAnswers
                       answers={addedAnswers}

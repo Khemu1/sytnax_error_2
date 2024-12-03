@@ -165,6 +165,7 @@ export interface InputSwitchFieldProps {
   onChange?: (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void;
+  onChangeEditor: (() => void) | ((e: string) => void);
   switchChecked?: boolean;
   onSwitchChange?: (checked: boolean) => void;
   placeholder?: string;

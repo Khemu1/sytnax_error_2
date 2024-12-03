@@ -9,6 +9,7 @@ interface Props {
 export const DELETE = async (req: NextRequest, { params }: Props) => {
   try {
     const { workspaceId } = await params;
+    console.log("workspaceId", workspaceId);
     await deleteWorkspaceService(workspaceId);
     return NextResponse.json({ workspaceId: workspaceId }, { status: 200 });
   } catch (error) {

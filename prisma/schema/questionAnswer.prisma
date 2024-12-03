@@ -4,5 +4,5 @@ model QuestionAnswer {
   answer       String
   createdAt    DateTime?         @default(now())
   updatedAt    DateTime?         @updatedAt
-  question     Question         @relation(fields: [questionId], references: [id]) 
+  question     Question         @relation(fields: [questionId], references: [id],onDelete: Cascade) 
 }

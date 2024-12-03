@@ -24,6 +24,7 @@ const questionsSlice = createSlice({
       state,
       action: PayloadAction<Partial<NewQuestionModel>>
     ) => {
+      console.log("updating", action.payload);
       return { ...state, ...action.payload };
     },
     addAnswer: (state, action: PayloadAction<string>) => {

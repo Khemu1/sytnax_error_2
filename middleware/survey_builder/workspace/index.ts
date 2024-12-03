@@ -67,6 +67,10 @@ export async function checkWorkspaceExists(
         JSON.stringify({ workspaceId: workspace.id, userId: workspace.userId })
       )
     );
+    repsonse.headers.set(
+      "workspace",
+      JSON.stringify({ id: workspace.id, userId: workspace.userId })
+    );
     repsonse.headers.set("User-Id", res.headers.get("User-Id")!);
     return repsonse;
   } catch (error) {
@@ -106,7 +110,7 @@ export const checkGroupMembershipForWorkspace = async (
       },
     });
 
-    if (isNaN(userId) || !workspace || typeof workspace.userId !== "number") {
+    if (isNaN(userId) || !workspace || typeof +workspace.userId !== "number") {
       throw new CustomError("Invalid User-Id or workspace data", 400);
     }
 
@@ -114,7 +118,9 @@ export const checkGroupMembershipForWorkspace = async (
 
     response.headers.set("User-Group-Ids", JSON.stringify(groupMembers));
     response.headers.set("workspace", JSON.stringify(workspace));
-
+    console.log("workspace", workspace.userId);
+    console.log("userId", userId);
+    console.log("adadsdsaads", workspace.userId === userId);
     if (workspace.userId === userId) {
       return response;
     }
