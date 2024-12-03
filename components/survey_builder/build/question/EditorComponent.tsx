@@ -22,6 +22,7 @@ import {
 } from "ckeditor5";
 import { useDispatch } from "react-redux";
 import { updateCurrentQuestion } from "@/store/slices/survey/questionSlice";
+import { updateCurrentEditQuestion } from "@/store/slices/survey/editQuestionSlice";
 
 export interface EditorComponentProps {
   id: string;
@@ -36,12 +37,23 @@ const EditorComponent: React.FC<EditorComponentProps> = ({
 
   const handleEditorChange = (_event: unknown, editor: ClassicEditor) => {
     const content = editor.getData();
+    if (id.toLowerCase().includes("edit")) {
+      if (id.toLowerCase().includes("description-")) {
+        dispatch(updateCurrentEditQuestion({ description: content }));
+        return;
+      }
+      if (id.toLowerCase().includes("label-")) {
+        dispatch(updateCurrentEditQuestion({ label: content }));
+        return;
+      }
+    }
     if (id.toLowerCase().includes("description-")) {
       dispatch(updateCurrentQuestion({ description: content }));
     }
     if (id.toLowerCase().includes("label-")) {
       dispatch(updateCurrentQuestion({ label: content }));
     }
+    console.log(id.toLowerCase().includes("edit"));
   };
 
   return (

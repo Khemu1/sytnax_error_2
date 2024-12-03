@@ -7,10 +7,19 @@ import {
   checkDoesSurveyExistForQuestion,
   checkDoesWorkspaceExistForQuestion,
   checkGroupMemberShipForQuestion,
+  doesQuestionExists,
+  vlidateForEditQuestion,
   vlidateForNewQuestion,
 } from ".";
-import { parseAndValidateNewQuestionFormData } from "@/utils/survey_builder/question";
-import { NewQuestionModel, QuestionOptions } from "@/types/buildSurvey";
+import {
+  parseAndValidateEditQuestionFormData,
+  parseAndValidateNewQuestionFormData,
+} from "@/utils/survey_builder/question";
+import {
+  EditQuestionModel,
+  NewQuestionModel,
+  QuestionOptions,
+} from "@/types/buildSurvey";
 
 export const questionBuilderRoutes = async (req: NextRequest) => {
   try {
@@ -18,7 +27,10 @@ export const questionBuilderRoutes = async (req: NextRequest) => {
     await checkDashBoardRoles(authUser);
 
     const rawFormData = await req.formData();
-    const formData = parseAndValidateNewQuestionFormData(rawFormData);
+    const formDataNewQuestion =
+      parseAndValidateNewQuestionFormData(rawFormData);
+    const formDataEditQuestion =
+      parseAndValidateEditQuestionFormData(rawFormData);
     const method = req.method;
     const pathName = req.nextUrl.pathname;
 
@@ -29,9 +41,19 @@ export const questionBuilderRoutes = async (req: NextRequest) => {
             return await handleAddQuestion(
               req,
               authUser,
-              formData.surveyId,
-              formData.workspaceId,
-              formData
+              formDataNewQuestion.surveyId,
+              formDataNewQuestion.workspaceId,
+              formDataNewQuestion
+            );
+          }
+        case "PATCH":
+          if (pathName === "/api/survey_builder/question/edit") {
+            return await handleEditQuestion(
+              req,
+              authUser,
+              formDataEditQuestion.surveyId,
+              formDataNewQuestion.workspaceId,
+              formDataEditQuestion
             );
           }
           break;
@@ -95,5 +117,29 @@ const handleAddQuestion = async (
     surveyId,
     workspaceId
   );
-  return await vlidateForNewQuestion(req, checkMemberShip, formData);
+  return vlidateForNewQuestion(req, checkMemberShip, formData);
+};
+
+const handleEditQuestion = async (
+  req: NextRequest,
+  authUser: NextResponse,
+  surveyId: string,
+  workspaceId: string,
+  formData: {
+    question: EditQuestionModel;
+    options: QuestionOptions;
+    workspaceId: string;
+    surveyId: string;
+  }
+) => {
+  const { checkMemberShip } = await performCommonQuestionChecks(
+    req,
+    authUser,
+    surveyId,
+    workspaceId
+  );
+
+  await vlidateForEditQuestion(req, checkMemberShip, formData);
+
+  return doesQuestionExists(formData.question.id, surveyId);
 };

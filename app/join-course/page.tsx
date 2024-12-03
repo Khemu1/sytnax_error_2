@@ -147,7 +147,7 @@ const JoinCourse: React.FC = () => {
             className={`flex items-center justify-center ${
               isSubmitting || loading ? formStyle.button_success : ""
             }`}
-            disabled={isSubmitting}
+            disabled={isSubmitting || success}
           >
             {loading ? (
               <span className="loading loading-spinner loading-md"></span>

@@ -25,12 +25,11 @@ const questionsSlice = createSlice({
       );
     },
     updateQuestion: (state, action: PayloadAction<QuestionModel>) => {
-      const index = state.items.findIndex(
-        (question) => question.id === action.payload.id
+      state.items = state.items.map((question) =>
+        question.id === action.payload.id
+          ? { ...question, ...action.payload }
+          : question
       );
-      if (index !== -1) {
-        state.items[index] = action.payload;
-      }
     },
   },
 });

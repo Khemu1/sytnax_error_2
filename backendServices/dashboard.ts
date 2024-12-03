@@ -56,7 +56,7 @@ export const dashboardAllCourseDataService = async (id: number) => {
       where: { id: +id, deletedAt: null },
       include: { urlData: true },
       relationLoadStrategy: "join",
-      // cacheStrategy: { ttl: 60 },
+      cacheStrategy: { ttl: 60 },
     });
 
     if (!course.urlData) {
@@ -244,7 +244,7 @@ export const dashboardAdminsService = async () => {
       },
       select: { id: true },
       relationLoadStrategy: "join",
-      // cacheStrategy: { ttl: 60 },
+      cacheStrategy: { ttl: 60 },
     });
     if (!adminRole) {
       throw new CustomError("Admin role not found", 404, "role lookup", true);

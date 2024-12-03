@@ -21,19 +21,18 @@ const QuestionAnswers: React.FC<QuestionAnswersProps> = ({
   removeCorrectAnswer,
   zodError,
 }) => {
-  console.log("answers", answers);
-  console.log("correctAnswers", correctAnswers);
   const [answer, setAnswer] = useState("");
   const [validationErrors, setValidationErrors] = useState<Record<
     string,
     string
   > | null>(null);
-  console.log("correctAnswers", correctAnswers);
 
   const toggleCorrectAnswer = (answer: string) => {
     if (correctAnswers.includes(answer)) {
+      console.log("removing");
       removeCorrectAnswer(answer);
     } else {
+      console.log("adding");
       addCorrectAnswer(answer);
     }
   };
@@ -87,9 +86,6 @@ const QuestionAnswers: React.FC<QuestionAnswersProps> = ({
           {zodError?.answers && (
             <p className="error_message">{zodError.answers}</p>
           )}
-          {zodError?.correctAnswers && (
-            <p className="error_message">{zodError.correctAnswers}</p>
-          )}
         </div>
       </div>
       <div>
@@ -124,6 +120,9 @@ const QuestionAnswers: React.FC<QuestionAnswersProps> = ({
             </div>
           ))}
         </div>
+        {zodError?.correctAnswers && (
+          <p className="error_message">{zodError.correctAnswers}</p>
+        )}
         <p
           className={`${
             answers.length === 6 ? "error_message" : "font-semibold"

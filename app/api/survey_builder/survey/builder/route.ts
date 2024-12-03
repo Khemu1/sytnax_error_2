@@ -6,9 +6,9 @@ export const POST = async (req: NextRequest) => {
   try {
     const { surveyId } = await req.json();
 
-    console.log("in controller", surveyId);
+    console.log("in controller i'm in POST", surveyId);
     const survey = await returnSurveyForBuilderService(surveyId);
-    return NextResponse.json( survey, { status: 200 });
+    return NextResponse.json(survey, { status: 200 });
   } catch (error) {
     return errorHandler(error);
   }

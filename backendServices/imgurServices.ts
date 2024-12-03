@@ -45,7 +45,7 @@ export const uploadQuestionToImgur = async (
       const errorData = await response.json();
       throw new Error(`Imgur error: ${errorData.data.error}`);
     }
-
+    console.log("uploaded image to imgur");
     const data: imageDataResponse = await response.json();
     return data;
   } catch (error) {

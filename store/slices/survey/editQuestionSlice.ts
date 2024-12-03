@@ -11,12 +11,13 @@ const initialState: EditQuestionModel = {
   correctAnswers: [],
   questionAnswers: [],
   //
-  allowMultipleAnswers: false,
   deletedAnswers: [],
   deletedCorrectAnswers: [],
+  imageUrl: "",
   addedAnswers: [],
   addedCorrectAnswers: [],
   previewImageUrl: "",
+  allowMultipleAnswers: false,
   isDescriptionEnabled: false,
   isImageUploadEnabled: false,
 };
@@ -33,6 +34,7 @@ const editQuestionsSlice = createSlice({
         isDescriptionEnabled: action.payload.description ? true : false,
         isImageUploadEnabled: action.payload.questionImage ? true : false,
         allowMultipleAnswers: action.payload.allowMultipleAnswers,
+        previewImageUrl: action.payload.questionImage?.url ?? "",
         addedAnswers: action.payload.questionAnswers.map(
           (answer) => answer.answer
         ),
@@ -49,7 +51,7 @@ const editQuestionsSlice = createSlice({
     ) => {
       return { ...state, ...action.payload };
     },
-    addAnswer: (state, action: PayloadAction<string>) => {
+    addAnswerForEdit: (state, action: PayloadAction<string>) => {
       // look for the answer in the original array
       const findAnswer = state.questionAnswers.find(
         (answer) => answer.answer === action.payload
@@ -80,7 +82,7 @@ const editQuestionsSlice = createSlice({
       }
     },
 
-    removeAnswer: (state, action: PayloadAction<string>) => {
+    removeAnswerForEdit: (state, action: PayloadAction<string>) => {
       // check if the answer was part of the original question
       const existingAnswer = state.questionAnswers.find(
         (answer) => answer.answer === action.payload
@@ -102,33 +104,131 @@ const editQuestionsSlice = createSlice({
       }
     },
 
-    addCorrectAnswer: (state, action: PayloadAction<string>) => {
-      // look for answer in the original array
-      const findCorrectAnswer = state.correctAnswers.find(
-        (ca) => ca.value === action.payload
-      );
+    addCorrectAnswerForEdit: (state, action: PayloadAction<string>) => {
+      // If multiple answers are allowed, we can add new answers
+      if (state.allowMultipleAnswers) {
+        if (state.addedCorrectAnswers.length < 2) {
+          const findCorrectAnswer = state.correctAnswers.find(
+            (ca) => ca.value === action.payload
+          );
 
-      // was it deleted?
-      const findDeletedCorrectAnswer = state.deletedCorrectAnswers.find(
-        (ca) => ca.value === action.payload
-      );
+          // Was it deleted?
+          const findDeletedCorrectAnswer = state.deletedCorrectAnswers.find(
+            (ca) => ca.value === action.payload
+          );
 
-      // if yes, add it back
-      if (findCorrectAnswer && findDeletedCorrectAnswer) {
-        // remove it from deletedCorrectAnswers based on value
-        state.deletedCorrectAnswers = state.deletedCorrectAnswers.filter(
-          (ca) => ca.id !== findDeletedCorrectAnswer.id
+          // If yes, add it back
+          if (findCorrectAnswer && findDeletedCorrectAnswer) {
+            // Remove it from deletedCorrectAnswers based on value
+            state.deletedCorrectAnswers = state.deletedCorrectAnswers.filter(
+              (ca) => ca.id !== findDeletedCorrectAnswer.id
+            );
+
+            // Add it to addedCorrectAnswers
+            state.addedCorrectAnswers.push(action.payload);
+          } else {
+            // Otherwise, just add it to addedCorrectAnswers
+            state.addedCorrectAnswers.push(action.payload);
+          }
+        }
+      } else if (state.addedCorrectAnswers.length === 2) {
+        const findCorrectAnswer = state.correctAnswers.find(
+          (ca) => ca.value === action.payload
         );
 
-        // add it to addedCorrectAnswers
-        state.addedCorrectAnswers.push(action.payload);
+        // Was it deleted?
+        const findDeletedCorrectAnswer = state.deletedCorrectAnswers.find(
+          (ca) => ca.value === action.payload
+        );
+
+        // Access the last correct answer in addedCorrectAnswers
+        const lastCorrectAnswerValue =
+          state.addedCorrectAnswers[state.addedCorrectAnswers.length - 1];
+
+        const lastCorrectAnswerWithId = state.correctAnswers.find(
+          (ca) => ca.value === lastCorrectAnswerValue
+        );
+
+        if (lastCorrectAnswerWithId) {
+          state.deletedCorrectAnswers.push(lastCorrectAnswerWithId);
+        }
+
+        // If the answer exists in correctAnswers and deletedCorrectAnswers, replace the last one
+        if (findCorrectAnswer && findDeletedCorrectAnswer) {
+          // Remove it from deletedCorrectAnswers based on value
+          state.deletedCorrectAnswers = state.deletedCorrectAnswers.filter(
+            (ca) => ca.id !== findDeletedCorrectAnswer.id
+          );
+
+          // Replace the last added correct answer with the new one
+          state.addedCorrectAnswers = [
+            ...state.addedCorrectAnswers.slice(
+              0,
+              state.addedCorrectAnswers.length - 1
+            ),
+            action.payload,
+          ];
+        } else {
+          // Otherwise, replace the last added correct answer
+          state.addedCorrectAnswers = [
+            ...state.addedCorrectAnswers.slice(
+              0,
+              state.addedCorrectAnswers.length - 1
+            ),
+            action.payload,
+          ];
+        }
       } else {
-        // otherwise, just add it to addedCorrectAnswers
-        state.addedCorrectAnswers.push(action.payload);
+        const findCorrectAnswer = state.correctAnswers.find(
+          (ca) => ca.value === action.payload
+        );
+
+        // Was it deleted?
+        const findDeletedCorrectAnswer = state.deletedCorrectAnswers.find(
+          (ca) => ca.value === action.payload
+        );
+
+        // Access the last correct answer in addedCorrectAnswers
+        const lastCorrectAnswerValue =
+          state.addedCorrectAnswers[state.addedCorrectAnswers.length - 1];
+
+        const lastCorrectAnswerWithId = state.correctAnswers.find(
+          (ca) => ca.value === lastCorrectAnswerValue
+        );
+
+        if (lastCorrectAnswerWithId) {
+          state.deletedCorrectAnswers.push(lastCorrectAnswerWithId);
+        }
+
+        // If the answer exists in correctAnswers and deletedCorrectAnswers, replace the last one
+        if (findCorrectAnswer && findDeletedCorrectAnswer) {
+          // Remove it from deletedCorrectAnswers based on value
+          state.deletedCorrectAnswers = state.deletedCorrectAnswers.filter(
+            (ca) => ca.id !== findDeletedCorrectAnswer.id
+          );
+
+          // Replace the last added correct answer with the new one
+          state.addedCorrectAnswers = [
+            ...state.addedCorrectAnswers.slice(
+              0,
+              state.addedCorrectAnswers.length - 1
+            ),
+            action.payload,
+          ];
+        } else {
+          // Otherwise, replace the last added correct answer
+          state.addedCorrectAnswers = [
+            ...state.addedCorrectAnswers.slice(
+              0,
+              state.addedCorrectAnswers.length - 1
+            ),
+            action.payload,
+          ];
+        }
       }
     },
 
-    removeCorrectAnswer: (state, action: PayloadAction<string>) => {
+    removeCorrectAnswerForEdit: (state, action: PayloadAction<string>) => {
       // look for answer in the original array
       const findCorrectAnswer = state.correctAnswers.find(
         (ca) => ca.value === action.payload
@@ -150,7 +250,7 @@ const editQuestionsSlice = createSlice({
       }
     },
 
-    reduceCorrectAnswersTo1: (state) => {
+    reduceCorrectAnswersTo1ForEdit: (state) => {
       state.correctAnswers = [state.correctAnswers[0]];
     },
     resetCurrentEditQuestion: () => initialState,
@@ -159,13 +259,13 @@ const editQuestionsSlice = createSlice({
 
 export const {
   setCurrentEditQuestion,
-  addAnswer,
-  removeAnswer,
-  addCorrectAnswer,
-  removeCorrectAnswer,
+  addAnswerForEdit,
+  removeAnswerForEdit,
+  addCorrectAnswerForEdit,
+  removeCorrectAnswerForEdit,
   resetCurrentEditQuestion,
   updateCurrentEditQuestion,
-  reduceCorrectAnswersTo1,
+  reduceCorrectAnswersTo1ForEdit,
 } = editQuestionsSlice.actions;
 
 export default editQuestionsSlice.reducer;

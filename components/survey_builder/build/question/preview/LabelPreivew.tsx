@@ -1,7 +1,7 @@
 const LabelPreivew: React.FC<{ label: string }> = ({ label }) => {
   return (
     <div
-      className="custom-preview" // Add your custom class here
+      className="custom-preview w-min"
       dangerouslySetInnerHTML={{ __html: label }}
     ></div>
   );

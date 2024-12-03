@@ -79,7 +79,6 @@ const NewQuestion: React.FC<NewQuestionDialogProps> = ({ isOpen, onClose }) => {
     message: string;
     type: "success" | "error";
   } | null>(null);
-  console.log("in new question", label);
   const handleSwitchChange = (
     field: "description" | "imageUpload" | "allowMultipleChoice"
   ) => {
@@ -105,7 +104,6 @@ const NewQuestion: React.FC<NewQuestionDialogProps> = ({ isOpen, onClose }) => {
     }
   };
   const isFormInvalid =
-    isSubmitting ||
     label?.trim().length === 0 ||
     (isImageUploadEnabled && file === null) ||
     (isDescriptionEnabled && description?.trim().length === 0) ||
@@ -168,7 +166,6 @@ const NewQuestion: React.FC<NewQuestionDialogProps> = ({ isOpen, onClose }) => {
     } catch (error) {
       setValidationErrors(validateWithSchema(error));
       console.error("Error:", error);
-    } finally {
       setIsSubmitting(false);
     }
   };
@@ -374,7 +371,7 @@ const NewQuestion: React.FC<NewQuestionDialogProps> = ({ isOpen, onClose }) => {
                       Cancel
                     </button>
                     <button
-                      disabled={isFormInvalid}
+                      disabled={isFormInvalid || isSubmitting || isSuccess}
                       type="submit"
                       className={`flex justify-center items-center w-[82px] ${
                         isFormInvalid

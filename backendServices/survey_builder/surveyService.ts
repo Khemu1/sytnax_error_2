@@ -1,4 +1,4 @@
-import {  SurveySettings } from "@/types/survey";
+import { SurveySettings } from "@/types/survey";
 import { filterObject } from "@/utils";
 import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
@@ -128,7 +128,7 @@ export const returnSurveyForBuilderService = async (surveyId: string) => {
         },
       },
     });
-    
+
     return survey;
   } catch (error) {
     throw error;

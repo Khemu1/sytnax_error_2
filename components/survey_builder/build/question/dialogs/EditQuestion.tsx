@@ -4,16 +4,14 @@ import InputSwitchField from "../InputSwitchField";
 import {
   resetCurrentEditQuestion,
   updateCurrentEditQuestion,
-  addAnswer,
-  removeAnswer,
-  addCorrectAnswer,
-  removeCorrectAnswer,
-  reduceCorrectAnswersTo1,
+  addAnswerForEdit,
+  removeAnswerForEdit,
+  addCorrectAnswerForEdit,
+  removeCorrectAnswerForEdit,
+  reduceCorrectAnswersTo1ForEdit,
   setCurrentEditQuestion,
 } from "@/store/slices/survey/editQuestionSlice";
-import { useDispatch, useSelector } from "react-redux";
 import Image from "next/image";
-import { RootState } from "@/store/store";
 import ImageUploadField from "../ImageUploadField";
 import {
   returnFileAndUrl,
@@ -29,9 +27,11 @@ import "@/styles/surveyBuilder.css";
 import SwitchContainer from "../SwitchContainer";
 import QuestionAnswers from "../QuestionAnswers";
 import { validateWithSchema } from "@/utils/validations/validations";
-import { useAddQuestion } from "@/hooks/survey_builder/question";
+import { useEditQuestion } from "@/hooks/survey_builder/question";
 import Toast from "@/components/skeletons/Toast";
 import { EditQuestionModel, QuestionModel } from "@/types/buildSurvey";
+import { RootState } from "@/store/store";
+import { useDispatch, useSelector } from "react-redux";
 
 interface NewQuestionDialogProps {
   isOpen: boolean;
@@ -56,7 +56,6 @@ const EditQuestion: React.FC<NewQuestionDialogProps> = ({
     questions,
     allowMultipleAnswers,
     points,
-    image,
     addedAnswers,
     addedCorrectAnswers,
     deletedCorrectAnswers,
@@ -69,7 +68,6 @@ const EditQuestion: React.FC<NewQuestionDialogProps> = ({
     isImageUploadEnabled: state.editQuestion.isImageUploadEnabled,
     isDescriptionEnabled: state.editQuestion.isDescriptionEnabled,
     previewImageUrl: state.editQuestion.previewImageUrl ?? "",
-    image: state.editQuestion.questionImage,
     questions: state.questions.items,
     allowMultipleAnswers: state.editQuestion.allowMultipleAnswers,
     points: state.editQuestion.points,
@@ -90,7 +88,7 @@ const EditQuestion: React.FC<NewQuestionDialogProps> = ({
 
   const [isPreview, setIsPreview] = useState(false);
 
-  const { isPending, handleAddQuestion, isSuccess } = useAddQuestion();
+  const { isPending, handleEditQuestion, isSuccess } = useEditQuestion();
 
   const [toast, setToast] = useState<{
     message: string;
@@ -118,7 +116,7 @@ const EditQuestion: React.FC<NewQuestionDialogProps> = ({
       );
     } else if (field === "allowMultipleChoice") {
       if (allowMultipleAnswers) {
-        dispatch(reduceCorrectAnswersTo1());
+        dispatch(reduceCorrectAnswersTo1ForEdit());
       }
       dispatch(
         updateCurrentEditQuestion({
@@ -128,46 +126,58 @@ const EditQuestion: React.FC<NewQuestionDialogProps> = ({
     }
   };
   const isFormInvalid =
-    isSubmitting ||
     label?.trim().length === 0 ||
-    (isImageUploadEnabled && file === null) ||
     (isDescriptionEnabled && description && description.trim().length === 0) ||
-    // answers.length < 2 ||
-    // correctAnswers.length === 0 ||
     +points < 1;
-
   const handleFileChange = async (file: File | null) => {
-    const { file: _file, url } = await returnFileAndUrl(file);
-
-    setFile(_file);
-    dispatch(updateCurrentEditQuestion({ previewImageUrl: url }));
+    if (file) {
+      // Handle the file upload, generate URL and set it
+      const { file: _file, url } = await returnFileAndUrl(file);
+      setFile(_file);
+      dispatch(updateCurrentEditQuestion({ previewImageUrl: url }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsSubmitting(true);
     setValidationErrors(null);
     if (!currentQuestion.surveyId || !workspaceId) {
       alert("Please create a survey first");
       return;
     }
+
     try {
-      setIsSubmitting(true);
       const preopOptions = {
         isDescriptionEnabled,
         isImageUploadEnabled,
         allowMultipleAnswers,
       };
-
+      const regex = /([^/]+\.[a-zA-Z0-9]+)$/;
+      const match = currentQuestion.questionImage?.url.match(regex);
+      const orignalFileName = match ? match[0] : "";
+      console.log(orignalFileName);
+      console.log(file?.name);
       const data = {
-        description:
-          description && currentQuestion.description
-            ? description.trim() !== currentQuestion.description.trim()
-              ? description
-              : undefined
-            : undefined,
+        id: currentQuestion.id,
+        description: isDescriptionEnabled
+          ? description &&
+            description.trim() !== currentQuestion.description?.trim()
+            ? description
+            : !currentQuestion.description && description
+            ? description
+            : undefined
+          : currentQuestion.description
+          ? null
+          : undefined,
 
-        imageUrl:
-          previewImageUrl.trim().length > 0 ? previewImageUrl : undefined,
+        imageUrl: isImageUploadEnabled
+          ? file?.name !== orignalFileName
+            ? previewImageUrl
+            : undefined
+          : currentQuestion.questionImage
+          ? null
+          : undefined,
 
         label:
           label.trim() !== currentQuestion.label.trim() ? label : undefined,
@@ -179,29 +189,30 @@ const EditQuestion: React.FC<NewQuestionDialogProps> = ({
         addedAnswers,
         addedCorrectAnswers,
         points: points !== currentQuestion.points ? points : undefined,
+        allowMultipleAnswers:
+          allowMultipleAnswers === currentQuestion.allowMultipleAnswers
+            ? undefined
+            : allowMultipleAnswers,
       };
       const options = questionOptionsSchema().parse({ ...preopOptions });
-
-      console.log("before sending to big schema", data);
-      console.log("before sending to big schema", options);
-
       const question = editQuestionSchema({ ...options }).parse({ ...data });
-
       const completeQuestion = {
         question,
         options,
         workspaceId: workspaceId,
         surveyId: currentQuestion.surveyId,
+        questionId: currentQuestion.id,
+        oldToggleValue: currentQuestion.allowMultipleAnswers,
       };
       const formData = new FormData();
       transformDataIntoFormData(completeQuestion, formData);
-      handleAddQuestion({
+
+      handleEditQuestion({
         question: formData,
       });
     } catch (error) {
       setValidationErrors(validateWithSchema(error));
       console.error("Error:", validationErrors);
-    } finally {
       setIsSubmitting(false);
     }
   };
@@ -219,26 +230,25 @@ const EditQuestion: React.FC<NewQuestionDialogProps> = ({
 
     return () => window.removeEventListener("resize", handleResize);
   }, [isPreview]);
-
-  // useEffect(() => {
-  //   if (isSuccess) {
-  //     setToast({
-  //       message: "Question added successfully.",
-  //       type: "success",
-  //     });
-  //   }
-  //   setTimeout(() => {
-  //     onClose();
-  //     dispatch(resetCurrentQuestion());
-  //   }, 2000);
-  // // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [isSuccess]);
+  useEffect(() => {
+    if (isSuccess) {
+      console.log("isSuccess", isSuccess);
+      setToast({
+        message: "Question has been updated.",
+        type: "success",
+      });
+      setTimeout(() => {
+        onClose();
+        dispatch(resetCurrentEditQuestion());
+      }, 2000);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccess]);
 
   useEffect(() => {
     if (!currentQuestion) {
       onClose();
     }
-    console.log("currentQuestionmaaaaaaaaad", currentQuestion);
 
     dispatch(setCurrentEditQuestion(currentQuestion as EditQuestionModel));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -287,11 +297,13 @@ const EditQuestion: React.FC<NewQuestionDialogProps> = ({
                   <PreviewGenericTextArea
                     imageUrl={
                       isImageUploadEnabled
-                        ? image?.url ?? previewImageUrl
+                        ? previewImageUrl ?? currentQuestion.questionImage?.url
                         : undefined
                     }
                     label={label || ""}
-                    description={isDescriptionEnabled ? description : undefined}
+                    description={
+                      isDescriptionEnabled ? description ?? "" : undefined
+                    }
                     index={questions.length + 1}
                     answers={addedAnswers}
                   />
@@ -318,11 +330,11 @@ const EditQuestion: React.FC<NewQuestionDialogProps> = ({
                         height={30}
                       />
                     </button>
-                    <span className="font-semibold">New Question</span>
+                    <span className="font-semibold">Edit Question</span>
                   </div>
                   <div className="flex flex-col gap-6 px-4">
                     <InputSwitchField
-                      editorId="label"
+                      editorId="label-edit"
                       label="Label"
                       value={label}
                       onChange={(e) =>
@@ -339,7 +351,7 @@ const EditQuestion: React.FC<NewQuestionDialogProps> = ({
                       errorMessage={validationErrors?.label}
                     />
                     <InputSwitchField
-                      editorId="description"
+                      editorId="description-edit"
                       label="Description"
                       value={description ?? ""}
                       onChange={(e) =>
@@ -360,7 +372,7 @@ const EditQuestion: React.FC<NewQuestionDialogProps> = ({
                     />
                     <ImageUploadField
                       file={file}
-                      filePath={image?.url ?? previewImageUrl}
+                      filePath={previewImageUrl}
                       setFile={handleFileChange}
                       title=""
                       label="Image"
@@ -398,13 +410,15 @@ const EditQuestion: React.FC<NewQuestionDialogProps> = ({
                     <QuestionAnswers
                       answers={addedAnswers}
                       correctAnswers={addedCorrectAnswers}
-                      addAnswer={(answer) => dispatch(addAnswer(answer))}
-                      removeAnswer={(answer) => dispatch(removeAnswer(answer))}
+                      addAnswer={(answer) => dispatch(addAnswerForEdit(answer))}
+                      removeAnswer={(answer) =>
+                        dispatch(removeAnswerForEdit(answer))
+                      }
                       addCorrectAnswer={(answer) =>
-                        dispatch(addCorrectAnswer(answer))
+                        dispatch(addCorrectAnswerForEdit(answer))
                       }
                       removeCorrectAnswer={(answer) =>
-                        dispatch(removeCorrectAnswer(answer))
+                        dispatch(removeCorrectAnswerForEdit(answer))
                       }
                       zodError={validationErrors}
                     />
@@ -426,7 +440,7 @@ const EditQuestion: React.FC<NewQuestionDialogProps> = ({
                       Cancel
                     </button>
                     <button
-                      disabled={isFormInvalid}
+                      disabled={isFormInvalid || isSubmitting || isSuccess}
                       type="submit"
                       className={`flex justify-center items-center w-[82px] ${
                         isFormInvalid
@@ -447,11 +461,13 @@ const EditQuestion: React.FC<NewQuestionDialogProps> = ({
                 <PreviewGenericTextArea
                   imageUrl={
                     isImageUploadEnabled
-                      ? image?.url ?? previewImageUrl
+                      ? previewImageUrl ?? currentQuestion.questionImage?.url
                       : undefined
                   }
                   label={label || ""}
-                  description={isDescriptionEnabled ? description : undefined}
+                  description={
+                    isDescriptionEnabled ? description ?? "" : undefined
+                  }
                   index={questions.length + 1}
                   answers={addedAnswers}
                 />

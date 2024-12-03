@@ -40,7 +40,7 @@ export const sendDevError = (error: CustomError) => {
       errors: error.errors,
       stack: error.stack,
     },
-    { status: error.statusCode }
+    { status: error.statusCode || 500 }
   );
 };
 
@@ -53,7 +53,7 @@ export const sendProdError = (error: CustomError) => {
       errors: error.errors,
       type: error.type,
     },
-    { status: error.statusCode }
+    { status: error.statusCode || 500 }
   );
 };
 

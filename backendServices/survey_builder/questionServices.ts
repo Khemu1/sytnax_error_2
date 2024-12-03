@@ -1,8 +1,28 @@
-import { NewQuestionModelBackend } from "@/types/buildSurvey";
+import {
+  editedQuestionModel,
+  EditQuestionModelBackend,
+  NewQuestionModelBackend,
+} from "@/types/buildSurvey";
+import { filterObject } from "@/utils";
 import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
-import { uploadQuestionToImgur } from "../imgurServices";
 import { CustomError } from "@/middleware/CustomError";
+import {
+  extractAnswersToAdd,
+  extractAnswersToDelete,
+  extractCorrectAnswersToAdd,
+  extractCorrectAnswersToDelete,
+} from "@/utils/survey_builder/build/questions";
+import {
+  handleAnswerUpdates,
+  handleCorrectAnswerUpdates,
+  handleDescriptionUpdate,
+  handleImageUpdate,
+  handleImageUpload,
+  handleLabelUpadte,
+  handlePointsUpdate,
+  handleToggleAllowMultipleAnswers,
+} from "@/backendServices/survey_builder/helpers/question";
 
 const prisma = new PrismaClient().$extends(withAccelerate());
 
@@ -13,6 +33,8 @@ export const addQuestionService = async (
 
   try {
     const createdQuestion = await prisma.$transaction(async (prisma) => {
+      console.log("in service");
+      console.log("questionData", question.imageUrl ? true : false);
       const newQuestion = await prisma.question.create({
         data: {
           label: question.label,
@@ -76,7 +98,11 @@ export const addQuestionService = async (
         ...newQuestion,
         correctAnswers,
         questionAnswers: createdAnswers,
-        image: questionImage,
+        image: {
+          id: questionImage?.id,
+          url: questionImage?.url,
+          questionId: newQuestion.id,
+        },
       };
     });
 
@@ -89,31 +115,129 @@ export const addQuestionService = async (
   }
 };
 
-const handleImageUpload = async (imageUrl: string) => {
+export const updateQuestionService = async (data: EditQuestionModelBackend) => {
+  const prepQuestion: editedQuestionModel = { ...data.question };
+  const {
+    answersToAdd,
+    answersToRemove,
+    correactAnswersToAdd,
+    correactAnswersToRemove,
+  } = extractChanges(data);
+
   try {
-    const uploadResult = await uploadQuestionToImgur(imageUrl);
-    const imageData = uploadResult?.data;
-
-    if (!imageData?.id || !imageData.link || !imageData.deletehash) {
-      console.error("Invalid Imgur response:", uploadResult);
-      throw new CustomError(
-        "Invalid image upload response.",
-        500,
-        "adding question"
+    const result = await prisma.$transaction(async () => {
+      prepQuestion.questionAnswers = await handleAnswerUpdates(
+        answersToAdd,
+        answersToRemove,
+        prepQuestion
       );
-    }
 
-    return {
-      imgurId: imageData.id,
-      url: imageData.link,
-      deleteHash: imageData.deletehash,
-    };
+      const togglerUpdateData = await handleToggleAllowMultipleAnswers(
+        prepQuestion.allowMultipleAnswers,
+        prepQuestion.id
+      );
+      prepQuestion.allowMultipleAnswers =
+        togglerUpdateData?.isMultipleAnswersEnabled;
+      prepQuestion.updatedAt = togglerUpdateData?.updatedAt?.toUTCString();
+
+      const { correctAnswers, questionAnswers } =
+        await handleCorrectAnswerUpdates(
+          correactAnswersToAdd,
+          correactAnswersToRemove,
+          answersToAdd,
+          prepQuestion,
+          data.options.allowMultipleAnswers
+        );
+      prepQuestion.correctAnswers = correctAnswers;
+      prepQuestion.questionAnswers = questionAnswers;
+
+      const pointsUpdateData = await handlePointsUpdate(
+        data.question.points,
+        prepQuestion.id
+      );
+      prepQuestion.points = pointsUpdateData?.points;
+      prepQuestion.updatedAt = pointsUpdateData?.updatedAt.toUTCString();
+
+      const descriptionUpdateData = await handleDescriptionUpdate(
+        data.question.description,
+        prepQuestion.id
+      );
+      prepQuestion.description = descriptionUpdateData?.description;
+      prepQuestion.updatedAt = descriptionUpdateData?.updatedAt.toUTCString();
+
+      prepQuestion.questionImage = await handleImageUpdate(
+        data.question.imageUrl,
+        prepQuestion.id
+      );
+
+      const labelUpdateData = await handleLabelUpadte(
+        data.question.label,
+        prepQuestion.id
+      );
+      prepQuestion.label = labelUpdateData?.label;
+      prepQuestion.updatedAt = labelUpdateData?.updatedAt.toUTCString();
+
+      /**
+       * id
+       * surveyId
+       * label
+       * description
+       * questionImage
+       * createdAt
+       * updatedAt
+       * points
+       * questionAnswers
+       * correctAnswers
+       * allowMultipleAnswers
+       *
+       * any undefined field wasn't shouldn't be changed
+       */
+
+      const filteredQuestion = filterObject(
+        { ...prepQuestion, surveyId: data.surveyId },
+        [
+          "id",
+          "surveyId",
+          "label",
+          "description",
+          "questionImage",
+          "createdAt",
+          "updatedAt",
+          "points",
+          "questionAnswers",
+          "correctAnswers",
+          "allowMultipleAnswers",
+        ]
+      );
+      return filteredQuestion;
+    });
+
+    return result;
   } catch (error) {
-    console.error("Error uploading image to Imgur:", error);
-    throw new CustomError(
-      "Failed to upload image. Please try again.",
-      400,
-      "adding question"
-    );
+    throw error;
   }
+};
+
+// helpers
+export const extractChanges = (data: EditQuestionModelBackend) => {
+  const { question } = data;
+
+  return {
+    answersToAdd: extractAnswersToAdd(
+      question.questionAnswers,
+      question.addedAnswers
+    ),
+    answersToRemove: extractAnswersToDelete(
+      question.questionAnswers,
+      question.deletedAnswers
+    ),
+    correactAnswersToAdd: extractCorrectAnswersToAdd(
+      question.correctAnswers,
+      question.addedCorrectAnswers
+    ),
+    correactAnswersToRemove: extractCorrectAnswersToDelete(
+      question.correctAnswers,
+      question.deletedCorrectAnswers
+    ),
+  };
 };

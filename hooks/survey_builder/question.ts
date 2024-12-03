@@ -5,12 +5,12 @@ import {
   deleteQuestion,
   duplicateQuestion,
   editQuestion,
-} from "@/frontendServices/survey_builder/generic_question";
+} from "@/frontendServices/survey_builder/question";
 import { QuestionModel } from "@/types/buildSurvey";
 import { CustomError } from "@/middleware/CustomError";
 import { addQuestionF } from "@/utils/survey_builder/build/questions";
 import { useDispatch } from "react-redux";
-
+import { updateQuestionsArrayF } from "@/utils/survey_builder/build/questions";
 export const useAddQuestion = () => {
   const dispatch = useDispatch();
   const [errorState, setErrorState] = useState<Record<
@@ -164,29 +164,27 @@ export const useDuplicateQuestion = () => {
 };
 
 export const useEditQuestion = () => {
+  const dispatch = useDispatch();
   const [errorState, setErrorState] = useState<Record<
     string,
     string | undefined
   > | null>(null);
 
   const mutation = useMutation<
-    {
-      question: QuestionModel;
-    },
+    QuestionModel,
     CustomError | unknown,
     {
-      questionId: number;
-      questionData: FormData;
+      question: FormData;
     }
   >({
-    mutationFn: async ({ questionId, questionData }) => {
+    mutationFn: async ({ question }) => {
       setErrorState(null);
 
-      const response = await editQuestion(questionId, questionData);
+      const response = await editQuestion(question);
       return response;
     },
-    onSuccess: async (data: { question: QuestionModel }) => {
-      console.log("edited", data.question);
+    onSuccess: (question) => {
+      updateQuestionsArrayF(question, dispatch);
     },
     onError: (err: CustomError | unknown) => {
       const message =

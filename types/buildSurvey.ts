@@ -2,12 +2,11 @@ export interface QuestionModel {
   id: string;
   surveyId: string;
   label: string;
-  description?: string;
+  description?: string | null;
   questionImage?: {
     id: string;
-    imgurId: string;
+    questionId: string;
     url: string;
-    deleteHash: boolean;
   };
   createdAt?: string;
   updatedAt?: string;
@@ -17,14 +16,77 @@ export interface QuestionModel {
   allowMultipleAnswers: boolean;
 }
 
-export interface EditQuestionModel extends QuestionModel {
-  previewImageUrl: string;
+export interface editedQuestionModel {
+  id: string;
+  surveyId: string;
+  label?: string;
+  description?: string | null;
+  allowMultipleAnswers?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  points?: number;
+  questionImage?: {
+    id: string;
+    questionId: string;
+    url: string;
+  };
+  correctAnswers: CorrectAnswerModel[];
+  questionAnswers: AnswersModel[];
+}
+
+export interface updatedQuestionModel {
+  id: string;
+  surveyId: string;
+  label?: string;
+  description?: string;
+  questionImage?: {
+    id: string;
+    questionId: string;
+    url: string;
+  };
+  createdAt?: string;
+  updatedAt?: string;
+  points?: number;
+  correctAnswers: CorrectAnswerModel[];
+  questionAnswers: AnswersModel[];
+
+  allowMultipleAnswers?: boolean;
+}
+
+export interface EditQuestionSlice {
+  labelEdit: string;
+  descriptionEdit: string;
+  isImageUploadEnabled: boolean;
+  isDescriptionEnabled: boolean;
+  previewImageUrlEdit: string;
   deletedAnswers: AnswersModel[];
   deletedCorrectAnswers: Partial<CorrectAnswerModel>[];
   addedAnswers: string[];
   addedCorrectAnswers: string[];
+  questionAnswers: AnswersModel[];
+  correctAnswers: CorrectAnswerModel[];
+  pointsEdit: number;
+  allowMultipleAnswers: boolean;
+}
+
+export interface EditQuestionModel extends QuestionModel {
+  description?: string | null;
+  imageUrl: string | null;
+  previewImageUrl: string | null;
+  deletedAnswers: AnswersModel[];
+  deletedCorrectAnswers: CorrectAnswerModel[];
+  addedAnswers: string[];
+  allowMultipleAnswers: boolean;
+  addedCorrectAnswers: string[];
   isDescriptionEnabled: boolean;
   isImageUploadEnabled: boolean;
+}
+export interface EditQuestionModelBackend {
+  question: EditQuestionModel;
+  options: QuestionOptions;
+  workspaceId: string;
+  surveyId: string;
+  oldToggleValue: boolean;
 }
 export interface NewQuestionModel {
   label: string;

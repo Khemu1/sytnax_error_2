@@ -16,9 +16,10 @@ const FileUploader: React.FC<FileUploaderProps> = ({
 }) => {
   const [filePondFiles, setFilePondFiles] = useState<any[]>([]);
 
+
+  
   const fetchFileAsBlob = async (url: string): Promise<File> => {
-    const servedUrl = url;
-    const response = await fetch(servedUrl!);
+    const response = await fetch(url);
     const blob = await response.blob();
     const filename = url.split("/").pop() || "file";
     return new File([blob], filename, { type: blob.type });
@@ -26,6 +27,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({
 
   useEffect(() => {
     if (filePath && !file) {
+      console.log("Fetching file from URL:", filePath);
       fetchFileAsBlob(filePath)
         .then((blobFile) => {
           setFilePondFiles([
@@ -40,19 +42,28 @@ const FileUploader: React.FC<FileUploaderProps> = ({
         .catch((error) => {
           console.error("Error fetching file from URL:", error);
         });
-    } else {
+    } else if (!filePath) {
       setFilePondFiles([]);
     }
-  }, [filePath, file, setFile]);
+  }, [filePath, file]);
 
   return (
     <div className="flex flex-col gap-2">
-      {initialImage && <div className="mb-2"></div>}
+      {initialImage && (
+        <div className="mb-2"></div>
+      )}
       <FilePond
         files={file ? [file] : filePondFiles}
         allowMultiple={false}
         onupdatefiles={(fileItems) => {
-          setFile((fileItems[0]?.file as File) || null);
+          if (fileItems.length === 0) {
+            setFile(null);
+          } else {
+            const newFile = fileItems[0]?.file;
+            if (newFile && newFile !== file) {
+              setFile(newFile as File);
+            }
+          }
         }}
       />
     </div>

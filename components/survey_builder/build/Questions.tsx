@@ -22,6 +22,7 @@ const Questions = () => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
   const onClose = useCallback(() => {
     if (!currentSurvey) return;
 
@@ -100,8 +101,8 @@ const Questions = () => {
             className="cursor-pointer flex justify-between p-2 bg-[#42484b5b] rounded-md hover:bg-[#42484b86] transition-all relative"
             onClick={() => openQuestionDialog(question)}
           >
-            <div className="flex gap-4">
-              <div className="flex gap-2">
+            <div className="grid gap-4 items-center grid-cols-[auto,100px,auto,auto] md:grid-cols-[auto,200px,auto,auto] lg:grid-cols-[auto,300px,auto,auto]">
+              <div className="flex gap-2 items-center ">
                 <Image
                   src="/assets/icons/text.svg"
                   alt="Question Icon"
@@ -110,14 +111,21 @@ const Questions = () => {
                 />
                 <span className="font-semibold">{index + 1}</span>
               </div>
-              <div className="w-[200px] text-left text-[1rem] font-semibold">
+              <div className="text-left text-[1rem] font-semibold sm:ml-2 md:ml-0">
                 <LabelPreivew label={question.label} />
+              </div>
+              <span className="font-semibold">|</span>
+              <div className="text-left font-semibold">
+                {question.points} Point{question.points > 1 ? "s" : ""}
               </div>
             </div>
 
             <button
               className="flex justify-center items-center border w-[50px] h-[30px] border-[#85808025] rounded-lg menu-toggle-button"
-              onClick={(e) => toggleMenu(question.id, e)}
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleMenu(question.id, e);
+              }}
             >
               <Image
                 src="/assets/icons/dots.svg"
@@ -129,8 +137,16 @@ const Questions = () => {
 
             {openMenuId === question.id && (
               <div className="question-menu flex flex-col text-left right-0 text-sm absolute top-10 bg-[#0e0e0e] p-2 rounded-md shadow-md z-10">
-                <button className="survey_card_buttons">Duplicate</button>
-                <button className="survey_card_buttons text-red-600">
+                <button
+                  className="survey_card_buttons"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  Duplicate
+                </button>
+                <button
+                  className="survey_card_buttons text-red-600"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   Delete
                 </button>
               </div>

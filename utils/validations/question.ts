@@ -131,6 +131,7 @@ export const editQuestionSchema = (options: {
   allowMultipleAnswers: boolean;
 }) => {
   return object({
+    id: string({ message: "Question ID is required" }),
     label: string()
       .min(1, { message: "Label is required" })
       .max(100, { message: "Label is too long" })
@@ -139,34 +140,8 @@ export const editQuestionSchema = (options: {
     description: string()
       .max(300, { message: "Description is too long" })
       .optional()
-      .refine(
-        (val) =>
-          !options.isDescriptionEnabled || (val && val.trim().length > 0),
-        {
-          message: "Description is required when it is enabled",
-        }
-      ),
-
-    imageUrl: string()
-      .optional()
-      .refine(
-        (val) => {
-          if (!options.isImageUploadEnabled) {
-            return true;
-          }
-          return (
-            val &&
-            val.match(
-              /^data:image\/(jpeg|png|gif|bmp|webp);base64,[A-Za-z0-9+/=]+$/
-            )
-          );
-        },
-        {
-          message:
-            "Invalid image format. Only jpg, png, gif, bmp, and webp are allowed",
-        }
-      ),
-
+      .nullable(),
+    imageUrl: string().optional().nullable(),
     points: number()
       .min(1, { message: "Minimum number of points is 1" })
       .max(100, { message: "Maximum points exceeded" })
@@ -198,7 +173,6 @@ export const editQuestionSchema = (options: {
         id: string(),
         answer: string(),
         questionId: string(),
-        point: number(),
         createdAt: string().optional(),
         updatedAt: string().optional(),
       })
@@ -216,6 +190,7 @@ export const editQuestionSchema = (options: {
     ),
     addedAnswers: array(string()),
     addedCorrectAnswers: array(string()),
+    allowMultipleAnswers: boolean().optional(),
   })
     .refine(
       (data) => {
@@ -226,17 +201,18 @@ export const editQuestionSchema = (options: {
           equalArraysQuestionCorrectAnswers(
             data.addedCorrectAnswers,
             data.correctAnswers
-          );
-        !data.imageUrl === undefined &&
-          !data.description === undefined &&
+          ) &&
+          data.label === undefined &&
+          data.description === undefined &&
           data.points === undefined &&
-          !data.label === undefined;
+          data.imageUrl === undefined &&
+          data.allowMultipleAnswers === undefined;
 
         return !noChangesMade;
       },
       {
         message: "No changes were made",
-        path: ["noChange"], 
+        path: ["noChange"],
       }
     )
     .superRefine((data, ctx) => {
@@ -255,6 +231,44 @@ export const editQuestionSchema = (options: {
           code: "custom",
           path: issue.path,
           message: issue.message,
+        });
+      }
+
+      if (
+        options.isDescriptionEnabled &&
+        typeof data.description == "string" &&
+        data.description.trim().length === 0
+      ) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["description"],
+          message: "Description is enabled but missing or empty.",
+        });
+      }
+      if (
+        options.isImageUploadEnabled &&
+        typeof data.imageUrl === "string" &&
+        data.imageUrl.trim().length < 1
+      ) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["imageUrl"],
+          message: "Image upload is enabled but no image URL is provided.",
+        });
+      }
+      if (
+        options.isImageUploadEnabled &&
+        typeof data.imageUrl === "string" &&
+        data.imageUrl.trim().length > 0 &&
+        !data.imageUrl.match(
+          /^data:image\/(jpeg|png|gif|bmp|webp);base64,[A-Za-z0-9+/=]+$/
+        )
+      ) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["imageUrl"],
+          message:
+            "Image type is invalid only jpeg, png, gif, bmp, webp are allowed.",
         });
       }
     });
@@ -300,17 +314,6 @@ const validateQuestionsForEdit = (
 ): { path: string[]; message: string }[] => {
   try {
     const issues: { path: string[]; message: string }[] = [];
-
-    // if no changes return
-    const noChangesMade =
-      deletedAnswers.length === 0 &&
-      deletedCorrectAnswers.length === 0 &&
-      equalArraysQuestionAnswers(addedAnswers, questionAnswers) &&
-      equalArraysQuestionCorrectAnswers(addedCorrectAnswers, correctAnswers);
-
-    if (noChangesMade) {
-      return issues;
-    }
 
     // making sure that deleted answers exist in the questionAnswers list
     if (deletedAnswers.length > 0) {
@@ -372,8 +375,13 @@ const validateQuestionsForEdit = (
       });
     }
 
+    // 3 - 0 + 3
     const remainingAnswers =
-      questionAnswers.length - deletedAnswers.length + addedAnswers.length;
+      questionAnswers.length -
+      deletedAnswers.length +
+      addedAnswers.filter(
+        (answer) => !questionAnswers.some((a) => a.answer === answer)
+      ).length;
     if (remainingAnswers > 6) {
       issues.push({
         path: ["answers"],
@@ -390,10 +398,13 @@ const validateQuestionsForEdit = (
     }
 
     // make sure that  at least one correct answer remains after changes
+
     const remainingCorrectAnswers =
       correctAnswers.length -
       deletedCorrectAnswers.length +
-      addedCorrectAnswers.length;
+      addedCorrectAnswers.filter(
+        (answer) => !correctAnswers.some((ca) => ca.value === answer)
+      ).length;
     if (remainingCorrectAnswers < 1) {
       issues.push({
         path: ["correctAnswers"],
@@ -439,19 +450,39 @@ const validateQuestionsForEdit = (
           "If multiple answers are allowed, there must be more than 2 total answers.",
       });
     }
+    if (allowMultipleAnswers && remainingCorrectAnswers < 2) {
+      issues.push({
+        path: ["correctAnswers"],
+        message:
+          "If multiple answers are allowed, there must be two correct answers.",
+      });
+    }
+    if (allowMultipleAnswers && remainingCorrectAnswers > 2) {
+      issues.push({
+        path: ["correctAnswers"],
+        message:
+          "If multiple answers are allowed, there must be two correct answers.",
+      });
+    }
     return issues;
   } catch (error) {
     throw error;
   }
 };
 
-const equalArraysQuestionAnswers = (arr1: string[], arr2: AnswersModel[]) =>
-  arr1.length === arr2.length &&
-  arr1.every((val) => arr2.some((obj) => obj.answer === val));
+const equalArraysQuestionAnswers = (arr1: string[], arr2: AnswersModel[]) => {
+  return (
+    arr1.length === arr2.length &&
+    arr1.every((val) => arr2.some((obj) => obj.answer === val))
+  );
+};
 
 const equalArraysQuestionCorrectAnswers = (
   arr1: string[],
   arr2: CorrectAnswerModel[]
-) =>
-  arr1.length === arr2.length &&
-  arr1.every((val) => arr2.some((obj) => obj.value === val));
+) => {
+  return (
+    arr1.length === arr2.length &&
+    arr1.every((val) => arr2.some((obj) => obj.value === val))
+  );
+};

@@ -166,7 +166,7 @@ export function formatDateToCustomString(date: Date): string {
 }
 
 /**
- * filters an object based on allowed keys and removes undefined values.
+ * filters an object based on allowed keys and removes undefined and null values.
  *
  * @param obj - The input object to filter.
  * @param allowedKeys - The array of keys that are allowed in the result.
@@ -190,4 +190,3 @@ export function filterObject<T extends Record<string, any>>(
       return acc;
     }, {} as Partial<T>);
 }
-

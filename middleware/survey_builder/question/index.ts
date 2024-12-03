@@ -4,10 +4,15 @@ import { withAccelerate } from "@prisma/extension-accelerate";
 import { CustomError } from "@/middleware/CustomError";
 import { validateWithSchema } from "@/utils/validations/validations";
 import {
+  editQuestionSchema,
   newQuestionSchema,
   questionOptionsSchema,
 } from "@/utils/validations/question";
-import { NewQuestionModel, QuestionOptions } from "@/types/buildSurvey";
+import {
+  EditQuestionModel,
+  NewQuestionModel,
+  QuestionOptions,
+} from "@/types/buildSurvey";
 const prisma = new PrismaClient().$extends(withAccelerate());
 
 // for some damn reason, it won't set the headers without the this method
@@ -116,7 +121,6 @@ export const checkGroupMemberShipForQuestion = async (
     }
 
     const userId = +rawUserId;
-    console.log("Parsed User ID:", userId);
 
     let workspace: { workspaceId: string; userId: number };
     try {
@@ -141,9 +145,7 @@ export const checkGroupMemberShipForQuestion = async (
       );
     }
 
-    console.log("Workspace:", workspace);
     const ownerId = workspace.userId;
-    console.log("Owner ID:", ownerId, "User ID:", userId);
 
     // If it's the owner
     if (ownerId === userId) {
@@ -174,7 +176,6 @@ export const checkGroupMemberShipForQuestion = async (
   }
 };
 
-
 export const vlidateForNewQuestion = async (
   _req: NextRequest,
   res: NextResponse,
@@ -200,5 +201,55 @@ export const vlidateForNewQuestion = async (
       "",
       validateWithSchema(error)
     );
+  }
+};
+
+export const vlidateForEditQuestion = async (
+  _req: NextRequest,
+  res: NextResponse,
+  data: {
+    question: EditQuestionModel;
+    options: QuestionOptions;
+    workspaceId: string;
+    surveyId: string;
+  }
+) => {
+  try {
+    questionOptionsSchema().parse(data.options);
+    editQuestionSchema(data.options).parse(data.question);
+
+    const response = NextResponse.next();
+    return response;
+  } catch (error) {
+    throw new CustomError(
+      "Error validating new question",
+      400,
+      "question",
+      true,
+      "",
+      validateWithSchema(error)
+    );
+  }
+};
+
+export const doesQuestionExists = async (
+  questionId: string,
+  surveyId: string
+) => {
+  try {
+    console.log("Checking if question exists:", questionId, surveyId);
+    const question = await prisma.question.findUnique({
+      where: {
+        id: questionId,
+        surveyId: surveyId,
+      },
+    });
+    if (!question) {
+      throw new CustomError("Question does not exist", 404, "question");
+    }
+    return NextResponse.next();
+  } catch (error) {
+    console.error("faild to find the question", error);
+    throw error;
   }
 };

@@ -38,8 +38,12 @@ async function main() {
   );
 
   // Find roles
-  const ownerRole = await prisma.role.findUnique({ where: { name: "owner" } });
-  const adminRole = await prisma.role.findUnique({ where: { name: "admin" } });
+  const ownerRole = await prisma.role.findUnique({
+    where: { name: "owner" },
+  });
+  const adminRole = await prisma.role.findUnique({
+    where: { name: "admin" },
+  });
 
   if (!ownerRole || !adminRole) {
     throw new Error(

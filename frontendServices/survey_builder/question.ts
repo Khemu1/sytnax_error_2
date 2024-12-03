@@ -99,10 +99,10 @@ export const duplicateQuestion = async (
   }
 };
 
-export const editQuestion = async (questionId: number, question: FormData) => {
+export const editQuestion = async (question: FormData) => {
   try {
-    const response = await fetch(`/api/question/edit/${questionId}`, {
-      method: "PUT",
+    const response = await fetch(`/api/survey_builder/question/edit`, {
+      method: "PATCH",
       body: question,
     });
 
