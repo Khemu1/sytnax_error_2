@@ -105,18 +105,12 @@ const NewQuestion: React.FC<NewQuestionDialogProps> = ({ isOpen, onClose }) => {
   };
   const isFormInvalid =
     label?.trim().length === 0 ||
-    (isImageUploadEnabled && file === null) ||
+    (isImageUploadEnabled && !file) ||
     (isDescriptionEnabled && description?.trim().length === 0) ||
     answers.length < 2 ||
     correctAnswers.length === 0 ||
-    +points < 1 ||
-    (allowMultipleAnswers && correctAnswers.length < 2) ||
-    (allowMultipleAnswers &&
-      answers.length === 2 &&
-      correctAnswers.length === 1) ||
-    (allowMultipleAnswers &&
-      answers.length === 2 &&
-      correctAnswers.length === 2);
+    points < 1 ||
+    (allowMultipleAnswers && correctAnswers.length < 2);
 
   const handleFileChange = async (file: File | null) => {
     const { file: _file, url } = await returnFileAndUrl(file);
@@ -375,7 +369,7 @@ const NewQuestion: React.FC<NewQuestionDialogProps> = ({ isOpen, onClose }) => {
                       disabled={isFormInvalid || isSubmitting || isSuccess}
                       type="submit"
                       className={`flex justify-center items-center w-[82px] ${
-                        isFormInvalid
+                        isFormInvalid || isSubmitting || isSuccess
                           ? "bg-gray-600"
                           : "bg-blue-600 hover:bg-blue-700"
                       } py-2 px-6 rounded-md text-lg transition duration-300`}

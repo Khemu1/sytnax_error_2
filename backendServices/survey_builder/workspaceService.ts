@@ -1,6 +1,7 @@
 import { CustomError } from "@/middleware/CustomError";
 import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
+import { deleteImgur } from "../imgurServices";
 
 const prisma = new PrismaClient().$extends(withAccelerate());
 
@@ -101,7 +102,44 @@ export const addWorkSpaceService = async (userId: number, name: string) => {
 
 export const deleteWorkspaceService = async (workspaceId: string) => {
   try {
-    // todo later on delete delete the question images first to clear imgur
+    // todo make a helper instead
+
+    const surveys = await prisma.survey.findMany({
+      where: { workspaceId },
+      include: {
+        questions: {
+          include: {
+            questionImage: {
+              select: { deleteHash: true },
+            },
+          },
+        },
+      },
+    });
+
+    await Promise.all(
+      surveys.map(async (survey) => {
+        await Promise.all(
+          survey.questions.map(async (question) => {
+            try {
+              if (question.questionImage) {
+                await deleteImgur(question.questionImage.deleteHash);
+              }
+
+              await prisma.question.delete({
+                where: { id: question.id },
+              });
+            } catch (error) {
+              console.error(
+                `Error deleting question or image for question ID ${question.id}:`,
+                error
+              );
+            }
+          })
+        );
+      })
+    );
+
     await prisma.workspace.delete({
       where: { id: workspaceId },
     });

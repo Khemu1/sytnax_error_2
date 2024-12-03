@@ -57,8 +57,12 @@ const QuestionAnswers: React.FC<QuestionAnswersProps> = ({
     }
   };
 
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault(); // Prevent form submission entirely
+  };
+
   return (
-    <div className="flex flex-col gap-4">
+    <form onSubmit={handleFormSubmit} className="flex flex-col gap-4">
       <div className="flex justify-end gap-2 flex-wrap items-end">
         <input
           type="text"
@@ -66,14 +70,14 @@ const QuestionAnswers: React.FC<QuestionAnswersProps> = ({
           placeholder="Add Answer"
           onChange={(e) => setAnswer(e.target.value)}
           value={answer}
-          onKeyUp={(e) => (e.key === "Enter" ? handleAddAnswer() : null)}
+          onKeyPress={(e) => e.key === "Enter" && e.preventDefault()} // Prevents form submission when Enter is pressed
           className={`${
             validationErrors?.answers ? "input_error_border" : ""
           } `}
         />
         <button
           onClick={handleAddAnswer}
-          type="button"
+          type="button" // Ensure it's type="button" to prevent form submission
           className="bg-blue-600 text-white rounded-md p-2 hover:bg-blue-700"
         >
           Add Answer
@@ -133,7 +137,7 @@ const QuestionAnswers: React.FC<QuestionAnswersProps> = ({
             : "You are limited to 6 answers"}
         </p>
       </div>
-    </div>
+    </form>
   );
 };
 

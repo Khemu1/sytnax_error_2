@@ -2,6 +2,7 @@ import { SurveySettings } from "@/types/survey";
 import { filterObject } from "@/utils";
 import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
+import { deleteImgur } from "../imgurServices";
 
 const prisma = new PrismaClient().$extends(withAccelerate());
 
@@ -27,6 +28,37 @@ export const addSurveyService = async (workspaceId: string, name: string) => {
 };
 
 export const deleteSurveyService = async (surveyId: string) => {
+  // todo make a helper instead
+  const questions = await prisma.question.findMany({
+    where: { surveyId },
+    include: {
+      questionImage: {
+        select: { deleteHash: true },
+      },
+    },
+  });
+
+  await Promise.all(
+    questions.map(async (question) => {
+      try {
+        // delete from imgur if image exists
+        if (question.questionImage) {
+          await deleteImgur(question.questionImage.deleteHash);
+        }
+
+        // delete question from database
+        await prisma.question.delete({
+          where: { id: question.id },
+        });
+      } catch (error) {
+        console.error(
+          `Error deleting question or image for question ID ${question.id}:`,
+          error
+        );
+      }
+    })
+  );
+
   try {
     await prisma.survey.delete({
       where: { id: surveyId },
