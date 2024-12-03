@@ -86,7 +86,6 @@ export interface EditQuestionModelBackend {
   options: QuestionOptions;
   workspaceId: string;
   surveyId: string;
-  oldToggleValue: boolean;
 }
 export interface NewQuestionModel {
   label: string;
