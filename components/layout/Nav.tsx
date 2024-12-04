@@ -93,7 +93,7 @@ const Nav = () => {
         </span>
       </Link>
       <div className="hidden sm:flex gap-5 w-auto">
-        <ul className="flex items-center m-0 gap-5 font-semibold list-none h-max">
+        <ul className="flex items-center m-0 text-xl gap-5 font-semibold list-none h-max">
           <li className="nav_buttons">
             <Link href={"/"}>Home</Link>
           </li>

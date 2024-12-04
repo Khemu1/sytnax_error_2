@@ -25,22 +25,32 @@ export const uploadToImgur = async (
 };
 
 export const uploadQuestionToImgur = async (
-  base64Image: string
+  image: string,
+  type = "base64"
 ): Promise<imageDataResponse> => {
   try {
-    const codedImage = base64Image.split(",")[1];
+    let modifiedImage = null;
     const imgurFormData = new FormData();
-    imgurFormData.append("image", codedImage);
-    imgurFormData.append("type", "base64");
-    console.log("Uploading image to Imgur");
-
-    const response = await fetch("https://api.imgur.com/3/image", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.IMGUR_TOKEN}`,
-      },
-      body: imgurFormData,
-    });
+    console.log("got the image with type: ",type)
+    if (type === "base64") {
+      modifiedImage = image.split(",")[1];
+      console.log("Uploading image to Imgur");
+    } else {
+      modifiedImage = image;
+    }
+    imgurFormData.append("image", modifiedImage);
+    imgurFormData.append("type", type);
+    
+    if (!modifiedImage) {
+      throw new CustomError("error in appending image type", 403, "imgur");
+    }
+      const response = await fetch("https://api.imgur.com/3/image", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.IMGUR_TOKEN}`,
+        },
+        body: imgurFormData,
+      });
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(`Imgur error: ${errorData.data.error}`);

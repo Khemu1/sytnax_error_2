@@ -255,7 +255,15 @@ export const duplicateQuestionService = async (questionId: string) => {
 
       let imageData: imageDataResponse | undefined = undefined;
       if (question.questionImage) {
-        imageData = await uploadQuestionToImgur(question.questionImage?.url);
+        console.log(
+          "this question has in image , trying to upload",
+          question.questionImage
+        );
+        imageData = await uploadQuestionToImgur(
+          question.questionImage?.url,
+          "url"
+        );
+        console.log("image uploaded for duplication", imageData);
       }
 
       // Create a new question with associated data
