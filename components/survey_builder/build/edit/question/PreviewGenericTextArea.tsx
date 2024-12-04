@@ -81,12 +81,14 @@ const Preview: React.FC<PreviewProps> = ({
             />
           </div>
         )}
-        <div className="w-full mt-4">
-          {label && <LabelPreivew label={label} />}
-        </div>
+        <div className="flex flex-col gap-4 w-full">
+          <div className="w-full mt-4 sm:max-w-[500px] whitespace-normal">
+            {label && <LabelPreivew label={label} />}
+          </div>
 
-        <div className="w-full ">
-          {description && <DescriptionPreivew description={description} />}
+          <div className="w-full sm:max-w-[500px] whitespace-normal ">
+            {description && <DescriptionPreivew description={description} />}
+          </div>
         </div>
 
         {answers.length > 0 && (
@@ -94,7 +96,7 @@ const Preview: React.FC<PreviewProps> = ({
             {answers.map((answer, index) => (
               <div
                 key={index}
-                className="flex items-center justify-start gap-2 w-[300px]"
+                className="flex items-center justify-start gap-2 w-[200px] sm:w-[300px]"
               >
                 <div className="rounded-lg w-full bg-blue-500 p-3 text-white shadow-lg hover:bg-green-600 transition-all duration-300 transform  cursor-pointer">
                   <span className="font-semibold">

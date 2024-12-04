@@ -247,8 +247,6 @@ export const doesQuestionExists = async (
     if (!question) {
       throw new CustomError("Question does not exist", 404, "question");
     }
-    const response = NextResponse.next();
-    response.headers.set("question", JSON.stringify(question));
     return NextResponse.next();
   } catch (error) {
     console.error("faild to find the question", error);

@@ -167,7 +167,7 @@ const Questions = () => {
                 />
                 <span className="font-semibold">{index + 1}</span>
               </div>
-              <div className="text-left text-[1rem] font-semibold sm:ml-2 md:ml-0">
+              <div className="text-left text-[1rem] font-semibold sm:ml-2 md:ml-0 w-min">
                 <LabelPreivew label={question.label} />
               </div>
               <span className="font-semibold">|</span>
