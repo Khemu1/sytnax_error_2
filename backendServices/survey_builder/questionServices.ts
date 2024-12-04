@@ -239,65 +239,75 @@ export const deleteQuestionService = async (questionId: string) => {
 
 export const duplicateQuestionService = async (questionId: string) => {
   try {
-    const question = await prisma.question.findUnique({
-      where: { id: questionId },
-      include: {
-        questionImage: true,
-        questionAnswers: true,
-        correctAnswers: true,
-      },
-    });
-    if (!question) {
-      throw new CustomError("Question does not exist", 404, "question");
-    }
-
-    let imageData: imageDataResponse | undefined = undefined;
-    if (question.questionImage) {
-      imageData = await uploadQuestionToImgur(question.questionImage?.url);
-    }
-
-    if (!question) {
-      throw new CustomError("Question does not exist", 404, "question");
-    }
-
-    const newQuestion = await prisma.question.create({
-      data: {
-        label: question.label,
-        description: question.description,
-        allowMultipleAnswers: question.allowMultipleAnswers,
-        createdAt: question.createdAt,
-        updatedAt: question.updatedAt,
-        points: question.points,
-        surveyId: question.surveyId,
-        questionAnswers: {
-          createMany: {
-            data: question.questionAnswers.map((answer) => ({
-              answer: answer.answer,
-            })),
-          },
+    const result = await prisma.$transaction(async (prisma) => {
+      const question = await prisma.question.findUnique({
+        where: { id: questionId },
+        include: {
+          questionImage: true,
+          questionAnswers: true,
+          correctAnswers: true,
         },
-        correctAnswers: {
-          createMany: {
-            data: question.correctAnswers.map((ca) => ({
-              answerId: ca.answerId,
-              value: ca.value,
-              createdAt: ca.createdAt,
-              updatedAt: ca.updatedAt,
-            })),
+      });
+
+      if (!question) {
+        throw new CustomError("Question does not exist", 404, "question");
+      }
+
+      let imageData: imageDataResponse | undefined = undefined;
+      if (question.questionImage) {
+        imageData = await uploadQuestionToImgur(question.questionImage?.url);
+      }
+
+      // Create a new question with associated data
+      const newQuestion = await prisma.question.create({
+        data: {
+          label: question.label,
+          description: question.description,
+          allowMultipleAnswers: question.allowMultipleAnswers,
+          createdAt: question.createdAt,
+          updatedAt: question.updatedAt,
+          points: question.points,
+          surveyId: question.surveyId,
+          questionAnswers: {
+            createMany: {
+              data: question.questionAnswers.map((answer) => ({
+                answer: answer.answer,
+              })),
+            },
           },
+          correctAnswers: {
+            createMany: {
+              data: question.correctAnswers.map((ca) => ({
+                answerId: ca.answerId,
+                value: ca.value,
+                createdAt: ca.createdAt,
+                updatedAt: ca.updatedAt,
+              })),
+            },
+          },
+          questionImage: imageData
+            ? {
+                create: {
+                  imgurId: imageData.data.id,
+                  url: imageData.data.link,
+                  deleteHash: imageData.data.deletehash,
+                },
+              }
+            : undefined,
         },
-        questionImage: imageData
-          ? {
-              create: {
-                imgurId: imageData.data.id,
-                url: imageData.data.link,
-                deleteHash: imageData.data.deletehash,
-              },
-            }
-          : undefined,
-      },
+        include: {
+          questionAnswers: true,
+          correctAnswers: true,
+          questionImage: true,
+        },
+      });
+
+      return {
+        question: newQuestion,
+      };
     });
-    return newQuestion;
+
+    return result.question;
   } catch (error) {
     throw error;
   }

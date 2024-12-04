@@ -28,12 +28,18 @@ const questionsSlice = createSlice({
         state.items.push(action.payload.question);
         return;
       }
-      console.log("looking to add duplication");
       const index = state.items.findIndex(
         (question) => question.id === action.payload.orignalQuestionId
       );
-      console.log("index", index);
-      state.items.splice(index, 0, action.payload.question);
+      if (index !== -1) {
+        state.items = [
+          ...state.items.slice(0, index),
+          ...state.items.slice(index),
+          action.payload.question,
+        ];
+      } else {
+        console.error("Original question not found.");
+      }
     },
     deleteQuestion: (state, action: PayloadAction<string>) => {
       state.items = state.items.filter(

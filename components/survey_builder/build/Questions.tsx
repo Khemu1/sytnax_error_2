@@ -153,7 +153,7 @@ const Questions = () => {
       <div className="flex flex-col gap-4 p-4 h-[600px] overflow-y-scroll">
         {questions.map((question, index) => (
           <div
-            key={question.id}
+            key={question.id + "index"}
             className="cursor-pointer flex justify-between p-2 bg-[#42484b5b] rounded-md hover:bg-[#42484b86] transition-all relative"
             onClick={() => openQuestionDialog(question)}
           >

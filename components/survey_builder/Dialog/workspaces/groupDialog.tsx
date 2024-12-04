@@ -65,16 +65,16 @@ const GroupDialog: React.FC<GroupDialogProps> = ({ isOpen, onClose }) => {
       <Dialog
         open={isOpen}
         onClose={handleClose}
-        className="relative z-50"
+        className="relative z-50 "
         aria-labelledby="dialog-title"
         aria-describedby="dialog-description"
       >
         <div
-          className="fixed inset-0 bg-black bg-opacity-30"
+          className="fixed inset-0 bg-black bg-opacity-30 "
           aria-hidden="true"
         />
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          <DialogPanel className="w-full max-w-md rounded-xl bg-white/5 p-6 backdrop-blur-2xl">
+          <DialogPanel className="w-full max-w-md rounded-xl bg-white/5 p-6 backdrop-blur-2xl h-[600px] overflow-hidden">
             <button
               className="w-full flex justify-end pr-2"
               type="button"
@@ -100,7 +100,7 @@ const GroupDialog: React.FC<GroupDialogProps> = ({ isOpen, onClose }) => {
               >
                 You can invite other admins to share your surveys with them
               </span>
-              <div className="flex flex-col items-center gap-1">
+              <div className="flex flex-col items-center gap-1 overflow-hidden">
                 <div className="flex flex-wrap items-center gap-5">
                   <input
                     type="text"
@@ -138,13 +138,15 @@ const GroupDialog: React.FC<GroupDialogProps> = ({ isOpen, onClose }) => {
                 </span>
               )}
               {groupState.groupMembers.length !== 0 ? (
-                <ul className="px-3 overflow-y-scroll">
+                <ul className="flex flex-col gap-4 px-3 overflow-y-scroll h-[200px] py-2">
                   {groupState.groupMembers.map((member) => (
                     <li
                       key={member.userId}
                       className="flex justify-between px-3 items-center p-2 bg-base-100 rounded-md"
                     >
-                      <span>{member.user?.username}</span>
+                      <span className="block text-ellipsis overflow-hidden">
+                        {member.user?.username}
+                      </span>
                       <button
                         type="button"
                         disabled={deletePending}
