@@ -59,7 +59,6 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
       case "settings":
         dispatch(setCurrentSurvey(survey));
         setSettingsDialogOpen(true);
-
         break;
     }
   };

@@ -3,11 +3,13 @@
 import NewQuestion from "@/components/survey_builder/build/question/dialogs/NewQuestion";
 import Questions from "@/components/survey_builder/build/Questions";
 import { useGetSurvey } from "@/hooks/survey_builder/survey";
+import { logout } from "@/store/slices/authSlice";
 import { setCurrentSurvey } from "@/store/slices/survey/currentSurveySlice";
 import { setQuestions } from "@/store/slices/survey/questionsSlice";
-import { notFound } from "next/navigation";
+import { RootState } from "@/store/store";
+import { notFound, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 interface BuildSurveyProps {
   params: Promise<{
@@ -22,6 +24,25 @@ const BuildSurvey: React.FC<BuildSurveyProps> = ({ params }) => {
   const [workspaceId, setWorkspaceId] = useState<string | null>(null);
   const [surveyId, setSurveyId] = useState<string | null>(null);
   const [isNewQuestionDialogOpen, setIsNewQuestionDialogOpen] = useState(false);
+  const authState = useSelector((state: RootState) => state.auth);
+  const routeTo = useRouter();
+
+  useEffect(() => {
+    const localStorageAuth = localStorage.getItem("userData");
+    if (localStorageAuth) {
+      const { role } = JSON.parse(localStorageAuth);
+
+      if (!authState.isAuthenticated) {
+        dispatch(logout());
+      }
+
+      if (role !== 1 && role !== 2) {
+        routeTo.push("/");
+      }
+    } else {
+      routeTo.push("/authportal");
+    }
+  }, [authState.isAuthenticated, dispatch, routeTo]);
 
   useEffect(() => {
     params.then(({ workspaceId, surveyId }) => {

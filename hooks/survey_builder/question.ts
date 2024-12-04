@@ -8,7 +8,10 @@ import {
 } from "@/frontendServices/survey_builder/question";
 import { QuestionModel } from "@/types/buildSurvey";
 import { CustomError } from "@/middleware/CustomError";
-import { addQuestionF } from "@/utils/survey_builder/build/questions";
+import {
+  addQuestionF,
+  deleteQuestionFromArrayF,
+} from "@/utils/survey_builder/build/questions";
 import { useDispatch } from "react-redux";
 import { updateQuestionsArrayF } from "@/utils/survey_builder/build/questions";
 export const useAddQuestion = () => {
@@ -62,29 +65,29 @@ export const useAddQuestion = () => {
 };
 
 export const useDeleteQuestion = () => {
+  const dispatch = useDispatch();
   const [errorState, setErrorState] = useState<Record<
     string,
     string | undefined
   > | null>(null);
 
   const mutation = useMutation<
-    {
-      questionId: number;
-    },
+    string,
     CustomError | unknown,
     {
-      questionId: number;
-      workspaceAndSurvey: FormData;
+      questionId: string;
+      surveyId: string;
+      workspaceId: string;
     }
   >({
-    mutationFn: async ({ questionId, workspaceAndSurvey }) => {
+    mutationFn: async ({ questionId, surveyId, workspaceId }) => {
       setErrorState(null);
 
-      const response = await deleteQuestion(questionId, workspaceAndSurvey);
+      const response = await deleteQuestion(questionId, surveyId, workspaceId);
       return response;
     },
-    onSuccess: async (data: { questionId: number }) => {
-      console.log("deleted", data.questionId);
+    onSuccess: (questionId) => {
+      deleteQuestionFromArrayF(questionId, dispatch);
     },
     onError: (err: CustomError | unknown) => {
       const message =
@@ -113,29 +116,41 @@ export const useDeleteQuestion = () => {
 };
 
 export const useDuplicateQuestion = () => {
+  const dispatch = useDispatch();
   const [errorState, setErrorState] = useState<Record<
     string,
     string | undefined
   > | null>(null);
 
   const mutation = useMutation<
-    {
-      question: QuestionModel;
-    },
+    { question: QuestionModel; orignalQuestionId: string },
     CustomError | unknown,
     {
-      questionId: number;
-      workspaceAndSurvey: FormData;
+      questionId: string;
+      surveyId: string;
+      workspaceId: string;
     }
   >({
-    mutationFn: async ({ questionId, workspaceAndSurvey }) => {
+    mutationFn: async ({ questionId, surveyId, workspaceId }) => {
       setErrorState(null);
 
-      const response = await duplicateQuestion(questionId, workspaceAndSurvey);
+      const response = await duplicateQuestion(
+        questionId,
+        surveyId,
+        workspaceId
+      );
       return response;
     },
-    onSuccess: async (data: { question: QuestionModel }) => {
-      console.log("duplicated", data.question);
+    onSuccess: (data: {
+      question: QuestionModel;
+      orignalQuestionId: string;
+    }) => {
+      addQuestionF(
+        data.question,
+        dispatch,
+        "duplicate",
+        data.orignalQuestionId
+      );
     },
     onError: (err: CustomError | unknown) => {
       const message =

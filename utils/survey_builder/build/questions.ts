@@ -1,5 +1,6 @@
 import {
   addQuestion,
+  deleteQuestion,
   updateQuestion,
 } from "@/store/slices/survey/questionsSlice";
 import {
@@ -61,10 +62,15 @@ export const returnQuestionData = (formData: {
   return filterObject(formData, ["question", "options"]);
 };
 
-export const addQuestionF = (question: QuestionModel, dispatch: Dispatch) => {
+export const addQuestionF = (
+  question: QuestionModel,
+  dispatch: Dispatch,
+  type = "add",
+  orignalQuestionId: string | null = null
+) => {
   try {
-    console.log("Adding question:", question);
-    dispatch(addQuestion(question));
+    console.log("before adding",question, type, orignalQuestionId);
+    dispatch(addQuestion({ question, type, orignalQuestionId }));
   } catch (error) {
     throw error;
   }
@@ -114,10 +120,24 @@ export const extractCorrectAnswersToAdd = (
   return correctAnswersToAdd;
 };
 
-export const updateQuestionsArrayF = (question: QuestionModel, dispatch: Dispatch) => {
+export const updateQuestionsArrayF = (
+  question: QuestionModel,
+  dispatch: Dispatch
+) => {
   try {
     dispatch(updateQuestion(question));
   } catch (error) {
     console.error("Error updating questions array:", error);
+  }
+};
+
+export const deleteQuestionFromArrayF = (
+  questionId: string,
+  dispatch: Dispatch
+) => {
+  try {
+    dispatch(deleteQuestion(questionId));
+  } catch (error) {
+    console.error("Error deleting question from array:", error);
   }
 };

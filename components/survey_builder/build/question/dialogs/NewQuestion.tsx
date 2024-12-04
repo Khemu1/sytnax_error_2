@@ -179,22 +179,27 @@ const NewQuestion: React.FC<NewQuestionDialogProps> = ({ isOpen, onClose }) => {
   }, [isPreview]);
 
   useEffect(() => {
+    let timeoutId: ReturnType<typeof setTimeout> | undefined; // Declare variable here
+
     if (isSuccess) {
       setToast({
         message: "Question added successfully.",
         type: "success",
       });
-      setTimeout(() => {
-        dispatch(resetCurrentQuestion());
+      dispatch(resetCurrentQuestion());
+      setIsSubmitting(false);
+      timeoutId = setTimeout(() => {
         onClose();
-      }, 2000);
+      }, 1000); // Assign timeout to the outer variable
     }
-  }, [isSuccess]);
 
-  useEffect(() => {
-    console.log("ememememem", label);
-  }, [label]);
-  console.log("in new questions");
+    // Cleanup function to ensure proper unmounting
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId); // Clear timeout to prevent memory leaks
+      }
+    };
+  }, [isSuccess]);
   return (
     <>
       <Dialog
@@ -310,7 +315,7 @@ const NewQuestion: React.FC<NewQuestionDialogProps> = ({ isOpen, onClose }) => {
                       label="Image"
                       switchChecked={isImageUploadEnabled}
                       onSwitchChange={() => handleSwitchChange("imageUpload")}
-                      errorMessage={validationErrors?.imageFile}
+                      errorMessage={validationErrors?.imageUrl}
                     />
                     <SwitchContainer
                       id="multipleAnswers"
@@ -366,10 +371,10 @@ const NewQuestion: React.FC<NewQuestionDialogProps> = ({ isOpen, onClose }) => {
                       Cancel
                     </button>
                     <button
-                      disabled={isFormInvalid || isSubmitting || isSuccess}
+                      disabled={isFormInvalid || isSubmitting}
                       type="submit"
                       className={`flex justify-center items-center w-[82px] ${
-                        isFormInvalid || isSubmitting || isSuccess
+                        isFormInvalid || isSubmitting
                           ? "bg-gray-600"
                           : "bg-blue-600 hover:bg-blue-700"
                       } py-2 px-6 rounded-md text-lg transition duration-300`}

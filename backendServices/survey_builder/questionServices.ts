@@ -7,13 +7,9 @@ import { filterObject } from "@/utils";
 import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
 import { CustomError } from "@/middleware/CustomError";
+
 import {
-  extractAnswersToAdd,
-  extractAnswersToDelete,
-  extractCorrectAnswersToAdd,
-  extractCorrectAnswersToDelete,
-} from "@/utils/survey_builder/build/questions";
-import {
+  extractChanges,
   handleAnswerUpdates,
   handleCorrectAnswerUpdates,
   handleDescriptionUpdate,
@@ -23,6 +19,8 @@ import {
   handlePointsUpdate,
   handleToggleAllowMultipleAnswers,
 } from "@/backendServices/survey_builder/helpers/question";
+import { deleteImgur, uploadQuestionToImgur } from "../imgurServices";
+import { imageDataResponse } from "@/types";
 
 const prisma = new PrismaClient().$extends(withAccelerate());
 
@@ -218,26 +216,89 @@ export const updateQuestionService = async (data: EditQuestionModelBackend) => {
   }
 };
 
-// helpers
-export const extractChanges = (data: EditQuestionModelBackend) => {
-  const { question } = data;
+export const deleteQuestionService = async (questionId: string) => {
+  try {
+    const deletedQuestion = await prisma.question.delete({
+      where: { id: questionId },
+      include: {
+        questionImage: {
+          select: { deleteHash: true },
+        },
+      },
+    });
 
-  return {
-    answersToAdd: extractAnswersToAdd(
-      question.questionAnswers,
-      question.addedAnswers
-    ),
-    answersToRemove: extractAnswersToDelete(
-      question.questionAnswers,
-      question.deletedAnswers
-    ),
-    correactAnswersToAdd: extractCorrectAnswersToAdd(
-      question.correctAnswers,
-      question.addedCorrectAnswers
-    ),
-    correactAnswersToRemove: extractCorrectAnswersToDelete(
-      question.correctAnswers,
-      question.deletedCorrectAnswers
-    ),
-  };
+    // delete if from imgur
+    if (deletedQuestion.questionImage) {
+      await deleteImgur(deletedQuestion.questionImage.deleteHash);
+    }
+    return true;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const duplicateQuestionService = async (questionId: string) => {
+  try {
+    const question = await prisma.question.findUnique({
+      where: { id: questionId },
+      include: {
+        questionImage: true,
+        questionAnswers: true,
+        correctAnswers: true,
+      },
+    });
+    if (!question) {
+      throw new CustomError("Question does not exist", 404, "question");
+    }
+
+    let imageData: imageDataResponse | undefined = undefined;
+    if (question.questionImage) {
+      imageData = await uploadQuestionToImgur(question.questionImage?.url);
+    }
+
+    if (!question) {
+      throw new CustomError("Question does not exist", 404, "question");
+    }
+
+    const newQuestion = await prisma.question.create({
+      data: {
+        label: question.label,
+        description: question.description,
+        allowMultipleAnswers: question.allowMultipleAnswers,
+        createdAt: question.createdAt,
+        updatedAt: question.updatedAt,
+        points: question.points,
+        surveyId: question.surveyId,
+        questionAnswers: {
+          createMany: {
+            data: question.questionAnswers.map((answer) => ({
+              answer: answer.answer,
+            })),
+          },
+        },
+        correctAnswers: {
+          createMany: {
+            data: question.correctAnswers.map((ca) => ({
+              answerId: ca.answerId,
+              value: ca.value,
+              createdAt: ca.createdAt,
+              updatedAt: ca.updatedAt,
+            })),
+          },
+        },
+        questionImage: imageData
+          ? {
+              create: {
+                imgurId: imageData.data.id,
+                url: imageData.data.link,
+                deleteHash: imageData.data.deletehash,
+              },
+            }
+          : undefined,
+      },
+    });
+    return newQuestion;
+  } catch (error) {
+    throw error;
+  }
 };

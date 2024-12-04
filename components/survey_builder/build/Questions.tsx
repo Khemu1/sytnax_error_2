@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { QuestionModel } from "@/types/buildSurvey";
 import LabelPreivew from "./question/preview/LabelPreivew";
 import Image from "next/image";
@@ -6,6 +7,11 @@ import { RootState } from "@/store/store";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import EditQuestion from "./question/dialogs/EditQuestion";
+import {
+  useDeleteQuestion,
+  useDuplicateQuestion,
+} from "@/hooks/survey_builder/question";
+import Toast from "@/components/skeletons/Toast";
 
 const Questions = () => {
   const { questions, currentSurvey } = useSelector((state: RootState) => ({
@@ -18,6 +24,23 @@ const Questions = () => {
   const [currentQuestion, setCurrentQuestion] = useState<QuestionModel | null>(
     null
   );
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "error";
+  } | null>(null);
+
+  const {
+    handleDeleteEnding,
+    isPending: deletePending,
+    isSuccess: deleteSucess,
+    errorState: deleteError,
+  } = useDeleteQuestion();
+  const {
+    handleDuplicateQuestion,
+    isPending: duplicatePending,
+    isSuccess: duplicateSucess,
+    errorState: duplicateError,
+  } = useDuplicateQuestion();
 
   const router = useRouter();
   const pathname = usePathname();
@@ -85,6 +108,39 @@ const Questions = () => {
       }
     }
   }, [questions, searchParams]);
+  useEffect(() => {
+    if (deleteSucess) {
+      setToast({
+        message: "Question deleted successfully.",
+        type: "success",
+      });
+    }
+    if (deleteError) {
+      setToast({
+        message: "Error deleting question",
+        type: "error",
+      });
+    }
+    if (duplicateError) {
+      setToast({
+        message: "Error duplicating question",
+        type: "error",
+      });
+    }
+
+    if (duplicateSucess) {
+      setToast({
+        message: "Question duplicated successfully",
+        type: "success",
+      });
+    }
+  }, [
+    deleteSucess,
+    deleteError,
+    duplicateError,
+    duplicatePending,
+    duplicateSucess,
+  ]);
 
   if (questions.length < 1)
     return (
@@ -136,18 +192,56 @@ const Questions = () => {
             </button>
 
             {openMenuId === question.id && (
-              <div className="question-menu flex flex-col text-left right-0 text-sm absolute top-10 bg-[#0e0e0e] p-2 rounded-md shadow-md z-10">
+              <div className="question-menu w-[85.25px] h-[90px] flex flex-col text-left right-0 text-sm absolute top-10 bg-[#0e0e0e] p-2 rounded-md shadow-md z-10">
                 <button
-                  className="survey_card_buttons"
-                  onClick={(e) => e.stopPropagation()}
+                  className="survey_card_buttons flex justify-center items-center"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (!currentSurvey) {
+                      setToast({
+                        message: "Unable to duplicate question",
+                        type: "error",
+                      });
+                      console.error("No current survey");
+                      return;
+                    }
+                    handleDuplicateQuestion({
+                      questionId: question.id,
+                      surveyId: question.surveyId,
+                      workspaceId: currentSurvey?.workspaceId,
+                    });
+                  }}
                 >
-                  Duplicate
+                  {duplicatePending ? (
+                    <span className="loading loading-spinner loading-xs"></span>
+                  ) : (
+                    "Duplicate"
+                  )}
                 </button>
                 <button
-                  className="survey_card_buttons text-red-600"
-                  onClick={(e) => e.stopPropagation()}
+                  className="survey_card_buttons text-red-600 justify-center items-center"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (!currentSurvey) {
+                      setToast({
+                        message: "Unable to delete question",
+                        type: "error",
+                      });
+                      console.error("No current survey");
+                      return;
+                    }
+                    handleDeleteEnding({
+                      questionId: question.id,
+                      surveyId: question.surveyId,
+                      workspaceId: currentSurvey?.workspaceId,
+                    });
+                  }}
                 >
-                  Delete
+                  {deletePending ? (
+                    <span className="loading loading-spinner loading-xs"></span>
+                  ) : (
+                    "Delete"
+                  )}
                 </button>
               </div>
             )}
@@ -160,6 +254,14 @@ const Questions = () => {
           onClose={onClose}
           question={currentQuestion}
           workspaceId={currentSurvey!.workspaceId}
+        />
+      )}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+          duration={1500}
         />
       )}
     </>

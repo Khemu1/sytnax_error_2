@@ -371,7 +371,7 @@ const EditQuestion: React.FC<NewQuestionDialogProps> = ({
                       label="Image"
                       switchChecked={isImageUploadEnabled}
                       onSwitchChange={() => handleSwitchChange("imageUpload")}
-                      errorMessage={validationErrors?.imageFile}
+                      errorMessage={validationErrors?.imageUrl}
                     />
                     <SwitchContainer
                       id="multipleAnswers"
@@ -445,7 +445,7 @@ const EditQuestion: React.FC<NewQuestionDialogProps> = ({
                       {isPending ? (
                         <span className="loading loading-spinner loading-sm"></span>
                       ) : (
-                        "Add"
+                        "Edit"
                       )}
                     </button>
                   </div>

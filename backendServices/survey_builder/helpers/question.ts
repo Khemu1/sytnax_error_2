@@ -7,11 +7,36 @@ import {
   AnswersModel,
   CorrectAnswerModel,
   editedQuestionModel,
+  EditQuestionModelBackend,
 } from "@/types/buildSurvey";
+import { extractAnswersToAdd, extractAnswersToDelete, extractCorrectAnswersToAdd, extractCorrectAnswersToDelete } from "@/utils/survey_builder/build/questions";
 import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
 
 const prisma = new PrismaClient().$extends(withAccelerate());
+
+export const extractChanges = (data: EditQuestionModelBackend) => {
+  const { question } = data;
+
+  return {
+    answersToAdd: extractAnswersToAdd(
+      question.questionAnswers,
+      question.addedAnswers
+    ),
+    answersToRemove: extractAnswersToDelete(
+      question.questionAnswers,
+      question.deletedAnswers
+    ),
+    correactAnswersToAdd: extractCorrectAnswersToAdd(
+      question.correctAnswers,
+      question.addedCorrectAnswers
+    ),
+    correactAnswersToRemove: extractCorrectAnswersToDelete(
+      question.correctAnswers,
+      question.deletedCorrectAnswers
+    ),
+  };
+};
 
 export const handleAnswerUpdates = async (
   answersToAdd: string[],

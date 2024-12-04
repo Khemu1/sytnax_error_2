@@ -16,10 +16,26 @@ const questionsSlice = createSlice({
     setQuestions: (state, action: PayloadAction<QuestionModel[]>) => {
       state.items = action.payload;
     },
-    addQuestion: (state, action: PayloadAction<QuestionModel>) => {
-      state.items.push(action.payload);
+    addQuestion: (
+      state,
+      action: PayloadAction<{
+        question: QuestionModel;
+        type: string;
+        orignalQuestionId: string | null;
+      }>
+    ) => {
+      if (action.payload.type === "add") {
+        state.items.push(action.payload.question);
+        return;
+      }
+      console.log("looking to add duplication");
+      const index = state.items.findIndex(
+        (question) => question.id === action.payload.orignalQuestionId
+      );
+      console.log("index", index);
+      state.items.splice(index, 0, action.payload.question);
     },
-    removeQuestion: (state, action: PayloadAction<string>) => {
+    deleteQuestion: (state, action: PayloadAction<string>) => {
       state.items = state.items.filter(
         (question) => question.id !== action.payload
       );
@@ -34,7 +50,6 @@ const questionsSlice = createSlice({
   },
 });
 
-export const { setQuestions, addQuestion, removeQuestion, updateQuestion } =
+export const { setQuestions, addQuestion, deleteQuestion, updateQuestion } =
   questionsSlice.actions;
 export default questionsSlice.reducer;
-``;

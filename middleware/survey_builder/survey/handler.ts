@@ -109,13 +109,11 @@ const handleUpdateSurveySettings = async (
 
 const handleDuplicateOrMoveSurvey = async (
   req: NextRequest,
-  authUser: NextResponse,
+  authUser: NextResponse
 ) => {
-  const { surveyExists, body } = await performCommonSurveyChecks(
-    req,
-    authUser,
-  );
-  return await checkSurveyForDuplicatingOrMoving(
+  const { surveyExists, body } = await performCommonSurveyChecks(req, authUser);
+  console.log("common check done");
+  return checkSurveyForDuplicatingOrMoving(
     req,
     surveyExists!,
     body.targetWorkspaceId
@@ -129,7 +127,7 @@ export const surveyBuilderRoutes = async (req: NextRequest) => {
     const pathName = req.nextUrl.pathname;
 
     const moveOrDuplicateSurveyRegexPath =
-      /^\/api\/survey_builder\/survey\/([a-z0-9]{25})\/(move|duplicate)$/;
+      /^\/api\/survey_builder\/survey\/(move|duplicate)$/;
 
     await checkDashBoardRoles(authUser);
 
@@ -151,20 +149,13 @@ export const surveyBuilderRoutes = async (req: NextRequest) => {
           }
           break;
         case "PATCH":
-          if (
-            pathName === `/api/survey_builder/survey/update-name`
-          ) {
+          if (pathName === `/api/survey_builder/survey/update-name`) {
             return await handleUpdateSurvey(req, authUser);
           }
-          if (
-            pathName ===
-            `/api/survey_builder/survey/update-settings`
-          ) {
+          if (pathName === `/api/survey_builder/survey/update-settings`) {
             return await handleUpdateSurveySettings(req, authUser);
           }
-          if (
-            pathName === `/api/survey_builder/survey/update-status`
-          ) {
+          if (pathName === `/api/survey_builder/survey/update-status`) {
             const { checkMemberShip } = await performCommonSurveyChecks(
               req,
               authUser

@@ -1,6 +1,9 @@
 import { CustomError } from "@/middleware/CustomError";
+import { QuestionModel } from "@/types/buildSurvey";
 
-export const addQuestion = async (question: FormData) => {
+export const addQuestion = async (
+  question: FormData
+): Promise<QuestionModel> => {
   try {
     const response = await fetch(`/api/survey_builder/question`, {
       method: "POST",
@@ -32,13 +35,17 @@ export const addQuestion = async (question: FormData) => {
 };
 
 export const deleteQuestion = async (
-  questionId: number,
-  worksapceAndSurvey: FormData
-) => {
+  questionId: string,
+  surveyId: string,
+  workspaceId: string
+): Promise<string> => {
   try {
-    const response = await fetch(`/api/question/delete/${questionId}`, {
+    const response = await fetch(`/api/survey_builder/question/delete`, {
       method: "DELETE",
-      body: worksapceAndSurvey,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ surveyId, workspaceId, questionId }),
     });
 
     if (!response.ok) {
@@ -66,13 +73,17 @@ export const deleteQuestion = async (
 };
 
 export const duplicateQuestion = async (
-  questionId: number,
-  worksapceAndSurvey: FormData
-) => {
+  questionId: string,
+  surveyId: string,
+  workspaceId: string
+): Promise<{ question: QuestionModel; orignalQuestionId: string }> => {
   try {
-    const response = await fetch(`/api/question/duplicate/${questionId}`, {
+    const response = await fetch(`/api/survey_builder/question/duplicate`, {
       method: "POST",
-      body: worksapceAndSurvey,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ questionId, surveyId, workspaceId }),
     });
 
     if (!response.ok) {
@@ -99,10 +110,13 @@ export const duplicateQuestion = async (
   }
 };
 
-export const editQuestion = async (question: FormData) => {
+export const editQuestion = async (
+  question: FormData
+): Promise<QuestionModel> => {
   try {
     const response = await fetch(`/api/survey_builder/question/edit`, {
       method: "PATCH",
+
       body: question,
     });
 

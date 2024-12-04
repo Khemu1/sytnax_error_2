@@ -118,11 +118,14 @@ export const checkGroupMembershipForSurvey = async (
 
     response.headers.set("User-Group-Ids", JSON.stringify(groupMembers));
     response.headers.set("workspace", JSON.stringify(workspace));
-
     if (workspace.userId === userId) {
+      console.log("group membership check done for survey");
+
       return response;
     }
     if (groupMembers?.UserGroup.find((group) => group.userId === userId)) {
+      console.log("group membership check done for survey");
+
       return response;
     }
     throw new CustomError(
@@ -189,7 +192,7 @@ export const checkSurveyExists = async (
       console.error("Survey not found for ID:", surveyId);
       throw new CustomError("Survey not found", 404, "survey check", true);
     }
-    console.log("survey check completed");
+    console.log("survey existense check done for survey");
     const repsonse = NextResponse.next();
     repsonse.headers.set("survey", JSON.stringify(survey));
     repsonse.headers.set(
@@ -209,6 +212,7 @@ export const checkSurveyForDuplicatingOrMoving = async (
   targetWorkspaceId: string
 ) => {
   try {
+    console.log("targetWorkspaceId", targetWorkspaceId);
     if (!targetWorkspaceId) {
       throw new CustomError(
         "Targed Workspace Not Found",
@@ -230,12 +234,7 @@ export const checkSurveyForDuplicatingOrMoving = async (
     }
 
     const response = NextResponse.next();
-    response.headers.set("User-Id", res.headers.get("User-Id")!);
-    response.headers.set(
-      "workspace",
-      JSON.stringify(res.headers.get("workspace"))
-    );
-    response.headers.set("survey", JSON.stringify(res.headers.get("survey")));
+    console.log("checking survey for moving/duplication is done");
     return response;
   } catch (error) {
     throw error;
