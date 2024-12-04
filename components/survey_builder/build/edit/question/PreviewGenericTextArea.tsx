@@ -66,33 +66,31 @@ const Preview: React.FC<PreviewProps> = ({
         }`}
       >
         {imageUrl && (
-          <div
-            className={`mt-6 mb-4 ${
-              res === "pc"
-                ? "max-w-[500px] max-h-[500px]"
-                : "max-w-[300px] max-h-[300px]"
-            }`}
-          >
+          <div className={`flex justify-start mt-6 mb-4`}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={imageUrl}
               alt="Preview"
-              className="w-full h-auto rounded-lg shadow-xl"
+              className={`flex justify-start mt-6 mb-4 ${
+                res === "pc"
+                  ? "max-w-[500px] max-h-[500px]"
+                  : "max-w-[300px] max-h-[300px]"
+              }`}
             />
           </div>
         )}
-        <div className="flex flex-col gap-4 w-full">
-          <div className="w-full mt-4 sm:max-w-[500px] whitespace-normal">
+        <div className="flex flex-col gap-4 w-full items-center">
+          <div className="w-full mt-4 sm:max-w-[500px] break-words">
             {label && <LabelPreivew label={label} />}
           </div>
 
-          <div className="w-full sm:max-w-[500px] whitespace-normal ">
+          <div className="w-full sm:max-w-[500px] break-words">
             {description && <DescriptionPreivew description={description} />}
           </div>
         </div>
 
         {answers.length > 0 && (
-          <div className="flex flex-col flex-wrap gap-2 w-full justify-around">
+          <div className="flex flex-col flex-wrap gap-4 w-full items-center">
             {answers.map((answer, index) => (
               <div
                 key={index}
