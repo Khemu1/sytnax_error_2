@@ -254,6 +254,38 @@ export const getSurvey = async (
   }
 };
 
+export const getSurveyForQuiz = async (
+  surveyId: string
+): Promise<Omit<SurveyModel, "correctAnswers">> => {
+  try {
+    const response = await fetch(`/api/quiz/${surveyId}`, {
+      method: "GET",
+    });
+
+    if (!response.ok) {
+      const errorData: CustomError = await response.json();
+
+      const errorMessage = errorData.message ?? "Unknown Error Occurred";
+
+      const err = new CustomError(
+        errorMessage,
+        response.status,
+        "getSurveyForQuizError",
+        true,
+        errorData.details,
+        errorData.errors
+      );
+      throw err;
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
 export const updateSurveyUrl = async (
   workspaceId: string,
   surveyId: string,

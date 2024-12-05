@@ -124,7 +124,9 @@ const Nav = () => {
         >
           <Image alt="nav menu" src={"/assets/icons/menu.svg"} fill={true} />
           <ul
-            className={`nav_menu ${isMenuOpen ? "" : "nav_menu_closed"}`}
+            className={`nav_menu items-center ${
+              isMenuOpen ? "" : "nav_menu_closed"
+            } list-none `}
             ref={menuRef}
           >
             <li onClick={() => setIsMenuOpen(false)}>

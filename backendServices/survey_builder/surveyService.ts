@@ -3,6 +3,7 @@ import { filterObject } from "@/utils";
 import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
 import { deleteImgur } from "../imgurServices";
+import { CustomError } from "@/middleware/CustomError";
 
 const prisma = new PrismaClient().$extends(withAccelerate());
 
@@ -164,6 +165,64 @@ export const returnSurveyForBuilderService = async (surveyId: string) => {
       },
     });
 
+    return survey;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const returnSurveyQuizService = async (surveyId: string) => {
+  try {
+    console.log("surveyId", surveyId);
+    const survey = await prisma.survey.findUnique({
+      where: { id: surveyId },
+      include: {
+        questions: {
+          include: {
+            questionAnswers: true,
+            questionImage: true,
+          },
+          orderBy: {
+            createdAt: "asc",
+          },
+        },
+      },
+    });
+    // is survey open ?
+    if (!survey) {
+      throw new CustomError(
+        "Survey not found",
+        404,
+        "getSurveyError",
+        true,
+        "Survey not found",
+        {}
+      );
+    }
+    console.log("found survey");
+    if (!survey.startTime || !survey.endTime) {
+      throw new CustomError(
+        "Survey is closed",
+        404,
+        "getSurveyError",
+        true,
+        "Survey not found",
+        {}
+      );
+    }
+    const currrentDate = new Date();
+    const startTime = new Date(survey.startTime);
+    const endTime = new Date(survey.endTime);
+    if (currrentDate < startTime || currrentDate > endTime) {
+      throw new CustomError(
+        "Survey is not open",
+        400,
+        "getSurveyError",
+        true,
+        "Survey is not open",
+        {}
+      );
+    }
     return survey;
   } catch (error) {
     throw error;

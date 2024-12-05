@@ -120,7 +120,7 @@
 .error_message {
   @apply text-[#ff484f] font-semibold bg-[#4f000a] mt-2 py-1 px-2 rounded-md;
 }
-input {
+input:not([type="radio"]) {
   width: 100%;
   padding: 0.7rem;
   border-radius: 5px;
@@ -130,7 +130,7 @@ input {
   border: 1px solid #42484b !important;
 }
 
-input:focus {
+input:not([type="radio"]):focus {
   outline: none;
   border: 1px solid #174f6b !important;
 }
@@ -176,4 +176,16 @@ input:focus {
 
 .ck.ck-reset.ck-list li {
   margin: 0 !important;
+}
+
+.build_label {
+  @apply text-left font-semibold sm:ml-2 md:ml-0 w-full text-ellipsis overflow-hidden;
+  font-size: 1rem !important;
+}
+
+.build_label > *,
+.build_label > * > * {
+  font-size: 1rem !important;
+  @apply w-full text-ellipsis overflow-hidden;
+  white-space: nowrap;
 }

@@ -70,3 +70,19 @@ export const joinCourseFields = [
   { name: "promoCode", label: "Promo Code (if found)", type: "text" },
   { name: "questions", label: "Any questions", type: "textarea" },
 ];
+
+export const quizUserForm = [
+  { name: "email", label: "Email *", type: "email", onChangeType: "email" },
+  {
+    name: "studentId",
+    label: "Student ID *",
+    type: "text",
+    onChangeType: "studentId",
+  },
+  {
+    name: "phoneNumber",
+    label: "WhatsApp number *",
+    type: "phone",
+    onChangeType: "phone",
+  },
+];

@@ -236,7 +236,7 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
                   className="py-2"
                   onClick={() => {
                     window.navigator.clipboard.writeText(
-                      `${process.env.NEXT_PUBLIC_BASE_URL}/quiz/${survey.id}`
+                      `${process.env.NEXT_PUBLIC_BASE_URL}/quiz/participate/${survey.id}`
                     );
                     setToast({
                       message: "Link copied to clipboard",

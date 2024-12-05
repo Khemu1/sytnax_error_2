@@ -26,6 +26,17 @@ export const calculateExpirationDate = (duration: string): Date => {
   }
 };
 
+export const formatTimeForTimer = (seconds: number) => {
+  const hours = Math.floor(seconds / 3600)
+    .toString()
+    .padStart(2, "0");
+  const minutes = Math.floor((seconds % 3600) / 60)
+    .toString()
+    .padStart(2, "0");
+  const secs = (seconds % 60).toString().padStart(2, "0");
+  return `${hours} : ${minutes} : ${secs}`;
+};
+
 export const formatDate = (date: Date) => {
   if (!(date instanceof Date) || isNaN(date.getTime())) {
     return null; // Handle invalid dates

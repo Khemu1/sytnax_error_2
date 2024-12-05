@@ -7,6 +7,7 @@ import {
   validateNewSurvey,
   checkSurveyForDuplicatingOrMoving,
   validateSurveySettings,
+  checkSurveyExistsForQuiz,
 } from "./index";
 import {
   authenticateUser,
@@ -74,6 +75,17 @@ const handleGetSurvey = async (req: NextRequest, authUser: NextResponse) => {
     : NextResponse.json({ message: "Survey not found" }, { status: 404 });
 };
 
+const handleGetSurveyForQuiz = async (req: NextRequest) => {
+  const body = (await req.json()) as {
+    name: string;
+    workspaceId: string;
+    surveyId: string;
+    targetWorkspaceId: string;
+    settings: SurveySettings;
+  };
+  return checkSurveyExistsForQuiz(req, body.surveyId);
+};
+
 const handleDeleteSurvey = async (req: NextRequest, authUser: NextResponse) => {
   const surveyId = req.nextUrl.pathname.split("/")[4];
   const { surveyExists } = await performCommonSurveyChecks(
@@ -134,6 +146,11 @@ export const surveyBuilderRoutes = async (req: NextRequest) => {
     // Handle survey routes
     if (pathName.startsWith("/api/survey_builder/survey")) {
       switch (method) {
+        case "GET":
+          if (pathName === "/api/survey_builder/survey/quiz") {
+            return handleGetSurveyForQuiz(req);
+          }
+          break;
         case "POST":
           if (pathName === "/api/survey_builder/survey/add-survey") {
             return await handleAddSurvey(req, authUser);

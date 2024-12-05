@@ -20,6 +20,7 @@ import {
 } from "@/middleware/courses/courseMiddleware";
 import { handleSurveyBuilderRoutes } from "./middleware/survey_builder";
 import { CustomNextRequest } from "./types";
+import { quizRoutes } from "./middleware/quiz/hanlder";
 
 // Handle /api/courses routes
 const handleCoursesRoute = async (req: NextRequest) => {
@@ -103,13 +104,15 @@ export async function middleware(req: CustomNextRequest) {
     const { pathname } = req.nextUrl;
 
     if (pathname.startsWith("/api/courses")) {
-      return await handleCoursesRoute(req);
+      return handleCoursesRoute(req);
     } else if (pathname.startsWith("/api/auth")) {
-      return await handleAuthRoutes(req);
+      return handleAuthRoutes(req);
     } else if (pathname.startsWith("/api/dashboard")) {
-      return await handleDashboardRoutes(req);
+      return handleDashboardRoutes(req);
     } else if (pathname.startsWith("/api/survey_builder")) {
-      return await handleSurveyBuilderRoutes(req);
+      return handleSurveyBuilderRoutes(req);
+    } else if (pathname.startsWith("/api/survey/quiz")) {
+      return quizRoutes(req);
     }
 
     return NextResponse.next();
@@ -124,5 +127,6 @@ export const config = {
     "/api/auth/:path*",
     "/api/dashboard/:path*",
     "/api/survey_builder/:path*",
+    "/api/survey/quiz/:path*",
   ],
 };

@@ -74,6 +74,7 @@ nav {
   transition: 400ms ease-in-out;
   transform: translateX(10px) translateY(9px);
   z-index: 20;
+  margin: 0 !important;
 }
 
 .nav_menu_closed {
@@ -88,6 +89,7 @@ nav {
 
 .nav_menu > * {
   @apply w-full h-full transition-all hover:bg-base-100 py-2 cursor-pointer;
+  margin: 0 !important;
 }
 .nav_menu > * > * {
   @apply flex justify-center w-full h-full;

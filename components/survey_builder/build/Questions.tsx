@@ -1,6 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { QuestionModel } from "@/types/buildSurvey";
-import LabelPreivew from "./question/preview/LabelPreivew";
 import Image from "next/image";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
@@ -167,9 +166,10 @@ const Questions = () => {
                 />
                 <span className="font-semibold">{index + 1}</span>
               </div>
-              <div className="text-left text-[1rem] font-semibold sm:ml-2 md:ml-0 w-min">
-                <LabelPreivew label={question.label} />
-              </div>
+              <div
+                className="build_label"
+                dangerouslySetInnerHTML={{ __html: question.label }}
+              ></div>
               <span className="font-semibold">|</span>
               <div className="text-left font-semibold">
                 {question.points} Point{question.points > 1 ? "s" : ""}
