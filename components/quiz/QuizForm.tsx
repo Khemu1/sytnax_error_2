@@ -2,8 +2,8 @@
 import { quizUserForm } from "@/constants";
 import Image from "next/image";
 import formStyle from "@/styles/formStyle.module.css";
-import { QuizFormErrors, QuizUserFormProps } from "@/types";
 import ReactPhoneInput from "react-phone-input-2";
+import { QuizFormErrors, QuizUserFormProps } from "@/types/quiz";
 import "react-phone-input-2/lib/style.css";
 
 const QuizForm: React.FC<{

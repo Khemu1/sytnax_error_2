@@ -188,38 +188,14 @@ export const returnSurveyQuizService = async (surveyId: string) => {
         },
       },
     });
-    // is survey open ?
-    if (!survey) {
+    // is survey open || has questions  ?
+    if (!survey || survey.questions.length === 0) {
       throw new CustomError(
         "Survey not found",
         404,
         "getSurveyError",
         true,
         "Survey not found",
-        {}
-      );
-    }
-    console.log("found survey");
-    if (!survey.startTime || !survey.endTime) {
-      throw new CustomError(
-        "Survey is closed",
-        404,
-        "getSurveyError",
-        true,
-        "Survey not found",
-        {}
-      );
-    }
-    const currrentDate = new Date();
-    const startTime = new Date(survey.startTime);
-    const endTime = new Date(survey.endTime);
-    if (currrentDate < startTime || currrentDate > endTime) {
-      throw new CustomError(
-        "Survey is not open",
-        400,
-        "getSurveyError",
-        true,
-        "Survey is not open",
         {}
       );
     }

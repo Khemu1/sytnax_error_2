@@ -11,4 +11,6 @@ model Question {
   correctAnswers        CorrectAnswer[]
   questionAnswers       QuestionAnswer[]
   questionImage         QuestionImage?  
+
+  AnsweredQuestion AnsweredQuestion[]
 }

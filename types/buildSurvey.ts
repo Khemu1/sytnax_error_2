@@ -1,3 +1,26 @@
+export interface PrismaQuestion {
+  id: string;
+  surveyId: string;
+  label: string;
+  description?: string | null;
+  allowMultipleAnswers: boolean;
+  points: number;
+  correctAnswers: {
+    id: string;
+    createdAt: Date;
+    updatedAt: Date;
+    questionId: string;
+    answerId: string;
+    value: string;
+  }[];
+  questionAnswers: {
+    id: string;
+    createdAt: Date | null;
+    updatedAt: Date | null;
+    questionId: string;
+    answer: string;
+  }[];
+}
 export interface QuestionModel {
   id: string;
   surveyId: string;

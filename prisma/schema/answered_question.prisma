@@ -2,9 +2,10 @@ model AnsweredQuestion {
   id           String           @id @default(cuid())
   questionId   String
   submissionId String
-  answer       String
-  point        Int              @default(0)
+  QuestionPoints Int              
+  givenPoints        Int              @default(0)
   createdAt    DateTime         @default(now())
   updatedAt    DateTime         @updatedAt
+  question     Question         @relation(fields: [questionId], references: [id],onDelete: Cascade)
   submission   SurveySubmission @relation(fields: [submissionId], references: [id],onDelete: Cascade)
 }

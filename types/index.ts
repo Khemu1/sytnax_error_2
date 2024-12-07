@@ -235,14 +235,7 @@ export interface RegisterCourseFormProps {
   countryCode: string;
 }
 
-export interface QuizUserFormProps {
-  email: string;
-  studentId: string;
-  phoneNumber: string;
-  countryCode: string;
-}
 
-export type QuizFormErrors = Partial<Record<keyof QuizUserFormProps, string>>;
 
 
 export type Errors = Partial<Record<keyof RegisterCourseFormProps, string>>;

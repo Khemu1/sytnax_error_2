@@ -496,14 +496,16 @@ export const validatePasswordSchema = () => {
   });
 };
 
-const validatePhoneNumber = (value: string, countryCode: string): boolean => {
+export const validatePhoneNumber = (
+  value: string,
+  countryCode: string
+): boolean => {
   try {
     const phoneNumber = parsePhoneNumberFromString(
       value,
       countryCode as CountryCode
     );
-    console.log("phoneNumber", phoneNumber);
-    console.log("country", countryCode);
+
     return phoneNumber ? phoneNumber.isValid() : false;
   } catch (error) {
     return false;
@@ -546,34 +548,6 @@ export const joinCourseFieldsschema = () => {
         code: ZodIssueCode.custom,
         message: "Invalid WhatsApp number",
         path: ["whatsapp"],
-      });
-    }
-  });
-};
-
-export const quizUserFormschema = () => {
-  return object({
-    phoneNumber: string().min(1, "WhatsApp number is required"),
-    email: string({ required_error: "Email is required" }).email({
-      message: "Invalid email address",
-    }),
-    studentId: string().min(1, "Student ID is required"),
-    countryCode: string().min(1, "Country code is required"),
-  }).superRefine((val, ctx) => {
-    const { phoneNumber, countryCode, studentId } = val;
-    if (!validatePhoneNumber(phoneNumber, countryCode)) {
-      ctx.addIssue({
-        code: ZodIssueCode.custom,
-        message: "Invalid WhatsApp number",
-        path: ["phoneNumber"],
-      });
-    }
-    // 2201576
-    if (!studentId.match(/^\d{7}$/)) {
-      ctx.addIssue({
-        code: ZodIssueCode.custom,
-        message: "Invalid Student ID: Must be 7 digits long.",
-        path: ["studentId"],
       });
     }
   });

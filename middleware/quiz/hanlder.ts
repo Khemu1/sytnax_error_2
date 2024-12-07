@@ -1,8 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
-import { checkSurveyExistsForQuiz } from "./index";
+import { checkSurveyExistsForQuiz, validateQuizParticipant } from "./index";
+import { parseAndValidateQuizParticipantFormData } from "@/utils/quiz";
 
 const handleGetSurveyForQuiz = async (req: NextRequest, surveyId: string) => {
   return checkSurveyExistsForQuiz(req, surveyId);
+};
+const handleAddQuizParticipant = async (req: NextRequest) => {
+  const rawFormData = await req.formData();
+  const { surveyId, questions, userQuizAnswers, userInfo, clean } =
+    parseAndValidateQuizParticipantFormData(rawFormData);
+  await checkSurveyExistsForQuiz(req, surveyId);
+  return validateQuizParticipant(req, {
+    questions,
+    userQuizAnswers,
+    userInfo,
+    surveyId,
+    clean,
+  });
 };
 
 export const quizRoutes = async (req: NextRequest) => {
@@ -21,10 +35,10 @@ export const quizRoutes = async (req: NextRequest) => {
             return handleGetSurveyForQuiz(req, surveyIdFromParams);
           }
           break;
-        // case "POST":
-        //   if (pathName === "/api/quiz/survey/add-survey") {
-        //     return await handleAddSurvey(req, authUser);
-        //   }
+        case "POST":
+          if (pathName === "/api/quiz/add-participant") {
+            return handleAddQuizParticipant(req);
+          }
 
         default:
           return NextResponse.json(

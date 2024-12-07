@@ -8,13 +8,22 @@ import WarningDialog from "./WarningDialog";
 const Quiz: React.FC<{
   survey: Omit<SurveyModel, "questions">;
   questions: QuestionModel[];
-  handleSubmit: () => void;
+  handleSubmit: (clean: boolean) => void;
   handleAnswerSelection: (
     questionId: string,
     selectedAnswers: string[],
     values: string[]
   ) => void;
-}> = ({ survey, handleSubmit, questions, handleAnswerSelection }) => {
+  isSubmitting: boolean;
+  setIsSubmitting: React.Dispatch<React.SetStateAction<boolean>>;
+}> = ({
+  survey,
+  handleSubmit,
+  questions,
+  handleAnswerSelection,
+  isSubmitting,
+  setIsSubmitting,
+}) => {
   const [isWarningDialogOpen, setIsWarningDialogOpen] = useState({
     state: false,
     message: "",
@@ -23,6 +32,7 @@ const Quiz: React.FC<{
   const [selectedAnswers, setSelectedAnswers] = useState<
     Record<string, string[]>
   >({});
+
   const [isMounted, setIsMounted] = useState(false);
   const [timer, setTimer] = useState(survey.duration * 60);
   const [oneMinuteLeft, setOneMinuteLeft] = useState(false);
@@ -72,31 +82,37 @@ const Quiz: React.FC<{
     answerId: string,
     allowMultiple: boolean
   ) => {
+    console.log("handleAnswerClick", questionId, answerId, allowMultiple);
     setSelectedAnswers((prev) => {
       const currentAnswers = prev[questionId] || [];
-      const updatedAnswers = allowMultiple
-        ? currentAnswers.includes(answerId)
-          ? currentAnswers.filter((id) => id !== answerId)
-          : currentAnswers.length < 2
-          ? [...currentAnswers, answerId]
-          : [currentAnswers[0], answerId]
-        : [answerId];
 
-      return { ...prev, [questionId]: updatedAnswers };
+      if (allowMultiple) {
+        if (currentAnswers.includes(answerId)) {
+          return {
+            ...prev,
+            [questionId]: currentAnswers.filter((id) => id !== answerId),
+          };
+        }
+        if (currentAnswers.length < 2) {
+          return { ...prev, [questionId]: [...currentAnswers, answerId] };
+        }
+
+        return { ...prev, [questionId]: [currentAnswers[0], answerId] };
+      }
+
+      return { ...prev, [questionId]: [answerId] };
     });
   };
 
   const syncAnswersToParent = () => {
-    Object.entries(selectedAnswers).forEach(([questionId, answers]) => {
-      handleAnswerSelection(
-        questionId,
-        answers,
-        answers.map((id) => {
-          const question = questions.find((q) => q.id === questionId);
-          const answerObj = question?.questionAnswers.find((a) => a.id === id);
-          return answerObj?.answer || "";
-        })
-      );
+    Object.entries(selectedAnswers).forEach(([questionId, answersIds]) => {
+      const answerDetails = answersIds.map((id) => {
+        const question = questions.find((q) => q.id === questionId);
+        const answerObj = question?.questionAnswers.find((a) => a.id === id);
+        return answerObj ? answerObj.answer : "";
+      });
+
+      handleAnswerSelection(questionId, answersIds, answerDetails);
     });
   };
 
@@ -110,23 +126,30 @@ const Quiz: React.FC<{
 
   useEffect(() => {
     const handleVisibilityChange = () => {
-      if (document.visibilityState === "hidden") {
+      if (document.visibilityState === "hidden" && !isSubmitting) {
+        setIsSubmitting(true);
+        setTimer(0);
+        handleSubmit(false);
         setIsWarningDialogOpen({
           state: true,
           message:
-            "ou Tabbed out, Quiz is closed and you won't be allowed to see your grades and the instructor will be notified",
+            "You Tabbed out, Quiz is closed and you won't be allowed to see your grades and the instructor will be notified",
         });
       }
     };
 
     const handleWindowBlur = () => {
-      console.log("submitting");
-      handleSubmit();
-      setIsWarningDialogOpen({
-        state: true,
-        message:
-          "You unfocused the window, Quiz is closed and you won't be allowed to see your grades and the instructor will be notified",
-      });
+      if (!isSubmitting) {
+        console.log("submitting");
+        setIsSubmitting(true);
+        handleSubmit(false);
+        setTimer(0);
+        setIsWarningDialogOpen({
+          state: true,
+          message:
+            "You unfocused the window, Quiz is closed and you won't be allowed to see your grades and the instructor will be notified",
+        });
+      }
     };
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
@@ -142,7 +165,6 @@ const Quiz: React.FC<{
     const interval = setInterval(() => {
       setTimer((prev) => {
         if (prev === 0) {
-          clearInterval(interval);
           return 0;
         }
         if (prev <= 60 && !oneMinuteLeft) {
@@ -154,6 +176,13 @@ const Quiz: React.FC<{
 
     return () => clearInterval(interval);
   }, [oneMinuteLeft]);
+
+  useEffect(() => {
+    if (timer === 0 && !isSubmitting) {
+      setIsSubmitting(true);
+      handleSubmit(true);
+    }
+  }, [timer]);
 
   if (!isMounted) return null;
 
@@ -169,10 +198,19 @@ const Quiz: React.FC<{
             {formatTimeForTimer(timer)}
           </div>
           <button
-            className="w-[150px] bg-blue-600 p-2 rounded-md text-white font-semibold"
-            onClick={handleSubmit}
+            disabled={isSubmitting}
+            className="flex items-center justify-center w-[150px] bg-blue-600 p-2 rounded-md text-white font-semibold"
+            onClick={() => {
+              setIsSubmitting(true);
+              setTimer(0);
+              handleSubmit(true);
+            }}
           >
-            Submit
+            {isSubmitting ? (
+              <span className="loading loading-ring loading-md"></span>
+            ) : (
+              "Submit"
+            )}
           </button>
         </div>
 
@@ -210,6 +248,7 @@ const Quiz: React.FC<{
                         type={
                           question.allowMultipleAnswers ? "checkbox" : "radio"
                         }
+                        disabled={isSubmitting}
                         name={`answer-${question.id}`}
                         value={answer.id}
                         checked={
