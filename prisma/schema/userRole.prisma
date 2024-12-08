@@ -2,8 +2,8 @@ model UserRole {
   id     Int  @id @default(autoincrement())
   userId Int  @unique
   roleId Int
-  role   Role @relation(fields: [roleId], references: [id])
-  user   User @relation(fields: [userId], references: [id])
+  role   Role @relation(fields: [roleId], references: [id] ,onDelete: Cascade)
+  user   User @relation(fields: [userId], references: [id],onDelete: Cascade)
 
   @@unique([userId, roleId])
 }

@@ -45,6 +45,11 @@ export const useGetWorkspaces = () => {
         throw error;
       }
     },
+    enabled: true,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    staleTime: Infinity,
+    refetchOnMount: "always",
   });
 
   return {
@@ -89,7 +94,6 @@ export const useUpdateWorkspaceName = () => {
         err instanceof CustomError
           ? err.errors || { message: err.message }
           : { message: "Unknown Error" };
-
       setErrorState(message);
       console.error("Error updating survey title:", err);
     },

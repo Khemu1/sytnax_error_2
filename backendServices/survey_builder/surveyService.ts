@@ -189,16 +189,15 @@ export const returnSurveyQuizService = async (surveyId: string) => {
       },
     });
     // is survey open || has questions  ?
-    if (!survey || survey.questions.length === 0) {
+    if (survey?.questions.length === 0) {
       throw new CustomError(
-        "Survey not found",
-        404,
-        "getSurveyError",
-        true,
-        "Survey not found",
-        {}
+        "Survey has no questions",
+        403,
+        "surveyQuetions",
+        true
       );
     }
+
     return survey;
   } catch (error) {
     throw error;

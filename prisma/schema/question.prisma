@@ -7,7 +7,7 @@ model Question {
   createdAt             DateTime?         @default(now())
   updatedAt             DateTime?         @updatedAt
   points                Int              @default(1)
-  survey                Survey           @relation(fields: [surveyId], references: [id])
+  survey                Survey           @relation(fields: [surveyId], references: [id], onDelete: Cascade)
   correctAnswers        CorrectAnswer[]
   questionAnswers       QuestionAnswer[]
   questionImage         QuestionImage?  

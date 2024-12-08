@@ -9,7 +9,8 @@ const prisma = new PrismaClient().$extends(withAccelerate());
 
 export const checkSurveyExistsForQuiz = async (
   _req: NextRequest,
-  surveyId: string
+  surveyId: string,
+  submissionData?: Date
 ) => {
   try {
     if (!surveyId) {
@@ -40,17 +41,43 @@ export const checkSurveyExistsForQuiz = async (
       );
     }
     console.log("survey has intervals");
-    const currrentDate = new Date();
+    const currrentDate = submissionData ?? new Date();
     const startTime = new Date(survey.startTime);
     const endTime = new Date(survey.endTime);
-    if (!startTime || !endTime) {
-      throw new CustomError("Survey is closed", 403, "surveyIntervals", true);
-    }
     if (currrentDate < startTime || currrentDate > endTime) {
-      throw new CustomError("Survey is not open", 403, "getSurveyError", true);
+      throw new CustomError("Survey is not open", 403, "", true);
     }
 
     console.log("survey existense check done for quiz");
+    const repsonse = NextResponse.next();
+
+    return repsonse;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const checkDoesQuizExist = async (_req: NextRequest, quizId: string) => {
+  try {
+    if (!quizId) {
+      throw new CustomError(
+        "Quiz Id not doesn't exists",
+        400,
+        "quiz check",
+        false
+      );
+    }
+
+    const quiz = await prisma.surveySubmission.findUnique({
+      where: { id: quizId },
+    });
+
+    if (!quiz) {
+      console.error("Quiz not found for ID:", quizId);
+      throw new CustomError("Quiz not found", 404, "quiz check", true);
+    }
+    console.log("found quiz for quiz grade");
+
     const repsonse = NextResponse.next();
 
     return repsonse;

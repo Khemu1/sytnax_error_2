@@ -1,4 +1,7 @@
-import { addQuizParticipantService } from "@/frontendServices/quiz";
+import {
+  addQuizParticipantService,
+  getQuizGrade,
+} from "@/frontendServices/quiz";
 import { getSurveyForQuiz } from "@/frontendServices/survey_builder/survey";
 import { CustomError } from "@/middleware/CustomError";
 import { SurveyModel } from "@/types/survey";
@@ -37,6 +40,10 @@ export const useGetSurveyForQuiz = (surveyId: string) => {
         throw error;
       }
     },
+    enabled: !!shouldFetch,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    staleTime: Infinity,
   });
 
   return { survey, isError, isLoading, errorState };
@@ -80,6 +87,53 @@ export const useAddQuizParticipant = () => {
     isError,
     isSuccess,
     isPending,
-    data, 
+    data,
   };
+};
+
+export const useGetGrade = (quizId: string) => {
+  const [errorState, setErrorState] = useState<Record<string, string> | null>(
+    null
+  );
+
+  // Check if workspaceId and surveyId are valid before running the query
+  const shouldFetch = quizId;
+
+  const { data, isError, isLoading,isSuccess } = useQuery<
+    {
+      totalPoints: number | null;
+      givenPoints: number | null;
+      cleanSubmission: boolean | null;
+      gradesVisibility: "hidden" | "visibleAfterSurveyCloses" | "visible";
+      isOpen: boolean;
+      endTime: string | null;
+    },
+    CustomError
+  >({
+    queryKey: shouldFetch ? ["grade", quizId] : [],
+    queryFn: async () => {
+      try {
+        if (!shouldFetch) {
+          throw new Error("Missing workspaceId or surveyId");
+        }
+
+        setErrorState(null);
+        const survey = await getQuizGrade(quizId);
+        return survey;
+      } catch (error) {
+        const message =
+          error instanceof CustomError
+            ? error.errors || { message: error.message }
+            : { message: "Unknown Error" };
+        setErrorState(message);
+        throw error;
+      }
+    },
+    enabled: !!shouldFetch,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    staleTime: Infinity,
+  });
+
+  return { data, isError, isLoading, errorState, isSuccess };
 };

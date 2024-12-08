@@ -129,3 +129,89 @@ export const addQuizParticipant = async (data: QuizParticipantFormProps) => {
 
   return submissionData;
 };
+
+export const getQuizSubmission = async (quizId: string) => {
+  try {
+    const submission = await prisma.surveySubmission.findUnique({
+      where: { id: quizId },
+      select: {
+        totalPoints: true,
+        givenPoints: true,
+        cleanSubmission: true,
+        survey: {
+          select: {
+            name: true,
+            startTime: true,
+            endTime: true,
+            gradesVisibility: true,
+          },
+        },
+      },
+    });
+    console.log("survey", submission?.survey);
+    if (!submission) {
+      throw new CustomError("Quiz not found", 404);
+    }
+
+    const { cleanSubmission, survey, totalPoints, givenPoints } = submission;
+
+    const data: {
+      totalPoints: number | null;
+      givenPoints: number | null;
+      cleanSubmission: boolean | null;
+      gradesVisibility: "hidden" | "visibleAfterSurveyCloses" | "visible";
+      isOpen: boolean;
+      endTime: string | null;
+    } = {
+      totalPoints: null,
+      givenPoints: null,
+      cleanSubmission: submission.cleanSubmission,
+      gradesVisibility: survey.gradesVisibility,
+      isOpen: false,
+      endTime: null,
+    };
+
+    const currentTime = new Date();
+    const surveyEndTime = survey.endTime ? new Date(survey.endTime) : null;
+
+    if (!cleanSubmission) {
+      return data;
+    }
+
+    switch (survey.gradesVisibility) {
+      case "hidden":
+        return data;
+
+      case "visibleAfterSurveyCloses":
+        if (!survey.startTime || !surveyEndTime) {
+          // the survey is cloed , show grades
+          data.isOpen = false;
+          data.totalPoints = totalPoints;
+          data.givenPoints = givenPoints;
+          return data;
+        }
+        data.isOpen = currentTime < surveyEndTime;
+        // closed show grades
+        if (!data.isOpen) {
+          data.isOpen = false;
+          data.totalPoints = totalPoints;
+          data.givenPoints = givenPoints;
+          return data;
+        }
+        data.isOpen = true;
+        data.endTime = surveyEndTime.toUTCString();
+        return data;
+
+      case "visible":
+        data.totalPoints = totalPoints;
+        data.givenPoints = givenPoints;
+        break;
+    }
+
+    data.cleanSubmission = cleanSubmission;
+
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};

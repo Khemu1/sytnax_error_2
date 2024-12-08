@@ -13,19 +13,15 @@ import { notFound, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Submissions from "@/components/survey_builder/build/question/submissions/Submissions";
+import { useParams } from "next/navigation";
 
-interface BuildSurveyProps {
-  params: Promise<{
+const BuildSurvey: React.FC = () => {
+  const dispatch = useDispatch();
+  const { workspaceId, surveyId } = useParams() as {
     workspaceId: string;
     surveyId: string;
-  }>;
-}
+  };
 
-const BuildSurvey: React.FC<BuildSurveyProps> = ({ params }) => {
-  const dispatch = useDispatch();
-
-  const [workspaceId, setWorkspaceId] = useState<string | null>(null);
-  const [surveyId, setSurveyId] = useState<string | null>(null);
   const [isNewQuestionDialogOpen, setIsNewQuestionDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<
     "build" | "submissions" | "preview"
@@ -50,13 +46,6 @@ const BuildSurvey: React.FC<BuildSurveyProps> = ({ params }) => {
     }
   }, [authState.isAuthenticated, dispatch, routeTo]);
 
-  useEffect(() => {
-    params.then(({ workspaceId, surveyId }) => {
-      setWorkspaceId(workspaceId);
-      setSurveyId(surveyId);
-    });
-  }, [params]);
-
   const { survey, isError, isLoading } = useGetSurvey(
     workspaceId || "",
     surveyId || ""
@@ -78,7 +67,7 @@ const BuildSurvey: React.FC<BuildSurveyProps> = ({ params }) => {
     );
   }
 
-  if (isError || !workspaceId || !surveyId || (!isLoading && !survey)) {
+  if (isError || !workspaceId || (!isLoading && !survey)) {
     return notFound();
   }
   return (
@@ -136,7 +125,9 @@ const BuildSurvey: React.FC<BuildSurveyProps> = ({ params }) => {
           </div>
         )}
         {activeTab === "preview" && <PreviewSurvey />}
-        {activeTab === "submissions" && survey?.questionsPerPage && <Submissions />}
+        {activeTab === "submissions" && survey?.questionsPerPage && (
+          <Submissions />
+        )}
 
         {/* New Question Dialog */}
       </div>

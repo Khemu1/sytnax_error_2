@@ -36,7 +36,7 @@ const QuizParticipate: React.FC = () => {
   const [userQuizAnswers, setUserQuizAnswers] = useState<
     Array<{ questionId: string; choosenAnswersIds: string[]; values: string[] }>
   >([]);
-
+  const [duration, setDuration] = useState<number | null>(null);
   const [toast, setToast] = useState<{
     message: string;
     type: "success" | "error";
@@ -45,7 +45,7 @@ const QuizParticipate: React.FC = () => {
   const [startQuiz, setStartQuiz] = useState(false);
   const [validatingQuiz, setValidatingQuiz] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const [isQuizStillOpen, setIsQuizStillOpen] = useState(true);
   const { endTime } = getSurveyStatus(
     survey?.startTime ?? null,
     survey?.endTime ?? null
@@ -59,10 +59,32 @@ const QuizParticipate: React.FC = () => {
         values: [],
       }));
       setUserQuizAnswers(initialAnswers);
+      if (survey.endTime) {
+        const timeLeftInMinutes =
+          (new Date(survey?.endTime).getTime() - Date.now()) / 60000;
+        const totalDur = Math.min(survey?.duration, timeLeftInMinutes);
+        setDuration(totalDur * 60);
+      }
     }
   }, [survey]);
 
-  // Form field change handler
+  // is a fallback incase the quiz get fetched but the user don't enter
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (endTime) {
+        const currentTime = new Date();
+        const endimeTime = new Date(endTime);
+        if (currentTime > endimeTime) {
+          setIsQuizStillOpen(false);
+          setDuration(null);
+          clearInterval(interval); 
+        }
+      }
+    }, 1000); 
+
+    return () => clearInterval(interval); 
+  }, [endTime]);
+
   const handleFormChange = (
     value: string,
     type: "email" | "studentId" | "phoneNumber"
@@ -91,12 +113,15 @@ const QuizParticipate: React.FC = () => {
 
   // Submit quiz data
   const handleQuizSubmit = (clean = true) => {
+    const submissionDate = new Date();
+    submissionDate.setMilliseconds(0);
+    submissionDate.setSeconds(0);
     try {
       const data = newQuizSchema().parse({
         surveyId: params.id,
         questions: survey?.questions,
         userQuizAnswers,
-        submissionDate: new Date(),
+        submissionDate,
       });
 
       const prepData = {
@@ -163,26 +188,38 @@ const QuizParticipate: React.FC = () => {
           quizSuccess ? "items-center justify-center" : ""
         }`}
       >
-        {!startQuiz && survey && !quizSuccess && (
-          <QuizForm
-            studentData={participantData}
-            formErrors={formErrors}
-            handleChange={handleFormChange}
-            handleSubmit={handleQuizStart}
-            isValidating={validatingQuiz}
-          />
+        {isQuizStillOpen && duration !== null ? (
+          <>
+            {!startQuiz && survey && !quizSuccess && (
+              <QuizForm
+                studentData={participantData}
+                formErrors={formErrors}
+                handleChange={handleFormChange}
+                handleSubmit={handleQuizStart}
+                isValidating={validatingQuiz}
+              />
+            )}
+            {startQuiz && survey && !quizSuccess && (
+              <Quiz
+                survey={survey}
+                questions={survey.questions}
+                handleSubmit={handleQuizSubmit}
+                handleAnswerSelection={handleAnswerSelection}
+                isSubmitting={isSubmitting}
+                setIsSubmitting={setIsSubmitting}
+                duration={duration}
+              />
+            )}
+          </>
+        ) : (
+          <div className="flex-1 flex items-center justify-center">
+            <div className="bg-red-700 text-white p-4 rounded-md flex items-center space-x-2">
+              <div className="flex-1">
+                <p className="text-xl font-semibold">The quiz has ended</p>
+              </div>
+            </div>
+          </div>
         )}
-        {startQuiz && survey && !quizSuccess && (
-          <Quiz
-            survey={survey}
-            questions={survey.questions}
-            handleSubmit={handleQuizSubmit}
-            handleAnswerSelection={handleAnswerSelection}
-            isSubmitting={isSubmitting}
-            setIsSubmitting={setIsSubmitting}
-          />
-        )}
-
         {quizSuccess && (
           <div className="flex flex-col bg-base-300 justify-center  p-6 rounded-md min-h-[300px] w-[300px] shadow-lg">
             <Link className="font-semibold mb-5 underline" href={"/"}>

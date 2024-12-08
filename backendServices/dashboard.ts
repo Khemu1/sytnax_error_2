@@ -617,11 +617,8 @@ export const dashboardDeleteAdminsService = async (ids: number[]) => {
       if (!findAdmin) {
         throw new CustomError(`Admin with ID ${id} not found`, 404, "", true);
       }
-      await prisma.user.update({
+      await prisma.user.delete({
         where: { id },
-        data: {
-          deletedAt: new Date(),
-        },
       });
     });
 

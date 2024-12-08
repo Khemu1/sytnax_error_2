@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, UseQueryOptions } from "@tanstack/react-query";
 import {
   createNewSurvey,
   deleteSurveyFromWorkspace,
@@ -339,13 +339,13 @@ export const useGetSurvey = (workspaceId: string, surveyId: string) => {
 
   // Check if workspaceId and surveyId are valid before running the query
   const shouldFetch = workspaceId && surveyId;
-
+  console.log("shouldFetch", shouldFetch);
   const {
     data: survey,
     isError,
     isLoading,
   } = useQuery<SurveyModel, CustomError>({
-    queryKey: shouldFetch ? ["getSurvey", workspaceId, surveyId] : [],
+    queryKey:  ["getSurvey", workspaceId, surveyId] ,
     queryFn: async () => {
       try {
         if (!shouldFetch) {
@@ -364,6 +364,10 @@ export const useGetSurvey = (workspaceId: string, surveyId: string) => {
         throw error;
       }
     },
+    enabled: !!shouldFetch,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchOnMount: "always",
   });
 
   return { survey, isError, isLoading, errorState };
@@ -377,11 +381,10 @@ export const useGetSubmissions = (workspaceId: string, surveyId: string) => {
   // Check if workspaceId and surveyId are valid before running the query
   const shouldFetch = workspaceId && surveyId;
 
-  const {
-    data: submissions,
-    isError,
-    isLoading,
-  } = useQuery<SubmissionModelForBuilder[], CustomError>({
+  const queryOptions: UseQueryOptions<
+    SubmissionModelForBuilder[],
+    CustomError
+  > = {
     queryKey: shouldFetch ? ["getSubmissions", workspaceId, surveyId] : [],
     queryFn: async () => {
       try {
@@ -401,7 +404,13 @@ export const useGetSubmissions = (workspaceId: string, surveyId: string) => {
         throw error;
       }
     },
-  });
+    enabled: !!shouldFetch,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchOnMount: "always",
+  };
+
+  const { data: submissions, isError, isLoading } = useQuery(queryOptions);
 
   return { submissions, isError, isLoading, errorState };
 };

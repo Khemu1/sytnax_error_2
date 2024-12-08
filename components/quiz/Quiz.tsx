@@ -17,6 +17,7 @@ const Quiz: React.FC<{
   ) => void;
   isSubmitting: boolean;
   setIsSubmitting: React.Dispatch<React.SetStateAction<boolean>>;
+  duration: number;
 }> = ({
   survey,
   handleSubmit,
@@ -24,6 +25,7 @@ const Quiz: React.FC<{
   handleAnswerSelection,
   isSubmitting,
   setIsSubmitting,
+  duration,
 }) => {
   const [isWarningDialogOpen, setIsWarningDialogOpen] = useState({
     state: false,
@@ -34,8 +36,8 @@ const Quiz: React.FC<{
     Record<string, string[]>
   >({});
 
+  const [timer, setTimer] = useState(duration);
   const [isMounted, setIsMounted] = useState(false);
-  const [timer, setTimer] = useState(survey.duration * 60);
   const [oneMinuteLeft, setOneMinuteLeft] = useState(false);
 
   const startIndex = (currentPage - 1) * (survey.questionsPerPage || 1);
@@ -168,25 +170,28 @@ const Quiz: React.FC<{
   useEffect(() => {
     const interval = setInterval(() => {
       setTimer((prev) => {
-        if (prev === 0) {
+        if (prev <= 0 && !isSubmitting) {
+          clearInterval(interval);
           return 0;
         }
+
         if (prev <= 60 && !oneMinuteLeft) {
           setOneMinuteLeft(true);
         }
+
         return prev - 1;
       });
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [oneMinuteLeft]);
+  }, [isSubmitting, oneMinuteLeft]);
 
   useEffect(() => {
     if (timer === 0 && !isSubmitting) {
       setIsSubmitting(true);
       handleSubmit(true);
     }
-  }, [timer]);
+  }, [timer, isSubmitting, handleSubmit]);
 
   if (!isMounted) return null;
 
@@ -195,7 +200,7 @@ const Quiz: React.FC<{
       <div className="flex-1 flex flex-col relative overflow-hidden">
         <div className="absolute w-full top-0 flex justify-between items-center p-2 z-10 bg-base-300">
           <div
-            className={`w-max border border-[#42484b] p-2 rounded-md font-semibold ${
+            className={`flex justify-center items-center  border border-[#42484b] p-2 rounded-md font-semibold w-[100px] ${
               oneMinuteLeft ? "text-red-600" : "text-white"
             }`}
           >

@@ -27,13 +27,16 @@ export const calculateExpirationDate = (duration: string): Date => {
 };
 
 export const formatTimeForTimer = (seconds: number) => {
+  if (seconds <= 0) {
+    return "00 : 00 : 00";
+  }
   const hours = Math.floor(seconds / 3600)
     .toString()
     .padStart(2, "0");
   const minutes = Math.floor((seconds % 3600) / 60)
     .toString()
     .padStart(2, "0");
-  const secs = (seconds % 60).toString().padStart(2, "0");
+  const secs = (seconds % 60).toFixed(0).toString().padStart(2, "0");
   return `${hours} : ${minutes} : ${secs}`;
 };
 
