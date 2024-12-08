@@ -4,6 +4,7 @@ import { SurveyModel } from "@/types/survey";
 import { QuestionModel } from "@/types/buildSurvey";
 import { formatTimeForTimer } from "@/utils";
 import WarningDialog from "./WarningDialog";
+import "@/styles/quiz.css";
 
 const Quiz: React.FC<{
   survey: Omit<SurveyModel, "questions">;
@@ -217,7 +218,7 @@ const Quiz: React.FC<{
           </button>
         </div>
 
-        <div className="flex flex-col gap-6 items-center  h-[74dvh] sm:h-[89dvh] overflow-y-scroll p-4 mt-8">
+        <div className="quiz-question-container">
           {currentQuestions.map((question, index) => (
             <div
               key={question.id}

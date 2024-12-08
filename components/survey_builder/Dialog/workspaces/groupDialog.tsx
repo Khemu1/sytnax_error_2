@@ -15,6 +15,9 @@ interface GroupDialogProps {
 
 const GroupDialog: React.FC<GroupDialogProps> = ({ isOpen, onClose }) => {
   const groupState = useSelector((state: RootState) => state.userGroup);
+  const [currentlyDeleting, setCurrentlyDeleting] = useState<number | null>(
+    null
+  );
   const {
     handleRemoveMember,
     errorState: removeErrorState,
@@ -53,6 +56,7 @@ const GroupDialog: React.FC<GroupDialogProps> = ({ isOpen, onClose }) => {
     if (isSuccess) {
       setText("");
     }
+    setCurrentlyDeleting(null);
   }, [isSuccess]);
 
   const handleClose = useCallback(() => {
@@ -150,10 +154,14 @@ const GroupDialog: React.FC<GroupDialogProps> = ({ isOpen, onClose }) => {
                       <button
                         type="button"
                         disabled={deletePending}
-                        onClick={() => removeMember(member.userId)}
+                        onClick={() => {
+                          removeMember(member.userId)
+                          setCurrentlyDeleting(member.userId);
+                        }}
                         className="text-red-400 hover:text-red-500 transition-all font-semibold"
                       >
-                        {deletePending ? (
+                        {deletePending &&
+                        currentlyDeleting === member.userId ? (
                           <span className="loading loading-spinner loading-sm"></span>
                         ) : (
                           "Remove"

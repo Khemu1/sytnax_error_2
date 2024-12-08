@@ -42,7 +42,7 @@ const ReviewQuiz: React.FC<{
   return (
     <>
       <div className="flex-1 flex flex-col relative ">
-        <div className="flex flex-col gap-6 items-center h-[70dvh] sm:h-[85dvh] overflow-y-scroll p-4 mt-8">
+        <div className="quiz-question-container">
           {currentQuestions.map((answer, index) => {
             const { question, givenPoints, selectedAnswers } = answer;
             const modifiedSelectedAnswers = selectedAnswers;

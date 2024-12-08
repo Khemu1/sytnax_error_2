@@ -220,21 +220,18 @@ const QuizParticipate: React.FC = () => {
                     </div>
                   </>
                 )}
-              {survey?.gradesVisibility === "visible" &&
-                data?.totalUserScore &&
-                data?.QuizTotalScore &&
-                data?.clean && (
-                  <>
-                    <div className="text-xl font-semibold text-white">
-                      You scored {data.totalUserScore} out of{" "}
-                      {data?.QuizTotalScore}.
-                    </div>
-                    <div className="text-sm text-gray-600 mt-2">
-                      If you wish to view your grades later, save the following
-                      link:
-                    </div>
-                  </>
-                )}
+              {survey?.gradesVisibility === "visible" && data?.clean && (
+                <>
+                  <div className="text-xl font-semibold text-white">
+                    You scored {data.totalUserScore} out of{" "}
+                    {data?.QuizTotalScore}.
+                  </div>
+                  <div className="text-sm text-gray-600 mt-2">
+                    If you wish to view your grades later, save the following
+                    link:
+                  </div>
+                </>
+              )}
               {!data?.clean && (
                 <>
                   <div className="bg-red-700 text-white p-4 rounded-md flex items-center space-x-2">

@@ -65,7 +65,8 @@ export const validateQuizParticipant = async (
 ) => {
   try {
     quizUserFormschema().parse(data.userInfo);
-    newQuizSchema().parse({ ...data.userQuizAnswers, ...data.questions });
+    console.log("validating quiz data");
+    newQuizSchema().parse(data);
     return NextResponse.next();
   } catch (error) {
     throw new CustomError(

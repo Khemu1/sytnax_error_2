@@ -2,6 +2,7 @@
 import { RootState } from "@/store/store";
 import React, { useState, useMemo } from "react";
 import { useSelector } from "react-redux";
+import "@/styles/quiz.css";
 
 const PreviewSurvey = () => {
   const { questions, currentSurvey } = useSelector((state: RootState) => ({
@@ -64,7 +65,7 @@ const PreviewSurvey = () => {
         </button>
       </div>
 
-      <div className="flex flex-col gap-6 items-center h-[65dvh] sm:h-[81dvh] overflow-y-scroll p-4 mt-8">
+      <div className="quiz-question-container">
         {currentQuestions.map((question, index) => (
           <div
             key={question.id}

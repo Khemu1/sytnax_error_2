@@ -2,22 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { checkSurveyExistsForQuiz, validateQuizParticipant } from "./index";
 import { parseAndValidateQuizParticipantFormData } from "@/utils/quiz";
 
-
 const handleGetSurveyForQuiz = async (req: NextRequest, surveyId: string) => {
-  return checkSurveyExistsForQuiz(req,surveyId);
+  return checkSurveyExistsForQuiz(req, surveyId);
 };
 const handleAddQuizParticipant = async (req: NextRequest) => {
   const rawFormData = await req.formData();
-  const { surveyId, questions, userQuizAnswers, userInfo, clean } =
-    parseAndValidateQuizParticipantFormData(rawFormData);
-  await checkSurveyExistsForQuiz(req,surveyId);
-  return validateQuizParticipant(req, {
-    questions,
-    userQuizAnswers,
-    userInfo,
-    surveyId,
-    clean,
-  });
+  const data = parseAndValidateQuizParticipantFormData(rawFormData);
+  await checkSurveyExistsForQuiz(req, data.surveyId);
+  console.log("know validing for new quiz participant");
+  return validateQuizParticipant(req, data);
 };
 
 export const quizRoutes = (req: NextRequest) => {

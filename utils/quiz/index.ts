@@ -8,12 +8,17 @@ export function parseAndValidateQuizParticipantFormData(rawFormData: FormData) {
   const questionsRaw = rawFormData.get("questions");
   const rawSurveyId = rawFormData.get("surveyId");
   const cleanRaw = rawFormData.get("clean");
+  const rawSubmissionDate = rawFormData.get("submissionDate");
 
   if (!userInfoRaw) {
     throw new CustomError("Missing 'userInfo' field", 400, "new question");
   }
   if (!userQuizAnswersRaw) {
-    throw new CustomError("Missing 'userQuizAnswers' field", 400, "new question");
+    throw new CustomError(
+      "Missing 'userQuizAnswers' field",
+      400,
+      "new question"
+    );
   }
   if (!questionsRaw) {
     throw new CustomError("Missing 'questions' field", 400, "new question");
@@ -23,6 +28,13 @@ export function parseAndValidateQuizParticipantFormData(rawFormData: FormData) {
   }
   if (!cleanRaw) {
     throw new CustomError("Missing 'clean' field", 400, "new question");
+  }
+  if (!rawSubmissionDate) {
+    throw new CustomError(
+      "Missing 'submissionDate' field",
+      400,
+      "new question"
+    );
   }
 
   try {
@@ -36,6 +48,7 @@ export function parseAndValidateQuizParticipantFormData(rawFormData: FormData) {
     >[];
     const surveyId = JSON.parse(String(rawSurveyId)) as string;
     const clean = JSON.parse(String(cleanRaw)) as boolean;
+    const submissionDate = new Date(JSON.parse(String(rawSubmissionDate)));
 
     return {
       userInfo,
@@ -43,6 +56,7 @@ export function parseAndValidateQuizParticipantFormData(rawFormData: FormData) {
       questions,
       surveyId,
       clean,
+      submissionDate,
     };
   } catch (error) {
     throw error;
