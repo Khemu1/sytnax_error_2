@@ -189,3 +189,7 @@ input:not([type="radio"]):focus {
   @apply w-full text-ellipsis overflow-hidden;
   white-space: nowrap;
 }
+
+.table_size {
+  height: calc(100dvh - 65px);
+}

@@ -3,7 +3,7 @@ import { useGetSubmissions } from "@/hooks/survey_builder/survey";
 import { SubmissionModelForBuilder } from "@/types/buildSurvey";
 import { convertToEgyptTime } from "@/utils";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import SubmissionDialog from "../dialogs/SubmissionDialog";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
@@ -20,12 +20,6 @@ const Submissions: React.FC = () => {
     workspaceId as string,
     surveyId as string
   );
-
-  useEffect(() => {
-    console.log("Is submissions an array?", Array.isArray(submissions));
-    console.log("Type of submissions:", typeof submissions);
-    console.log("Actual submissions:", submissions);
-  }, [submissions]);
 
   if (isLoading && !submissions) {
     return (
@@ -47,9 +41,8 @@ const Submissions: React.FC = () => {
     <>
       <div className="flex flex-col gap-4 px-4 overflow-hidden h-[85dvh]">
         <div className="relative overflow-x-auto shadow-md sm:rounded-lg overflow-y-hidden">
-          <div className="max-h-[100dvh] py-2 overflow-y-auto">
+          <div className="table_size py-2 overflow-y-auto">
             {" "}
-            {/* Added container for scroll */}
             <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
               <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
