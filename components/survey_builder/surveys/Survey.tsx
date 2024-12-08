@@ -54,7 +54,7 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
         setMoveDialogOpen(true);
         break;
       case "duplicate":
-        setDuplicateDialogOpen(false);
+        setDuplicateDialogOpen(true);
         break;
       case "settings":
         dispatch(setCurrentSurvey(survey));

@@ -67,21 +67,6 @@ export const getSurveyStatus = (
   const startTime = new Date(_startTime);
   const endTime = new Date(_endTime);
 
-  const convertToEgyptTime = (date: Date): string => {
-    // Convert the provided date to Africa/Cairo timezone and format it
-    const formatter = new Intl.DateTimeFormat("en-US", {
-      timeZone: "Africa/Cairo",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    });
-
-    return formatter.format(date);
-  };
-
   const egyptStartTime = convertToEgyptTime(startTime);
   const egyptEndTime = convertToEgyptTime(endTime);
 
@@ -93,6 +78,21 @@ export const getSurveyStatus = (
     endTime: egyptEndTime,
     isActive,
   };
+};
+
+export const convertToEgyptTime = (date: Date): string => {
+  // Convert the provided date to Africa/Cairo timezone and format it
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Africa/Cairo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
+
+  return formatter.format(date);
 };
 
 export const filterBy = (data: PublicCardCourseProps[], by: string) => {

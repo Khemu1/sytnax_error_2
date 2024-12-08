@@ -31,10 +31,7 @@ export const useGetWorkspaces = () => {
     CustomError
   >({
     queryKey: ["getWorkspaces"],
-    enabled: true,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-    staleTime: Infinity,
+
     queryFn: async () => {
       try {
         setErrorState(null);

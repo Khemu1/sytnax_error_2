@@ -107,7 +107,8 @@ const QuizParticipate: React.FC = () => {
       };
       const formData = new FormData();
       transformDataIntoFormData(prepData, formData);
-
+      console.log(survey?.questions);
+      console.log(userQuizAnswers);
       handleAddQuizParticipant({ quizData: formData });
 
       setToast({ message: "Submitting", type: "success" });
@@ -188,7 +189,7 @@ const QuizParticipate: React.FC = () => {
               Go Home
             </Link>
             <div className="text-center space-y-4">
-              {survey?.gradesVisibility === "hidden" && (
+              {survey?.gradesVisibility === "hidden" && data?.clean && (
                 <>
                   <div className="text-xl font-semibold text-white">
                     The instructor has set the grades to be hidden. Please
@@ -203,50 +204,68 @@ const QuizParticipate: React.FC = () => {
                   </div>
                 </>
               )}
-              {survey?.gradesVisibility === "visibleAfterSurveyCloses" && (
+              {survey?.gradesVisibility === "visibleAfterSurveyCloses" &&
+                data?.clean && (
+                  <>
+                    <div className="text-xl font-semibold  text-white">
+                      The grades will be visible after the survey closes. Please
+                      check again after {endTime}.
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      For more details about your grades, please contact{" "}
+                      <strong>+20 1080636980</strong>.
+                    </div>
+                    <div className="mt-4 text-sm text-gray-500">
+                      Please save the following link to view your grades later:
+                    </div>
+                  </>
+                )}
+              {survey?.gradesVisibility === "visible" &&
+                data?.totalUserScore &&
+                data?.QuizTotalScore &&
+                data?.clean && (
+                  <>
+                    <div className="text-xl font-semibold text-white">
+                      You scored {data.totalUserScore} out of{" "}
+                      {data?.QuizTotalScore}.
+                    </div>
+                    <div className="text-sm text-gray-600 mt-2">
+                      If you wish to view your grades later, save the following
+                      link:
+                    </div>
+                  </>
+                )}
+              {!data?.clean && (
                 <>
-                  <div className="text-xl font-semibold  text-white">
-                    The grades will be visible after the survey closes. Please
-                    check again after {endTime}.
-                  </div>
-                  <div className="text-sm text-gray-600">
-                    For more details about your grades, please contact{" "}
-                    <strong>+20 1080636980</strong>.
-                  </div>
-                  <div className="mt-4 text-sm text-gray-500">
-                    Please save the following link to view your grades later:
+                  <div className="bg-red-700 text-white p-4 rounded-md flex items-center space-x-2">
+                    <div className="flex-1">
+                      <p className="text-xl font-semibold">
+                        Your quiz has been submitted early due to inactivity
+                        (e.g., tapping out or unfocusing the window). Your data
+                        has already been submitted.
+                      </p>
+                    </div>
                   </div>
                 </>
               )}
-              {survey?.gradesVisibility === "visible" && (
-                <>
-                  <div className="text-xl font-semibold text-white">
-                    You scored {data?.totalUserScore} out of{" "}
-                    {data?.QuizTotalScore}.
-                  </div>
-                  <div className="text-sm text-gray-600 mt-2">
-                    If you wish to view your grades later, save the following
-                    link:
-                  </div>
-                </>
+              {data?.clean && (
+                <div className="flex justify-center mt-5">
+                  <button
+                    className="py-2 px-4 w-[200px] bg-blue-600 text-white rounded-md shadow-md hover:bg-blue-700 transition duration-300"
+                    onClick={() => {
+                      window.navigator.clipboard.writeText(
+                        `${process.env.NEXT_PUBLIC_BASE_URL}/quiz/check-grade/${data?.id}`
+                      );
+                      setToast({
+                        message: "Link copied to clipboard",
+                        type: "success",
+                      });
+                    }}
+                  >
+                    Copy Link
+                  </button>
+                </div>
               )}
-
-              <div className="flex justify-center mt-5">
-                <button
-                  className="py-2 px-4 w-[200px] bg-blue-600 text-white rounded-md shadow-md hover:bg-blue-700 transition duration-300"
-                  onClick={() => {
-                    window.navigator.clipboard.writeText(
-                      `${process.env.NEXT_PUBLIC_BASE_URL}/quiz/check-grade/${data?.id}`
-                    );
-                    setToast({
-                      message: "Link copied to clipboard",
-                      type: "success",
-                    });
-                  }}
-                >
-                  Copy Link
-                </button>
-              </div>
             </div>
           </div>
         )}

@@ -3,6 +3,7 @@ import {
   createNewSurvey,
   deleteSurveyFromWorkspace,
   duplicateSurvey,
+  getSubmissions,
   getSurvey,
   moveSurveyToWorkspace,
   updateSurveySettings,
@@ -21,8 +22,10 @@ import {
   deleteSurveyF,
   moveSurveyF,
   updateSurveyF,
+  duplicateSurveyF,
 } from "@/utils/survey_builder/survey";
 import { useDispatch } from "react-redux";
+import { SubmissionModelForBuilder } from "@/types/buildSurvey";
 
 export const useUpdateSurvey = () => {
   const dispatch = useDispatch();
@@ -54,7 +57,7 @@ export const useUpdateSurvey = () => {
       console.error("Error updating survey title:", err);
     },
     onSuccess: async (survey) => {
-      await updateSurveyF(survey, dispatch);
+      updateSurveyF(survey, dispatch);
     },
   });
 
@@ -75,6 +78,7 @@ export const useUpdateSurvey = () => {
 };
 
 export const useDuplicateSurvey = () => {
+  const dispatch = useDispatch();
   const [errorState, setErrorState] = useState<Record<string, string> | null>(
     null
   );
@@ -83,17 +87,17 @@ export const useDuplicateSurvey = () => {
     SurveyModel,
     unknown,
     {
-      title: string;
+      name: string;
       workspaceId: string;
       surveyId: string;
-      targetWorkspaceId: number;
+      targetWorkspaceId: string;
     }
   >({
-    mutationFn: async ({ title, workspaceId, surveyId, targetWorkspaceId }) => {
+    mutationFn: async ({ name, workspaceId, surveyId, targetWorkspaceId }) => {
       setErrorState(null);
 
       const response = await duplicateSurvey(
-        title,
+        name,
         workspaceId,
         surveyId,
         targetWorkspaceId
@@ -109,6 +113,9 @@ export const useDuplicateSurvey = () => {
 
       setErrorState(message);
       console.error("Error duplicating survey:", err);
+    },
+    onSuccess: (data) => {
+      duplicateSurveyF(data, dispatch);
     },
   });
 
@@ -153,12 +160,7 @@ export const useMoveSurvey = () => {
       );
     },
     onSuccess: async ({ targetWorkspaceId, surveyId, soruceWorkspaceId }) => {
-      await moveSurveyF(
-        surveyId,
-        soruceWorkspaceId,
-        targetWorkspaceId,
-        dispatch
-      );
+      moveSurveyF(surveyId, soruceWorkspaceId, targetWorkspaceId, dispatch);
     },
 
     onError: (err: CustomError | unknown) => {
@@ -207,7 +209,7 @@ export const useChangeSurveyStatus = () => {
       return await updateSurveyStatus(workspaceId, surveyId);
     },
     onSuccess: async (survey) => {
-      await updateSurveyF(survey, dispatch);
+      updateSurveyF(survey, dispatch);
       setErrorState(null);
     },
     onError: (err: CustomError | unknown) => {
@@ -253,7 +255,7 @@ export const useDeleteSurvey = () => {
       return await deleteSurveyFromWorkspace(workspaceId, surveyId);
     },
     onSuccess: async ({ surveyId, workspaceId }) => {
-      await deleteSurveyF(surveyId, workspaceId, dispatch);
+      deleteSurveyF(surveyId, workspaceId, dispatch);
     },
     onError: (err: CustomError | unknown) => {
       const message =
@@ -365,6 +367,43 @@ export const useGetSurvey = (workspaceId: string, surveyId: string) => {
   });
 
   return { survey, isError, isLoading, errorState };
+};
+
+export const useGetSubmissions = (workspaceId: string, surveyId: string) => {
+  const [errorState, setErrorState] = useState<Record<string, string> | null>(
+    null
+  );
+
+  // Check if workspaceId and surveyId are valid before running the query
+  const shouldFetch = workspaceId && surveyId;
+
+  const {
+    data: submissions,
+    isError,
+    isLoading,
+  } = useQuery<SubmissionModelForBuilder[], CustomError>({
+    queryKey: shouldFetch ? ["getSubmissions", workspaceId, surveyId] : [],
+    queryFn: async () => {
+      try {
+        if (!shouldFetch) {
+          throw new Error("Missing workspaceId or surveyId");
+        }
+
+        setErrorState(null);
+        const submissions = await getSubmissions(workspaceId, surveyId);
+        return submissions;
+      } catch (error) {
+        const message =
+          error instanceof CustomError
+            ? error.errors || { message: error.message }
+            : { message: "Unknown Error" };
+        setErrorState(message);
+        throw error;
+      }
+    },
+  });
+
+  return { submissions, isError, isLoading, errorState };
 };
 
 export const useUpdateSurveySettings = () => {

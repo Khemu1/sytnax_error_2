@@ -7,7 +7,6 @@ import {
   validateNewSurvey,
   checkSurveyForDuplicatingOrMoving,
   validateSurveySettings,
-  checkSurveyExistsForQuiz,
 } from "./index";
 import {
   authenticateUser,
@@ -34,8 +33,7 @@ const performCommonSurveyChecks = async (
     settings: SurveySettings;
   };
   body.surveyId = body.surveyId ?? surveyId;
-  console.log(body);
-  // Perform checks for workspace existence and membership
+
   const workspaceExists = await checkWorkspaceExistsForSurvey(
     req,
     authUser,
@@ -59,7 +57,6 @@ const handleAddSurvey = async (req: NextRequest, authUser: NextResponse) => {
     req,
     authUser
   );
-  console.log("in handle add survey");
   return await validateNewSurvey(req, checkMemberShip, body.name);
 };
 
@@ -70,20 +67,7 @@ const handleGetSurvey = async (req: NextRequest, authUser: NextResponse) => {
     authUser,
     surveyId
   );
-  return surveyExists
-    ? surveyExists
-    : NextResponse.json({ message: "Survey not found" }, { status: 404 });
-};
-
-const handleGetSurveyForQuiz = async (req: NextRequest) => {
-  const body = (await req.json()) as {
-    name: string;
-    workspaceId: string;
-    surveyId: string;
-    targetWorkspaceId: string;
-    settings: SurveySettings;
-  };
-  return checkSurveyExistsForQuiz(req, body.surveyId);
+  return surveyExists;
 };
 
 const handleDeleteSurvey = async (req: NextRequest, authUser: NextResponse) => {
@@ -119,12 +103,25 @@ const handleUpdateSurveySettings = async (
   return await validateSurveySettings(req, checkMemberShip, body.settings);
 };
 
-const handleDuplicateOrMoveSurvey = async (
+const handleMoveSurveySurvey = async (
   req: NextRequest,
   authUser: NextResponse
 ) => {
   const { surveyExists, body } = await performCommonSurveyChecks(req, authUser);
-  console.log("common check done");
+  return checkSurveyForDuplicatingOrMoving(
+    req,
+    surveyExists!,
+    body.targetWorkspaceId
+  );
+};
+
+const handleDuplicateSurvey = async (
+  req: NextRequest,
+  authUser: NextResponse
+) => {
+  const { surveyExists, body, workspaceExists } =
+    await performCommonSurveyChecks(req, authUser);
+  await checkSurveyTitle(req, workspaceExists, body.name);
   return checkSurveyForDuplicatingOrMoving(
     req,
     surveyExists!,
@@ -145,32 +142,31 @@ export const surveyBuilderRoutes = async (req: NextRequest) => {
 
     // Handle survey routes
     if (pathName.startsWith("/api/survey_builder/survey")) {
+      console.log("pathName", pathName);
       switch (method) {
-        case "GET":
-          if (pathName === "/api/survey_builder/survey/quiz") {
-            return handleGetSurveyForQuiz(req);
-          }
-          break;
         case "POST":
           if (pathName === "/api/survey_builder/survey/add-survey") {
-            return await handleAddSurvey(req, authUser);
+            return handleAddSurvey(req, authUser);
           }
 
           if (pathName === "/api/survey_builder/survey/builder") {
-            return await handleGetSurvey(req, authUser);
+            return handleGetSurvey(req, authUser);
+          }
+          if (pathName === "/api/survey_builder/survey/submissions") {
+            return handleGetSurvey(req, authUser);
           }
           break;
         case "DELETE":
           if (pathName === `/api/survey_builder/survey/delete`) {
-            return await handleDeleteSurvey(req, authUser);
+            return handleDeleteSurvey(req, authUser);
           }
           break;
         case "PATCH":
           if (pathName === `/api/survey_builder/survey/update-name`) {
-            return await handleUpdateSurvey(req, authUser);
+            return handleUpdateSurvey(req, authUser);
           }
           if (pathName === `/api/survey_builder/survey/update-settings`) {
-            return await handleUpdateSurveySettings(req, authUser);
+            return handleUpdateSurveySettings(req, authUser);
           }
           if (pathName === `/api/survey_builder/survey/update-status`) {
             const { checkMemberShip } = await performCommonSurveyChecks(
@@ -192,7 +188,9 @@ export const surveyBuilderRoutes = async (req: NextRequest) => {
     if (moveOrDuplicateSurveyRegexPath.test(pathName)) {
       switch (method) {
         case "PATCH":
-          return await handleDuplicateOrMoveSurvey(req, authUser);
+          return handleMoveSurveySurvey(req, authUser);
+        case "POST":
+          return handleDuplicateSurvey(req, authUser);
         default:
           return NextResponse.json(
             { message: "Method not allowed" },

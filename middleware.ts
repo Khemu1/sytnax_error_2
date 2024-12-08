@@ -102,17 +102,17 @@ export async function middleware(req: CustomNextRequest) {
   try {
     // await checkRateLimit(req); // Check general rate limits
     const { pathname } = req.nextUrl;
-
+    console.log("pathname", pathname);
     if (pathname.startsWith("/api/courses")) {
-      return handleCoursesRoute(req);
+      return await handleCoursesRoute(req);
     } else if (pathname.startsWith("/api/auth")) {
-      return handleAuthRoutes(req);
+      return await handleAuthRoutes(req);
     } else if (pathname.startsWith("/api/dashboard")) {
-      return handleDashboardRoutes(req);
+      return await handleDashboardRoutes(req);
     } else if (pathname.startsWith("/api/survey_builder")) {
-      return handleSurveyBuilderRoutes(req);
-    } else if (pathname.startsWith("/api/survey/quiz")) {
-      return quizRoutes(req);
+      return await handleSurveyBuilderRoutes(req);
+    } else if (pathname.startsWith("/api/quiz")) {
+      return await quizRoutes(req);
     }
 
     return NextResponse.next();
@@ -127,6 +127,6 @@ export const config = {
     "/api/auth/:path*",
     "/api/dashboard/:path*",
     "/api/survey_builder/:path*",
-    "/api/survey/quiz/:path*",
+    "/api/quiz/:path*",
   ],
 };

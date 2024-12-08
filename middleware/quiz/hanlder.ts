@@ -2,14 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { checkSurveyExistsForQuiz, validateQuizParticipant } from "./index";
 import { parseAndValidateQuizParticipantFormData } from "@/utils/quiz";
 
+
 const handleGetSurveyForQuiz = async (req: NextRequest, surveyId: string) => {
-  return checkSurveyExistsForQuiz(req, surveyId);
+  return checkSurveyExistsForQuiz(req,surveyId);
 };
 const handleAddQuizParticipant = async (req: NextRequest) => {
   const rawFormData = await req.formData();
   const { surveyId, questions, userQuizAnswers, userInfo, clean } =
     parseAndValidateQuizParticipantFormData(rawFormData);
-  await checkSurveyExistsForQuiz(req, surveyId);
+  await checkSurveyExistsForQuiz(req,surveyId);
   return validateQuizParticipant(req, {
     questions,
     userQuizAnswers,
@@ -19,14 +20,12 @@ const handleAddQuizParticipant = async (req: NextRequest) => {
   });
 };
 
-export const quizRoutes = async (req: NextRequest) => {
+export const quizRoutes = (req: NextRequest) => {
   try {
-    const surveyIdFromParams = req.nextUrl.pathname.split("/")[4];
+    const surveyIdFromParams = req.nextUrl.pathname.split("/")[3];
     console.log("surveyIdFromParams", surveyIdFromParams);
     const method = req.method;
     const pathName = req.nextUrl.pathname;
-    console.log("pathName", pathName);
-    console.log(`/api/quiz/${surveyIdFromParams}`);
     // Handle survey routes
     if (pathName.startsWith("/api/quiz")) {
       switch (method) {
@@ -50,7 +49,7 @@ export const quizRoutes = async (req: NextRequest) => {
 
     // Handle move/duplicate survey routes
     return NextResponse.json(
-      { message: "Survey Method Not found" },
+      { message: "Quiz Method Not found" },
       { status: 404 }
     );
   } catch (error) {

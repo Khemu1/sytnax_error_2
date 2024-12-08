@@ -54,7 +54,7 @@ const PreviewSurvey = () => {
 
   return (
     <div className="flex-1 flex flex-col relative overflow-hidden">
-      <div className="absolute w-full top-0 flex justify-between items-center p-2 z-10">
+      <div className="absolute w-full top-0 flex justify-between items-center p-2 z-10 bg-base-300">
         <div className="w-max border border-[#42484b] p-2 rounded-md text-white font-semibold">
           00 : 00 : 00
         </div>
@@ -64,7 +64,7 @@ const PreviewSurvey = () => {
         </button>
       </div>
 
-      <div className="flex flex-col gap-6 items-center h-[90dvh] overflow-y-scroll p-4 mt-8">
+      <div className="flex flex-col gap-6 items-center h-[65dvh] sm:h-[81dvh] overflow-y-scroll p-4 mt-8">
         {currentQuestions.map((question, index) => (
           <div
             key={question.id}

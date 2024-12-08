@@ -39,6 +39,33 @@ export interface QuestionModel {
   allowMultipleAnswers: boolean;
 }
 
+export interface SubmissionModelForBuilder {
+  id: string;
+  surveyId: string;
+  email: string;
+  phoneNumber: string;
+  studentId: string;
+  createdAt: Date;
+  updatedAt: Date;
+  totalPoints: number;
+  givenPoints: number;
+  submittedAt: Date;
+  cleanSubmission: boolean;
+  answers: AnsweredQuestion[];
+}
+
+export interface AnsweredQuestion {
+  id: string;
+  selectedAnswers: string[];
+  questionId: string;
+  submissionId: string;
+  QuestionPoints: number;
+  givenPoints: number;
+  createdAt: Date;
+  updatedAt: Date;
+  question: QuestionModel;
+}
+
 export interface editedQuestionModel {
   id: string;
   surveyId: string;
@@ -162,22 +189,6 @@ export interface AnswersModel {
   answer: string;
   createdAt?: string;
   updatedAt?: string;
-}
-
-export interface SubmissionModel {
-  id: string;
-  surveyId: string;
-  name: string;
-  phoneNumber: string;
-  answers: SubmittedAnswerModel[];
-  totalPoints: number;
-  submittedAt: Date;
-}
-
-interface SubmittedAnswerModel {
-  questionId: string;
-  selectedAnswer: string;
-  points: number;
 }
 
 export interface InputSwitchFieldProps {

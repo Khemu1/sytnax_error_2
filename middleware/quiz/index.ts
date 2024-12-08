@@ -29,29 +29,25 @@ export const checkSurveyExistsForQuiz = async (
       console.error("Survey not found for ID:", surveyId);
       throw new CustomError("Survey not found", 404, "survey check", true);
     }
+    console.log("found survey for quiz");
 
     if (!survey.startTime || !survey.endTime) {
       throw new CustomError(
-        "Survey is closed",
-        404,
-        "getSurveyError",
-        true,
-        "Survey not found",
-        {}
+        "Survey has no intervals",
+        403,
+        "noIntervals",
+        true
       );
     }
+    console.log("survey has intervals");
     const currrentDate = new Date();
     const startTime = new Date(survey.startTime);
     const endTime = new Date(survey.endTime);
+    if (!startTime || !endTime) {
+      throw new CustomError("Survey is closed", 403, "surveyIntervals", true);
+    }
     if (currrentDate < startTime || currrentDate > endTime) {
-      throw new CustomError(
-        "Survey is not open",
-        400,
-        "getSurveyError",
-        true,
-        "Survey is not open",
-        {}
-      );
+      throw new CustomError("Survey is not open", 403, "getSurveyError", true);
     }
 
     console.log("survey existense check done for quiz");

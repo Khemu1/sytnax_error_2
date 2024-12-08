@@ -248,7 +248,7 @@ const NewQuestion: React.FC<NewQuestionDialogProps> = ({ isOpen, onClose }) => {
                     }
                     label={label ? label : ""}
                     description={isDescriptionEnabled ? description : undefined}
-                    index={questions.length + 1}
+                    index={questions?.length + 1 || 1}
                     answers={answers}
                   />
                 </div>
@@ -397,7 +397,7 @@ const NewQuestion: React.FC<NewQuestionDialogProps> = ({ isOpen, onClose }) => {
                   }
                   label={label ? label : ""}
                   description={isDescriptionEnabled ? description : undefined}
-                  index={questions.length + 1}
+                  index={questions?.length + 1 || 1}
                   answers={answers}
                 />
               </div>

@@ -2,7 +2,7 @@ import { SurveySettings } from "@/types/survey";
 import { filterObject } from "@/utils";
 import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
-import { deleteImgur } from "../imgurServices";
+import { deleteImgur, uploadQuestionToImgur } from "../imgurServices";
 import { CustomError } from "@/middleware/CustomError";
 
 const prisma = new PrismaClient().$extends(withAccelerate());
@@ -202,5 +202,169 @@ export const returnSurveyQuizService = async (surveyId: string) => {
     return survey;
   } catch (error) {
     throw error;
+  }
+};
+
+export const returnSurveySubmissionsService = async (surveyId: string) => {
+  try {
+    const survey = await prisma.survey.findUnique({
+      where: { id: surveyId },
+      include: {
+        submissions: {
+          include: {
+            answers: {
+              include: {
+                question: {
+                  include: {
+                    questionAnswers: true,
+                    correctAnswers: true,
+                    questionImage: true,
+                  },
+                },
+              },
+            },
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+        },
+      },
+    });
+
+    if (!survey) {
+      throw new Error("Survey not found.");
+    }
+
+    return survey.submissions;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to fetch survey submissions.");
+  }
+};
+
+export const duplicateSurveyService = async (
+  surveyId: string,
+  targetWorkspaceId: string,
+  name: string
+) => {
+  try {
+    const survey = await prisma.survey.findUnique({
+      where: { id: surveyId },
+      include: {
+        questions: {
+          include: {
+            questionAnswers: true,
+            correctAnswers: true,
+            questionImage: true,
+          },
+          orderBy: {
+            createdAt: "asc",
+          },
+        },
+      },
+    });
+
+    if (!survey) {
+      throw new CustomError("Survey does not exist", 404, "survey");
+    }
+
+    const newSurvey = await prisma.survey.create({
+      data: {
+        name: name,
+        workspaceId: targetWorkspaceId,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    });
+
+    await Promise.all(
+      survey.questions.map(async (question) => {
+        const newQuestion = await prisma.question.create({
+          data: {
+            label: question.label,
+            description: question.description,
+            allowMultipleAnswers: question.allowMultipleAnswers,
+            points: question.points,
+            surveyId: newSurvey.id,
+          },
+        });
+
+        const createdAnswers = await Promise.all(
+          question.questionAnswers.map((answer) =>
+            prisma.questionAnswer.create({
+              data: {
+                questionId: newQuestion.id,
+                answer: answer.answer,
+              },
+            })
+          )
+        );
+
+        const correctAnswers = await Promise.all(
+          question.correctAnswers.map((correctValue) => {
+            const matchedAnswer = createdAnswers.find(
+              (a) => a.answer === correctValue.value
+            );
+
+            if (!matchedAnswer) {
+              throw new CustomError(
+                `Correct answer "${correctValue.value}" does not match any provided answers.`,
+                400,
+                "duplicating question"
+              );
+            }
+
+            return prisma.correctAnswer.create({
+              data: {
+                questionId: newQuestion.id,
+                answerId: matchedAnswer.id,
+                value: correctValue.value,
+              },
+            });
+          })
+        );
+
+        let questionImage;
+        if (question.questionImage) {
+          const imageData = await uploadQuestionToImgur(
+            question.questionImage.url,
+            "url"
+          );
+
+          questionImage = await prisma.questionImage.create({
+            data: {
+              questionId: newQuestion.id,
+              imgurId: imageData.data.id,
+              url: imageData.data.link,
+              deleteHash: imageData.data.deletehash,
+            },
+          });
+        }
+
+        return {
+          ...newQuestion,
+          correctAnswers,
+          questionAnswers: createdAnswers,
+          image: questionImage
+            ? {
+                id: questionImage.id,
+                url: questionImage.url,
+                questionId: newQuestion.id,
+              }
+            : null,
+        };
+      })
+    );
+
+    return newSurvey;
+  } catch (error) {
+    console.error("Error in duplicateSurveyService:", error);
+    throw error instanceof CustomError
+      ? error
+      : new CustomError(
+          "Unexpected error occurred.",
+          500,
+          "duplicating survey"
+        );
   }
 };

@@ -256,7 +256,7 @@ export const duplicateQuestionService = async (questionId: string) => {
       let imageData: imageDataResponse | undefined = undefined;
       if (question.questionImage) {
         console.log(
-          "this question has in image , trying to upload",
+          "this question has an image, trying to upload",
           question.questionImage
         );
         imageData = await uploadQuestionToImgur(
@@ -266,57 +266,91 @@ export const duplicateQuestionService = async (questionId: string) => {
         console.log("image uploaded for duplication", imageData);
       }
 
-      // Create a new question with associated data
       const newQuestion = await prisma.question.create({
         data: {
           label: question.label,
           description: question.description,
           allowMultipleAnswers: question.allowMultipleAnswers,
-          createdAt: question.createdAt,
-          updatedAt: question.updatedAt,
           points: question.points,
           surveyId: question.surveyId,
-          questionAnswers: {
-            createMany: {
-              data: question.questionAnswers.map((answer) => ({
-                answer: answer.answer,
-              })),
-            },
-          },
-          correctAnswers: {
-            createMany: {
-              data: question.correctAnswers.map((ca) => ({
-                answerId: ca.answerId,
-                value: ca.value,
-                createdAt: ca.createdAt,
-                updatedAt: ca.updatedAt,
-              })),
-            },
-          },
-          questionImage: imageData
-            ? {
-                create: {
-                  imgurId: imageData.data.id,
-                  url: imageData.data.link,
-                  deleteHash: imageData.data.deletehash,
-                },
-              }
-            : undefined,
-        },
-        include: {
-          questionAnswers: true,
-          correctAnswers: true,
-          questionImage: true,
+          createdAt: question.createdAt,
         },
       });
 
+      const createdAnswers = await Promise.all(
+        question.questionAnswers.map((answer) =>
+          prisma.questionAnswer.create({
+            data: {
+              questionId: newQuestion.id,
+              answer: answer.answer,
+            },
+          })
+        )
+      );
+
+      const correctAnswers = await Promise.all(
+        question.correctAnswers.map((correctValue) => {
+          const matchedAnswer = createdAnswers.find(
+            (a) => a.answer === correctValue.value
+          );
+
+          if (!matchedAnswer) {
+            throw new CustomError(
+              `Correct answer "${correctValue.value}" does not match any provided answers.`,
+              400,
+              "duplicating question"
+            );
+          }
+
+          return prisma.correctAnswer.create({
+            data: {
+              questionId: newQuestion.id,
+              answerId: matchedAnswer.id,
+              value: correctValue.value,
+            },
+          });
+        })
+      );
+
+      let questionImage;
+      if (question.questionImage && imageData) {
+        console.log(
+          "this question has an image, and it was uploaded",
+          imageData
+        );
+        questionImage = await prisma.questionImage.create({
+          data: {
+            questionId: newQuestion.id,
+            imgurId: imageData.data.id,
+            url: imageData.data.link,
+            deleteHash: imageData.data.deletehash,
+          },
+        });
+      }
+
       return {
-        question: newQuestion,
+        ...newQuestion,
+        correctAnswers,
+        questionAnswers: createdAnswers,
+        questionImage: questionImage
+          ? {
+              id: questionImage.id,
+              url: questionImage.url,
+              questionId: newQuestion.id,
+            }
+          : null,
       };
     });
 
-    return result.question;
+    return result;
   } catch (error) {
-    throw error;
+    console.error("Error in duplicateQuestionService:", error);
+    throw error instanceof CustomError
+      ? error
+      : new CustomError(
+          "Unexpected error occurred.",
+          500,
+          "duplicating question"
+        );
   }
 };

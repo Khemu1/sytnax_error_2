@@ -12,6 +12,7 @@ import Link from "next/link";
 import { notFound, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import Submissions from "@/components/survey_builder/build/question/submissions/Submissions";
 
 interface BuildSurveyProps {
   params: Promise<{
@@ -135,13 +136,16 @@ const BuildSurvey: React.FC<BuildSurveyProps> = ({ params }) => {
           </div>
         )}
         {activeTab === "preview" && <PreviewSurvey />}
+        {activeTab === "submissions" && survey?.questionsPerPage && <Submissions />}
 
         {/* New Question Dialog */}
       </div>
-      <NewQuestion
-        isOpen={isNewQuestionDialogOpen}
-        onClose={() => setIsNewQuestionDialogOpen(false)}
-      />
+      {activeTab === "build" && (
+        <NewQuestion
+          isOpen={isNewQuestionDialogOpen}
+          onClose={() => setIsNewQuestionDialogOpen(false)}
+        />
+      )}
     </>
   );
 };

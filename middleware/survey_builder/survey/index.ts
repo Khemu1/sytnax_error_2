@@ -238,8 +238,8 @@ export const checkSurveyExistsForQuiz = async (
 };
 
 export const checkSurveyForDuplicatingOrMoving = async (
-  req: NextRequest,
-  res: NextResponse,
+  _req: NextRequest,
+  _res: NextResponse,
   targetWorkspaceId: string
 ) => {
   try {

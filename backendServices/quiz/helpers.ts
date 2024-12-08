@@ -20,7 +20,7 @@ export const calcTotalScore = (
 export const calcUserScore = (
   userAnswers: participantAnswers[],
   questions: PrismaQuestion[],
-  accumulatePointsCallback?: (givenPoints: number) => void 
+  accumulatePointsCallback?: (givenPoints: number) => void
 ): number => {
   try {
     let userScore = 0;
@@ -36,9 +36,10 @@ export const calcUserScore = (
 
       const { allowMultipleAnswers, points, correctAnswers } = question;
 
-      let givenPoints = 0; 
+      let givenPoints = 0;
 
       if (allowMultipleAnswers) {
+        console.log("this question has multiple answers");
         let totalCorrect = 0;
         userAnswer.choosenAnswersIds.every((id) => {
           if (correctAnswers.some((correct) => correct.answerId === id)) {
@@ -52,12 +53,16 @@ export const calcUserScore = (
           givenPoints = points / 2;
         }
       } else {
-        const anyCorrect = userAnswer.choosenAnswersIds.some((id) =>
-          correctAnswers.some((correct) => correct.id === id)
-        );
-        if (anyCorrect) {
-          givenPoints = points;
-        }
+        console.log("this question has only one answer");
+        userAnswer.choosenAnswersIds.forEach((id) => {
+          const correctAnswer = correctAnswers.find(
+            (correct) => correct.answerId.trim() === id.trim()
+          );
+
+          if (correctAnswer) {
+            givenPoints = points;
+          }
+        });
       }
 
       if (accumulatePointsCallback) {
@@ -66,7 +71,7 @@ export const calcUserScore = (
 
       userScore += givenPoints;
     });
-
+    console.log("userScore", userScore);
     return userScore;
   } catch (error) {
     console.error("Error calculating user score:", error);

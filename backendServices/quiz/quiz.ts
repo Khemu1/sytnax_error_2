@@ -7,7 +7,8 @@ import { CustomError } from "@/middleware/CustomError";
 const prisma = new PrismaClient().$extends(withAccelerate());
 
 export const addQuizParticipant = async (data: QuizParticipantFormProps) => {
-  console.log("addQuizParticipant", data.clean);
+  console.log("Chosen Answers Ids:", data.userQuizAnswers);
+
   const survey = await prisma.survey.findUnique({
     where: {
       id: data.surveyId,
@@ -29,12 +30,19 @@ export const addQuizParticipant = async (data: QuizParticipantFormProps) => {
   // Calculate the total score of the survey
   const totalScore = calcTotalScore(data.questions);
 
-  // Calculate the user's score and accumulate total given points in the same step
+  // Initialize totalGivenPoints to accumulate points
   let totalGivenPoints = 0;
-  calcUserScore(data.userQuizAnswers, survey.questions, (givenPoints) => {
-    totalGivenPoints += givenPoints;
-  });
-  console.log("totalGivenPoints", totalGivenPoints);
+
+  // Use calcUserScore to calculate the total given points
+  totalGivenPoints = calcUserScore(
+    data.userQuizAnswers,
+    survey.questions,
+    (givenPoints) => {
+      totalGivenPoints += givenPoints;
+    }
+  );
+
+  console.log("Total Given Points:", totalGivenPoints);
 
   // Create a SurveySubmission entry with the total score and given points
   const submission = await prisma.surveySubmission.create({
@@ -71,30 +79,35 @@ export const addQuizParticipant = async (data: QuizParticipantFormProps) => {
                 totalCorrect++;
               }
             });
+
             if (totalCorrect === correctAnswers.length) {
               givenPoints = points;
             } else if (totalCorrect > 0) {
               givenPoints = points / 2;
             }
           } else {
-            const anyCorrect = userAnswer.choosenAnswersIds.some((id) =>
-              correctAnswers.some((correct) => correct.id === id)
-            );
-            if (anyCorrect) {
-              givenPoints = points;
-            }
+            userAnswer.choosenAnswersIds.forEach((id) => {
+              const correctAnswer = correctAnswers.find(
+                (correct) => correct.answerId.trim() === id.trim()
+              );
+
+              if (correctAnswer) {
+                givenPoints = points;
+              }
+            });
           }
 
-          // Use the calculated `givenPoints` directly here
           return {
             questionId: userAnswer.questionId,
             QuestionPoints: points,
             givenPoints,
+            selectedAnswers: userAnswer.choosenAnswersIds,
           };
         }),
       },
     },
   });
+
   const submissionData = {
     id: submission.id,
     QuizTotalScore:
@@ -111,6 +124,8 @@ export const addQuizParticipant = async (data: QuizParticipantFormProps) => {
         : data.clean
         ? totalGivenPoints
         : null,
+    clean: data.clean,
   };
+
   return submissionData;
 };

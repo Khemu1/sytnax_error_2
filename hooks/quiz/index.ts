@@ -48,6 +48,7 @@ export const useAddQuizParticipant = () => {
       id: string;
       QuizTotalScore: number | null;
       totalUserScore: number | null;
+      clean: boolean;
     },
     CustomError | unknown,
     {

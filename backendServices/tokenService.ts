@@ -1,7 +1,8 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client/edge";
 import { CustomError } from "@/middleware/CustomError";
-import cron from "node-cron";
-const prisma = new PrismaClient();
+import { withAccelerate } from "@prisma/extension-accelerate";
+
+const prisma = new PrismaClient().$extends(withAccelerate());
 
 export const addSecretTokenService = async (
   token: string,
@@ -79,22 +80,3 @@ export const setTokenToUsed = async (token: string) => {
     throw error;
   }
 };
-
-cron.schedule("0 3 * * *", async () => {
-  try {
-    const result = await prisma.token.deleteMany({
-      where: {
-        OR: [{ used: true }, { expiresAt: { lt: new Date() } }],
-      },
-    });
-    console.log(`${result.count} tokens deleted`);
-  } catch (error) {
-    console.error("Error deleting tokens:", error);
-    throw new CustomError(
-      "Token not found or couldn't be deleted",
-      500,
-      "",
-      true
-    );
-  }
-});

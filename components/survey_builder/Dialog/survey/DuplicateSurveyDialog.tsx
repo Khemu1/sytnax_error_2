@@ -25,11 +25,11 @@ const DuplicateSurveyDialog: React.FC<DuplicateSurveyDialogProps> = ({
   const currentWorkspace = useSelector(
     (state: RootState) => state.currentWorkspace.currentWorkspace
   );
-  const [surveyTitle, setSurveyTitle] = useState("");
-  const [workspaceId, setWorkspaceId] = useState<number | null>(null);
+  const [surveyName, setsurveyName] = useState("");
+  const [workspaceId, setWorkspaceId] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string> | null>(null);
 
-  const { handleDuplicateSurvey, isError, errorState, isSuccess,isPending } =
+  const { handleDuplicateSurvey, isError, errorState, isSuccess, isPending } =
     useDuplicateSurvey();
 
   const handleSave = async (e: React.FormEvent) => {
@@ -37,14 +37,14 @@ const DuplicateSurveyDialog: React.FC<DuplicateSurveyDialogProps> = ({
     setErrors(null);
 
     try {
-      newSurveySchema().parse({ title: surveyTitle });
-      if (!workspaceId || typeof workspaceId !== "number" || workspaceId < 1) {
+      newSurveySchema().parse({ name: surveyName });
+      if (!workspaceId) {
         setErrors({ chooseWorkspace: "Please Choose a Workspace" });
         return;
       }
 
       await handleDuplicateSurvey({
-        title: surveyTitle,
+        name: surveyName,
         workspaceId: currentWorkspace!.id,
         surveyId: currentSurvey!.id,
         targetWorkspaceId: workspaceId,
@@ -90,14 +90,14 @@ const DuplicateSurveyDialog: React.FC<DuplicateSurveyDialogProps> = ({
             <div className="border-b border-b-gray-500 p-[2rem]">
               <input
                 type="text"
-                value={surveyTitle}
+                value={surveyName}
                 placeholder="Enter Name"
-                onChange={(e) => setSurveyTitle(e.target.value)}
+                onChange={(e) => setsurveyName(e.target.value)}
                 className="w-full bg-[#2a2a2a] text-white border-none outline-none p-2 rounded-md"
               />
-              {((isError && errorState?.title) || (errors && errors.title)) && (
-                <div className="text-red-600 text-sm mt-2 px-4 text-center">
-                  {errorState?.title || errors?.title}
+              {((isError && errorState?.name) || (errors && errors.name)) && (
+                <div className="text-red-600 text-sm mt-2 px-4 text-center font-semibold">
+                  {errorState?.name || errors?.name}
                 </div>
               )}
             </div>
@@ -108,7 +108,7 @@ const DuplicateSurveyDialog: React.FC<DuplicateSurveyDialogProps> = ({
               </span>
               <select
                 value={workspaceId ?? ""}
-                onChange={(e) => setWorkspaceId(Number(e.target.value))}
+                onChange={(e) => setWorkspaceId(e.target.value)}
                 className="w-full bg-[#2a2a2a] text-white border-none outline-none p-2 rounded-md"
               >
                 <option value="" disabled>
@@ -123,13 +123,13 @@ const DuplicateSurveyDialog: React.FC<DuplicateSurveyDialogProps> = ({
               {((isError && errorState) ||
                 (errors && errors.chooseWorkspace)) && (
                 <div className="text-red-600 text-sm mt-2 px-4 text-center">
-                  {errorState?.message || errors?.chooseWorkspace}
+                  {errors?.chooseWorkspace}
                 </div>
               )}
             </div>
 
             {isError && errorState && (
-              <div className="text-red-600 text-sm mt-2 px-4">
+              <div className="text-red-600 text-sm mt-2 px-4 text-center font-semibold">
                 {errorState.message}
               </div>
             )}
@@ -139,7 +139,7 @@ const DuplicateSurveyDialog: React.FC<DuplicateSurveyDialogProps> = ({
                 className="bg-red-700 py-2 px-4 rounded"
                 type="button"
                 onClick={() => {
-                  setSurveyTitle("");
+                  setsurveyName("");
                   onClose();
                 }}
               >

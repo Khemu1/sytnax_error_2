@@ -127,28 +127,31 @@ const Quiz: React.FC<{
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === "hidden" && !isSubmitting) {
-        setIsSubmitting(true);
         setTimer(0);
-        handleSubmit(false);
+        setIsSubmitting(true);
         setIsWarningDialogOpen({
           state: true,
           message:
             "You Tabbed out, Quiz is closed and you won't be allowed to see your grades and the instructor will be notified",
         });
+        setTimeout(() => {
+          handleSubmit(false);
+        }, 5000);
       }
     };
 
     const handleWindowBlur = () => {
       if (!isSubmitting) {
-        console.log("submitting");
         setIsSubmitting(true);
-        handleSubmit(false);
         setTimer(0);
         setIsWarningDialogOpen({
           state: true,
           message:
             "You unfocused the window, Quiz is closed and you won't be allowed to see your grades and the instructor will be notified",
         });
+        setTimeout(() => {
+          handleSubmit(false);
+        }, 5000);
       }
     };
 
@@ -189,7 +192,7 @@ const Quiz: React.FC<{
   return (
     <>
       <div className="flex-1 flex flex-col relative overflow-hidden">
-        <div className="absolute w-full top-0 flex justify-between items-center p-2 z-10">
+        <div className="absolute w-full top-0 flex justify-between items-center p-2 z-10 bg-base-300">
           <div
             className={`w-max border border-[#42484b] p-2 rounded-md font-semibold ${
               oneMinuteLeft ? "text-red-600" : "text-white"
@@ -214,7 +217,7 @@ const Quiz: React.FC<{
           </button>
         </div>
 
-        <div className="flex flex-col gap-6 items-center h-[90dvh] overflow-y-scroll p-4 mt-8">
+        <div className="flex flex-col gap-6 items-center  h-[74dvh] sm:h-[89dvh] overflow-y-scroll p-4 mt-8">
           {currentQuestions.map((question, index) => (
             <div
               key={question.id}
@@ -229,10 +232,29 @@ const Quiz: React.FC<{
                 {startIndex + index + 1}
                 {")"}
               </span>
+              {question.questionImage && (
+                <div className={`flex justify-center mt-6 mb-4`}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={question.questionImage.url}
+                    alt="Preview"
+                    className={`flex justify-start mt-6 mb-4 
+                        sm:max-w-[500px] sm:max-h-[500px]
+                        "max-w-[300px] max-h-[300px]
+                  `}
+                  />
+                </div>
+              )}
               <div
                 className="mt-4 text-center"
                 dangerouslySetInnerHTML={{ __html: question.label }}
               ></div>
+              {question.description && (
+                <div
+                  className="mt-4 text-center"
+                  dangerouslySetInnerHTML={{ __html: question.description }}
+                ></div>
+              )}
               {question.questionAnswers.length > 0 && (
                 <div className="flex flex-col flex-wrap gap-2 w-full items-center mt-7">
                   {question.questionAnswers.map((answer) => (

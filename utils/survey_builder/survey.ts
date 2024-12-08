@@ -21,7 +21,7 @@ import {
 import { SurveyModel } from "@/types/survey";
 import { Dispatch } from "@reduxjs/toolkit";
 
-export const addSurveyF = async (
+export const addSurveyF =  (
   newSurvey: SurveyModel,
   dispatch: Dispatch
 ) => {
@@ -34,7 +34,7 @@ export const addSurveyF = async (
   }
 };
 
-export const deleteSurveyF = async (
+export const deleteSurveyF =  (
   surveyId: string,
   surveyWorkspaceId: string,
   dispatch: Dispatch
@@ -46,13 +46,12 @@ export const deleteSurveyF = async (
     dispatch(
       deleteWorkspaceSurvey({ surveyId, workspaceId: surveyWorkspaceId })
     );
-
   } catch (error) {
     console.error("Error deleting survey:", error);
   }
 };
 
-export const updateSurveyF = async (
+export const updateSurveyF =  (
   survey: SurveyModel,
   dispatch: Dispatch
 ) => {
@@ -66,24 +65,18 @@ export const updateSurveyF = async (
   }
 };
 
-export const duplicateSurveyF = async (
+export const duplicateSurveyF =  (
   newSurvey: SurveyModel,
-  currentWorkspaceId: string,
   dispatch: Dispatch
 ) => {
   try {
-    if (newSurvey.workspaceId === currentWorkspaceId) {
-      dispatch(addSurveyToCurrentWorkspace(newSurvey));
-      dispatch(addSurvey(newSurvey));
-    }
-
     dispatch(addSurveyToWorkspace(newSurvey));
   } catch (error) {
     console.error("Error duplicating survey:", error);
   }
 };
 
-export const moveSurveyF = async (
+export const moveSurveyF =  (
   surveyId: string,
   sourceWorkspaceId: string,
   targetWorkspaceId: string,

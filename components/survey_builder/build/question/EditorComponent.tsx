@@ -1,11 +1,3 @@
-"use client";
-
-/**
- * 11/29/2024 - khemu
- * there was an error due to duplicated modules
- * the error was fixed by removing the following node_modules and package-lock.json
- */
-
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import "ckeditor5/ckeditor5.css";
 import {
@@ -49,19 +41,18 @@ const EditorComponent: React.FC<EditorComponentProps> = ({
         }}
         onChange={handleEditorChange}
         config={{
-          toolbar: {
-            items: [
-              "fontFamily",
-              "fontSize",
-              "bold",
-              "italic",
-              "underline",
-              "alignment",
-              "highlight",
-              "undo",
-              "redo",
-            ],
-          },
+          licenseKey: "GPL",
+          toolbar: [
+            "fontFamily",
+            "fontSize",
+            "bold",
+            "italic",
+            "underline",
+            "alignment",
+            "highlight",
+            "undo",
+            "redo",
+          ],
           plugins: [
             Font,
             Essentials,

@@ -9,8 +9,8 @@ const allowedGradesVisibility = [
 export const newSurveySchema = () => {
   return object({
     name: string()
-      .min(1, "survey title is required")
-      .max(100, "survey title is too long"),
+      .min(1, "survey name is required")
+      .max(100, "survey name is too long"),
   });
 };
 

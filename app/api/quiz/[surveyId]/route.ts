@@ -8,7 +8,7 @@ interface QuizParams {
 export const GET = async (req: NextRequest, { params }: QuizParams) => {
   try {
     const { surveyId } = (await params) as { surveyId: string };
-    console.log("in controller");
+    console.log("in controller to fetch survey");
     const survey = await returnSurveyQuizService(surveyId);
     return NextResponse.json(survey);
   } catch (error) {

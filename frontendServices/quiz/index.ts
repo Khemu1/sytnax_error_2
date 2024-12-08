@@ -6,6 +6,7 @@ export const addQuizParticipantService = async (
   id: string;
   QuizTotalScore: number | null;
   totalUserScore: number | null;
+  clean: boolean;
 }> => {
   try {
     const response = await fetch(`/api/quiz/add-participant`, {

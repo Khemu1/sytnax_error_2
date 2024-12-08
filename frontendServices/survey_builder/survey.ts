@@ -1,4 +1,5 @@
 import { CustomError } from "@/middleware/CustomError";
+import { SubmissionModelForBuilder } from "@/types/buildSurvey";
 import { SurveyModel, SurveySettings } from "@/types/survey";
 
 export const updateSurveyTitle = async (
@@ -37,10 +38,10 @@ export const updateSurveyTitle = async (
 };
 
 export const duplicateSurvey = async (
-  title: string,
+  name: string,
   workspaceId: string,
   surveyId: string,
-  targetWorkspaceId: number
+  targetWorkspaceId: string
 ): Promise<SurveyModel> => {
   try {
     const response = await fetch(`/api/survey_builder/survey/duplicate`, {
@@ -48,7 +49,7 @@ export const duplicateSurvey = async (
 
       body: JSON.stringify({
         workspaceId,
-        title,
+        name,
         targetWorkspaceId,
         surveyId,
       }),
@@ -254,6 +255,41 @@ export const getSurvey = async (
   }
 };
 
+export const getSubmissions = async (
+  workspaceId: string,
+  surveyId: string
+): Promise<SubmissionModelForBuilder[]> => {
+  try {
+    const response = await fetch(`/api/survey_builder/survey/submissions`, {
+      method: "POST",
+      body: JSON.stringify({ workspaceId, surveyId }),
+    });
+
+    if (!response.ok) {
+      const errorData: CustomError = await response.json();
+
+      const errorMessage = errorData.message ?? "Unknown Error Occurred";
+
+      const err = new CustomError(
+        errorMessage,
+        response.status,
+        "getSubmissionsError",
+        true,
+        errorData.details,
+        errorData.errors
+      );
+      throw err;
+    }
+
+    const data = await response.json();
+    console.log("Fetched submissions:", data);
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
 export const getSurveyForQuiz = async (
   surveyId: string
 ): Promise<Omit<SurveyModel, "correctAnswers">> => {
@@ -261,6 +297,9 @@ export const getSurveyForQuiz = async (
     const response = await fetch(`/api/quiz/${surveyId}`, {
       method: "GET",
     });
+
+
+    console.log("response", response);
 
     if (!response.ok) {
       const errorData: CustomError = await response.json();
@@ -281,7 +320,6 @@ export const getSurveyForQuiz = async (
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error(error);
     throw error;
   }
 };
@@ -352,7 +390,6 @@ export const updateSurveySettings = async (
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error(error);
     throw error;
   }
 };
