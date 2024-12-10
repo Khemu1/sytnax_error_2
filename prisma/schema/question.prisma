@@ -6,7 +6,7 @@ model Question {
   allowMultipleAnswers  Boolean          @default(false)
   createdAt             DateTime?         @default(now())
   updatedAt             DateTime?         @updatedAt
-  points                Int              @default(1)
+  points                Decimal              @default(1)
   survey                Survey           @relation(fields: [surveyId], references: [id], onDelete: Cascade)
   correctAnswers        CorrectAnswer[]
   questionAnswers       QuestionAnswer[]

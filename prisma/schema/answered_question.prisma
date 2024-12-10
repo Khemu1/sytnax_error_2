@@ -2,8 +2,8 @@ model AnsweredQuestion {
   id           String           @id @default(cuid())
   questionId   String
   submissionId String
-  QuestionPoints Int              
-  givenPoints        Int              @default(0)
+  QuestionPoints Decimal              
+  givenPoints        Decimal              @default(0)
   selectedAnswers String[]
   createdAt    DateTime         @default(now())
   updatedAt    DateTime         @updatedAt
