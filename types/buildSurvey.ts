@@ -1,10 +1,12 @@
+import { Decimal } from "@prisma/client/runtime/library";
+
 export interface PrismaQuestion {
   id: string;
   surveyId: string;
   label: string;
   description?: string | null;
   allowMultipleAnswers: boolean;
-  points: number;
+  points: Decimal;
   correctAnswers: {
     id: string;
     createdAt: Date;

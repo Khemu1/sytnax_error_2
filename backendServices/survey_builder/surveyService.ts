@@ -189,7 +189,7 @@ export const returnSurveyQuizService = async (surveyId: string) => {
       },
     });
     // is survey open || has questions  ?
-    if (survey?.questions.length === 0) {
+    if (!survey || survey.questions.length === 0) {
       throw new CustomError(
         "Survey has no questions",
         403,
@@ -197,6 +197,10 @@ export const returnSurveyQuizService = async (surveyId: string) => {
         true
       );
     }
+    survey.questions.map((question) => {
+      // @ts-expect-error new Decimal is not a number
+      question.points = question.points.toNumber();
+    });
 
     return survey;
   } catch (error) {

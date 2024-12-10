@@ -79,6 +79,7 @@ const InputSwitchField: React.FC<InputSwitchFieldProps> = ({
                 errorMessage ? "input_error_border" : "input_border"
               }`}
               min={1}
+              step="0.01"
               placeholder={placeholder}
               disabled={isSubmitting}
               required={required}

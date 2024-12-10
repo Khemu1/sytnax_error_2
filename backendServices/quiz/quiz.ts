@@ -81,9 +81,9 @@ export const addQuizParticipant = async (data: QuizParticipantFormProps) => {
             });
 
             if (totalCorrect === correctAnswers.length) {
-              givenPoints = points;
+              givenPoints = points.toNumber();
             } else if (totalCorrect > 0) {
-              givenPoints = points / 2;
+              givenPoints = points.toNumber() / 2;
             }
           } else {
             userAnswer.choosenAnswersIds.forEach((id) => {
@@ -92,7 +92,7 @@ export const addQuizParticipant = async (data: QuizParticipantFormProps) => {
               );
 
               if (correctAnswer) {
-                givenPoints = points;
+                givenPoints = points.toNumber();
               }
             });
           }
@@ -186,16 +186,16 @@ export const getQuizSubmission = async (quizId: string) => {
         if (!survey.startTime || !surveyEndTime) {
           // the survey is cloed , show grades
           data.isOpen = false;
-          data.totalPoints = totalPoints;
-          data.givenPoints = givenPoints;
+          data.totalPoints = totalPoints.toNumber();
+          data.givenPoints = givenPoints.toNumber();
           return data;
         }
         data.isOpen = currentTime < surveyEndTime;
         // closed show grades
         if (!data.isOpen) {
           data.isOpen = false;
-          data.totalPoints = totalPoints;
-          data.givenPoints = givenPoints;
+          data.totalPoints = totalPoints.toNumber();
+          data.givenPoints = givenPoints.toNumber();
           return data;
         }
         data.isOpen = true;
@@ -203,8 +203,8 @@ export const getQuizSubmission = async (quizId: string) => {
         return data;
 
       case "visible":
-        data.totalPoints = totalPoints;
-        data.givenPoints = givenPoints;
+        data.totalPoints = totalPoints.toNumber();
+        data.givenPoints = givenPoints.toNumber();
         break;
     }
 

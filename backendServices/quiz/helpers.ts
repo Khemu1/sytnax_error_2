@@ -48,9 +48,9 @@ export const calcUserScore = (
         });
 
         if (totalCorrect === correctAnswers.length) {
-          givenPoints = points;
+          givenPoints = points.toNumber();
         } else if (totalCorrect > 0) {
-          givenPoints = points / 2;
+          givenPoints = points.toNumber() / 2;
         }
       } else {
         console.log("this question has only one answer");
@@ -60,7 +60,7 @@ export const calcUserScore = (
           );
 
           if (correctAnswer) {
-            givenPoints = points;
+            givenPoints = points.toNumber();
           }
         });
       }

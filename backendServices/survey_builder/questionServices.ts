@@ -153,7 +153,7 @@ export const updateQuestionService = async (data: EditQuestionModelBackend) => {
         data.question.points,
         prepQuestion.id
       );
-      prepQuestion.points = pointsUpdateData?.points;
+      prepQuestion.points = pointsUpdateData?.points.toNumber();
       prepQuestion.updatedAt = pointsUpdateData?.updatedAt.toUTCString();
 
       const descriptionUpdateData = await handleDescriptionUpdate(
