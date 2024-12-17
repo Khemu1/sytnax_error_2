@@ -68,7 +68,10 @@ export const joinCourseFields = [
         value: "Database Final Revision (100)",
         label: "Database Final Revision (100)",
       },
-      { value: "Network  Basics (100)", label: "Network  Basics (100)" },
+      {
+        value: "Network Final Revision (100)",
+        label: "Network Final Revision (100)",
+      },
     ],
   },
   { name: "whatsapp", label: "WhatsApp number *", type: "phone" },
