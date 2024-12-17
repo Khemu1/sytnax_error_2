@@ -69,8 +69,8 @@ export const joinCourseFields = [
         label: "Database Final Revision (100)",
       },
       {
-        value: "Network Final Revision (100)",
-        label: "Network Final Revision (100)",
+        value: "Network Final Revision (75)",
+        label: "Network Final Revision (75)",
       },
     ],
   },
