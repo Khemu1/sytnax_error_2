@@ -63,6 +63,12 @@ export const joinCourseFields = [
       { value: "OOP (200 LE)", label: "OOP (200 LE)" },
       { value: "Database (250 LE)", label: "Database (250 LE)" },
       { value: "All Courses (500 LE)", label: "All Courses (500 LE)" },
+      { value: "OOP Final Revision (100)", label: "OOP Final Revision (100)" },
+      {
+        value: "Database Final Revision (100)",
+        label: "Database Final Revision (100)",
+      },
+      { value: "Network  Basics (100)", label: "Network  Basics (100)" },
     ],
   },
   { name: "whatsapp", label: "WhatsApp number *", type: "phone" },
