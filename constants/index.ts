@@ -63,14 +63,17 @@ export const joinCourseFields = [
       { value: "OOP (200 LE)", label: "OOP (200 LE)" },
       { value: "Database (250 LE)", label: "Database (250 LE)" },
       { value: "All Courses (500 LE)", label: "All Courses (500 LE)" },
-      { value: "OOP Final Revision (100)", label: "OOP Final Revision (100)" },
       {
-        value: "Database Final Revision (100)",
-        label: "Database Final Revision (100)",
+        value: "OOP Final Revision (100 LE)",
+        label: "OOP Final Revision (100 LE)",
       },
       {
-        value: "Network Final Revision (75)",
-        label: "Network Final Revision (75)",
+        value: "Database Final Revision (100 LE)",
+        label: "Database Final Revision (100 LE)",
+      },
+      {
+        value: "Network Final Revision (75 LE)",
+        label: "Network Final Revision (75 LE)",
       },
     ],
   },

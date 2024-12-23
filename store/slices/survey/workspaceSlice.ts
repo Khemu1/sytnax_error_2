@@ -3,10 +3,12 @@ import { SurveyModel, WorkSpaceModel } from "../../../types/survey";
 
 interface WorkspaceState {
   workspaces: WorkSpaceModel[];
+  currentWorkspace: WorkSpaceModel | null;
 }
 
 const initialState: WorkspaceState = {
   workspaces: [],
+  currentWorkspace: null,
 };
 
 const workspaceSlice = createSlice({
@@ -14,22 +16,25 @@ const workspaceSlice = createSlice({
   initialState,
   reducers: {
     setWorkspaces: (state, action: PayloadAction<WorkSpaceModel[]>) => {
-      // Ensure surveys is initialized as an array for each workspace
-      state.workspaces = action.payload.map((workspace) => ({
-        ...workspace,
-        surveys: workspace.surveys || [],
-      }));
+      state.workspaces = action.payload;
+    },
+    setCurrentWorkspace: (state, action: PayloadAction<WorkSpaceModel>) => {
+      state.currentWorkspace = action.payload;
     },
     signOut: (state) => {
       state.workspaces = [];
+      state.currentWorkspace = null;
     },
     addWorkspace: (state, action: PayloadAction<WorkSpaceModel>) => {
-      // Initialize surveys if it's undefined
       const newWorkspace = {
         ...action.payload,
         surveys: action.payload.surveys || [],
       };
       state.workspaces.push(newWorkspace);
+
+      if (state.currentWorkspace?.id === newWorkspace.id) {
+        state.currentWorkspace = newWorkspace;
+      }
     },
     updateWorkspaces: (
       state,
@@ -45,11 +50,23 @@ const workspaceSlice = createSlice({
             }
           : workspace
       );
+
+      if (state.currentWorkspace?.id === action.payload.id) {
+        state.currentWorkspace = {
+          ...state.currentWorkspace,
+          ...action.payload.workspaceData,
+        };
+      }
     },
     deleteWorkspace: (state, action: PayloadAction<string>) => {
-      state.workspaces = state.workspaces.filter(
+      const updatedWorkspaces = state.workspaces.filter(
         (workspace) => workspace.id !== action.payload
       );
+      state.workspaces = updatedWorkspaces;
+
+      if (state.currentWorkspace?.id === action.payload) {
+        state.currentWorkspace = null;
+      }
     },
     addSurveyToWorkspace: (state, action: PayloadAction<SurveyModel>) => {
       state.workspaces = state.workspaces.map((workspace) =>
@@ -60,6 +77,16 @@ const workspaceSlice = createSlice({
             }
           : workspace
       );
+
+      const updatedWorkspace = state.workspaces.find(
+        (ws) => ws.id === action.payload.workspaceId
+      );
+      if (
+        updatedWorkspace &&
+        updatedWorkspace.id === state.currentWorkspace?.id
+      ) {
+        state.currentWorkspace = { ...updatedWorkspace };
+      }
     },
     deleteWorkspaceSurvey: (
       state,
@@ -79,6 +106,10 @@ const workspaceSlice = createSlice({
             ? { ...ws, surveys: updatedSurveys }
             : ws
         );
+
+        if (state.currentWorkspace?.id === action.payload.workspaceId) {
+          state.currentWorkspace = { ...workspace, surveys: updatedSurveys };
+        }
       }
     },
     updateWorkspaceSurvey: (state, action: PayloadAction<SurveyModel>) => {
@@ -96,6 +127,10 @@ const workspaceSlice = createSlice({
         state.workspaces = state.workspaces.map((ws) =>
           ws.id === workspace.id ? { ...ws, surveys: updatedSurveys } : ws
         );
+
+        if (state.currentWorkspace?.id === workspace.id) {
+          state.currentWorkspace = { ...workspace, surveys: updatedSurveys };
+        }
       }
     },
 
@@ -118,7 +153,6 @@ const workspaceSlice = createSlice({
       );
 
       if (sourceWorkspace && targetWorkspace) {
-        // Ensure surveys are initialized
         sourceWorkspace.surveys = sourceWorkspace.surveys || [];
         targetWorkspace.surveys = targetWorkspace.surveys || [];
 
@@ -127,14 +161,12 @@ const workspaceSlice = createSlice({
         );
 
         if (surveyToMove) {
-          // Remove from source workspace and add to target workspace
           sourceWorkspace.surveys = sourceWorkspace.surveys.filter(
             (survey) => survey.id !== surveyId
           );
 
           targetWorkspace.surveys.push(surveyToMove);
 
-          // Update the state with modified workspaces
           state.workspaces = state.workspaces.map((workspace) => {
             if (workspace.id === sourceWorkspaceId) {
               return { ...workspace, surveys: [...sourceWorkspace.surveys] };
@@ -144,6 +176,19 @@ const workspaceSlice = createSlice({
             }
             return workspace;
           });
+
+          if (state.currentWorkspace?.id === sourceWorkspaceId) {
+            state.currentWorkspace = {
+              ...sourceWorkspace,
+              surveys: sourceWorkspace.surveys,
+            };
+          }
+          if (state.currentWorkspace?.id === targetWorkspaceId) {
+            state.currentWorkspace = {
+              ...targetWorkspace,
+              surveys: targetWorkspace.surveys,
+            };
+          }
         }
       }
     },
@@ -160,5 +205,6 @@ export const {
   deleteWorkspaceSurvey,
   updateWorkspaceSurvey,
   moveSurveyToAnotherWorkspace,
+  setCurrentWorkspace,
 } = workspaceSlice.actions;
 export default workspaceSlice.reducer;

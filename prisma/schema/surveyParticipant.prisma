@@ -1,0 +1,14 @@
+model SurveyParticipant {
+  id          String             @id @default(cuid())
+  surveyId    String
+  submissionId String?
+  studentId   String
+  attempts Int @default(1)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  survey      Survey             @relation(fields: [surveyId], references: [id],onDelete: Cascade)
+  submission  SurveySubmission?  
+
+    @@unique([studentId, surveyId]) 
+
+}

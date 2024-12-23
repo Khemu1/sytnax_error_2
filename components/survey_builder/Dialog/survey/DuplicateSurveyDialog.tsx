@@ -16,15 +16,14 @@ const DuplicateSurveyDialog: React.FC<DuplicateSurveyDialogProps> = ({
   isOpen,
   onClose,
 }) => {
-  const workspaces = useSelector(
-    (state: RootState) => state.workspace.workspaces
+  const { workspaces, currentWorkspace, currentSurvey } = useSelector(
+    (state: RootState) => ({
+      workspaces: state.workspace.workspaces,
+      currentWorkspace: state.workspace.currentWorkspace,
+      currentSurvey: state.survey.currentSurvey,
+    })
   );
-  const currentSurvey = useSelector(
-    (state: RootState) => state.currentSurvey.currentSurvey
-  );
-  const currentWorkspace = useSelector(
-    (state: RootState) => state.currentWorkspace.currentWorkspace
-  );
+
   const [surveyName, setsurveyName] = useState("");
   const [workspaceId, setWorkspaceId] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string> | null>(null);
@@ -42,11 +41,14 @@ const DuplicateSurveyDialog: React.FC<DuplicateSurveyDialogProps> = ({
         setErrors({ chooseWorkspace: "Please Choose a Workspace" });
         return;
       }
+      if (!currentWorkspace?.id || !currentSurvey?.id) {
+        throw new Error("Missing survey id or workspace id");
+      }
 
       await handleDuplicateSurvey({
         name: surveyName,
-        workspaceId: currentWorkspace!.id,
-        surveyId: currentSurvey!.id,
+        workspaceId: currentWorkspace?.id,
+        surveyId: currentSurvey?.id,
         targetWorkspaceId: workspaceId,
       });
     } catch (error) {

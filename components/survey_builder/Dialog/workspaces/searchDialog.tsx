@@ -1,6 +1,5 @@
-import { clearCurrentSurvey } from "@/store/slices/survey/currentSurveySlice";
-import { setCurrentWorkspace } from "@/store/slices/survey/currentWorkspaceSlice";
-import { setSurveys } from "@/store/slices/survey/surveySlice";
+import { clearCurrentSurvey, setSurveys } from "@/store/slices/survey/surveySlice";
+import { setCurrentWorkspace } from "@/store/slices/survey/workspaceSlice";
 import { RootState } from "@/store/store";
 import { retrunSearchData } from "@/utils/survey_builder/workspace";
 import { Dialog, DialogPanel } from "@headlessui/react";

@@ -1,9 +1,8 @@
 model SurveySubmission {
   id          String             @id @default(cuid())
   surveyId    String
-  email       String
   phoneNumber String
-  studentId   String
+  participantId String            @unique
   createdAt   DateTime           @default(now())
   updatedAt   DateTime           @updatedAt
   totalPoints Decimal                @default(0)
@@ -12,4 +11,8 @@ model SurveySubmission {
   cleanSubmission Boolean @default(true)
   survey      Survey             @relation(fields: [surveyId], references: [id],onDelete: Cascade)
   answers     AnsweredQuestion[]
+
+  participant     SurveyParticipant    @relation(fields: [participantId], references: [id], onDelete: Cascade)
+
+    @@unique([surveyId, participantId])  
 }

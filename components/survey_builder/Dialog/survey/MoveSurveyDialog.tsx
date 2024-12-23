@@ -24,9 +24,9 @@ const MoveSurveyDialog: React.FC<MoveSurveyDialogProps> = ({
 }) => {
   const { currentWorkspace, workspaces, currentSurvey, auth } = useSelector(
     (state: RootState) => ({
-      currentWorkspace: state.currentWorkspace.currentWorkspace,
+      currentWorkspace: state.workspace.currentWorkspace,
       workspaces: state.workspace.workspaces,
-      currentSurvey: state.currentSurvey.currentSurvey,
+      currentSurvey: state.survey.currentSurvey,
       auth: state.auth,
     })
   );

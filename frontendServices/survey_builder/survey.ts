@@ -1,6 +1,10 @@
 import { CustomError } from "@/middleware/CustomError";
 import { SubmissionModelForBuilder } from "@/types/buildSurvey";
-import { SurveyModel, SurveySettings } from "@/types/survey";
+import {
+  SurveyModel,
+  SurveyParticipantModel,
+  SurveySettings,
+} from "@/types/survey";
 
 export const updateSurveyTitle = async (
   name: string,
@@ -298,7 +302,6 @@ export const getSurveyForQuiz = async (
       method: "GET",
     });
 
-
     console.log("response", response);
 
     if (!response.ok) {
@@ -320,42 +323,6 @@ export const getSurveyForQuiz = async (
     const data = await response.json();
     return data;
   } catch (error) {
-    throw error;
-  }
-};
-
-export const updateSurveyUrl = async (
-  workspaceId: string,
-  surveyId: string,
-  url: string
-) => {
-  try {
-    const response = await fetch(`/api/survey/${surveyId}/update-url`, {
-      method: "PATCH",
-
-      body: JSON.stringify({ workspaceId, url }),
-    });
-
-    if (!response.ok) {
-      const errorData: CustomError = await response.json();
-
-      const errorMessage = errorData.message ?? "Unknown Error Occurred";
-
-      const err = new CustomError(
-        errorMessage,
-        response.status,
-        "getSurveyError",
-        true,
-        errorData.details,
-        errorData.errors
-      );
-      throw err;
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error(error);
     throw error;
   }
 };
@@ -390,6 +357,218 @@ export const updateSurveySettings = async (
     const data = await response.json();
     return data;
   } catch (error) {
+    throw error;
+  }
+};
+
+export const getSurveyParticipants = async (
+  workspaceId: string,
+  surveyId: string
+): Promise<SurveyParticipantModel[]> => {
+  try {
+    const response = await fetch(`/api/survey_builder/survey/get-members`, {
+      method: "POST",
+      body: JSON.stringify({ workspaceId, surveyId }),
+    });
+
+    if (!response.ok) {
+      const errorData: CustomError = await response.json();
+
+      const errorMessage = errorData.message ?? "Unknown Error Occurred";
+
+      const err = new CustomError(
+        errorMessage,
+        response.status,
+        "getSurveyParticipantsError",
+        true,
+        errorData.details,
+        errorData.errors
+      );
+      throw err;
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const addMembersToSurvey = async (
+  workspaceId: string,
+  surveyId: string,
+  members: string[]
+): Promise<{ members: SurveyParticipantModel[]; surveyId: string }> => {
+  try {
+    const response = await fetch(`/api/survey_builder/survey/add-members`, {
+      method: "POST",
+      body: JSON.stringify({ workspaceId, surveyId, members }),
+    });
+
+    if (!response.ok) {
+      const errorData: CustomError = await response.json();
+
+      const errorMessage = errorData.message ?? "Unknown Error Occurred";
+
+      const err = new CustomError(
+        errorMessage,
+        response.status,
+        "addMembersToSurveyError",
+        true,
+        errorData.details,
+        errorData.errors
+      );
+      throw err;
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+export const removeMembersFromSurvey = async (
+  workspaceId: string,
+  surveyId: string,
+  members: string[]
+): Promise<{ members: SurveyParticipantModel[]; surveyId: string }> => {
+  try {
+    const response = await fetch(`/api/survey_builder/survey/remove-members`, {
+      method: "DELETE",
+      body: JSON.stringify({ workspaceId, surveyId, members }),
+    });
+
+    if (!response.ok) {
+      const errorData: CustomError = await response.json();
+
+      const errorMessage = errorData.message ?? "Unknown Error Occurred";
+
+      const err = new CustomError(
+        errorMessage,
+        response.status,
+        "removeMembersFromSurveyError",
+        true,
+        errorData.details,
+        errorData.errors
+      );
+      throw err;
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+export const resetMembersAttempts = async (
+  workspaceId: string,
+  surveyId: string,
+  members: string[]
+): Promise<{ members: SurveyParticipantModel[]; surveyId: string }> => {
+  try {
+    const response = await fetch(`/api/survey_builder/survey/reset-attempts`, {
+      method: "PATCH",
+      body: JSON.stringify({ workspaceId, surveyId, members }),
+    });
+
+    if (!response.ok) {
+      const errorData: CustomError = await response.json();
+
+      const errorMessage = errorData.message ?? "Unknown Error Occurred";
+
+      const err = new CustomError(
+        errorMessage,
+        response.status,
+        "resetMembersAttemptsError",
+        true,
+        errorData.details,
+        errorData.errors
+      );
+      throw err;
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+export const deleteAllMembers = async (
+  workspaceId: string,
+  surveyId: string
+): Promise<{ surveyId: string }> => {
+  try {
+    const response = await fetch(
+      `/api/survey_builder/survey/delete-all-members`,
+      {
+        method: "DELETE",
+        body: JSON.stringify({ workspaceId, surveyId }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorData: CustomError = await response.json();
+
+      const errorMessage = errorData.message ?? "Unknown Error Occurred";
+
+      const err = new CustomError(
+        errorMessage,
+        response.status,
+        "deleteAllMembersAttemptsError",
+        true,
+        errorData.details,
+        errorData.errors
+      );
+      throw err;
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+export const resetAllMembersAttempts = async (
+  workspaceId: string,
+  surveyId: string
+): Promise<{ surveyId: string }> => {
+  try {
+    const response = await fetch(
+      `/api/survey_builder/survey/reset-all-attempts`,
+      {
+        method: "PATCH",
+        body: JSON.stringify({ workspaceId, surveyId }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorData: CustomError = await response.json();
+
+      const errorMessage = errorData.message ?? "Unknown Error Occurred";
+
+      const err = new CustomError(
+        errorMessage,
+        response.status,
+        "resetAllMembersAttemptsError",
+        true,
+        errorData.details,
+        errorData.errors
+      );
+      throw err;
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error(error);
     throw error;
   }
 };

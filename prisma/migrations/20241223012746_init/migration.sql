@@ -7,7 +7,7 @@ CREATE TABLE "AnsweredQuestion" (
     "questionId" TEXT NOT NULL,
     "submissionId" TEXT NOT NULL,
     "QuestionPoints" DECIMAL(65,30) NOT NULL,
-    "givenPoints" DECIMAL(65,30) NOT NULL DEFAULT 0.0,
+    "givenPoints" DECIMAL(65,30) NOT NULL DEFAULT 0,
     "selectedAnswers" TEXT[],
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -65,7 +65,7 @@ CREATE TABLE "Question" (
     "allowMultipleAnswers" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3),
-    "points" DECIMAL(65,30) NOT NULL DEFAULT 1.0,
+    "points" DECIMAL(65,30) NOT NULL DEFAULT 1,
 
     CONSTRAINT "Question_pkey" PRIMARY KEY ("id")
 );
@@ -117,16 +117,28 @@ CREATE TABLE "Survey" (
 );
 
 -- CreateTable
+CREATE TABLE "SurveyParticipant" (
+    "id" TEXT NOT NULL,
+    "surveyId" TEXT NOT NULL,
+    "submissionId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "attempts" INTEGER NOT NULL DEFAULT 1,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "SurveyParticipant_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "SurveySubmission" (
     "id" TEXT NOT NULL,
     "surveyId" TEXT NOT NULL,
-    "email" TEXT NOT NULL,
     "phoneNumber" TEXT NOT NULL,
-    "studentId" TEXT NOT NULL,
+    "participantId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "totalPoints" DECIMAL(65,30) NOT NULL DEFAULT 0.0,
-    "givenPoints" DECIMAL(65,30) NOT NULL DEFAULT 0.0,
+    "totalPoints" DECIMAL(65,30) NOT NULL DEFAULT 0,
+    "givenPoints" DECIMAL(65,30) NOT NULL DEFAULT 0,
     "submittedAt" TIMESTAMP(3) NOT NULL,
     "cleanSubmission" BOOLEAN NOT NULL DEFAULT true,
 
@@ -225,6 +237,15 @@ CREATE UNIQUE INDEX "QuestionImage_imgurId_key" ON "QuestionImage"("imgurId");
 CREATE UNIQUE INDEX "Role_name_key" ON "Role"("name");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "SurveyParticipant_studentId_surveyId_key" ON "SurveyParticipant"("studentId", "surveyId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "SurveySubmission_participantId_key" ON "SurveySubmission"("participantId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "SurveySubmission_surveyId_participantId_key" ON "SurveySubmission"("surveyId", "participantId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Token_token_key" ON "Token"("token");
 
 -- CreateIndex
@@ -273,7 +294,13 @@ ALTER TABLE "QuestionImage" ADD CONSTRAINT "QuestionImage_questionId_fkey" FOREI
 ALTER TABLE "Survey" ADD CONSTRAINT "Survey_workspaceId_fkey" FOREIGN KEY ("workspaceId") REFERENCES "Workspace"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "SurveyParticipant" ADD CONSTRAINT "SurveyParticipant_surveyId_fkey" FOREIGN KEY ("surveyId") REFERENCES "Survey"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "SurveySubmission" ADD CONSTRAINT "SurveySubmission_surveyId_fkey" FOREIGN KEY ("surveyId") REFERENCES "Survey"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "SurveySubmission" ADD CONSTRAINT "SurveySubmission_participantId_fkey" FOREIGN KEY ("participantId") REFERENCES "SurveyParticipant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Token" ADD CONSTRAINT "Token_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;

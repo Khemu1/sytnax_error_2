@@ -1,4 +1,4 @@
-import { QuestionModel } from "./buildSurvey";
+import { QuestionModel, SubmissionModelForBuilder } from "@/types/buildSurvey";
 
 export interface AuthSliceProps {
   id: number | null;
@@ -17,6 +17,20 @@ export interface SurveyModel {
   questionsPerPage: number;
   updatedAt?: Date;
   questions: QuestionModel[];
+  participants: SurveyParticipantModel[];
+}
+
+export interface SurveyParticipantModel {
+  id: string;
+  surveyId: string;
+  submissionId: string;
+  studentId: string;
+  attempts: number;
+  createdAt: Date;
+  updatedAt: Date;
+  submittedAt: Date;
+  survey: SurveyModel;
+  submission?: SubmissionModelForBuilder;
 }
 
 export interface SurveyPreviewModel {

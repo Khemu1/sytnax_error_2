@@ -1,4 +1,3 @@
-import { clearCurrentWorkspace, updateCurrentWorkspace } from "@/store/slices/survey/currentWorkspaceSlice";
 import {
   addWorkspace,
   updateWorkspaces,
@@ -13,7 +12,6 @@ export const updateWorkspaceF = async (
   dispatch: Dispatch
 ) => {
   try {
-    dispatch(updateCurrentWorkspace(workspaceData));
     dispatch(updateWorkspaces({ workspaceData, id: workspaceId }));
   } catch (error) {
     console.error("Error updating survey title:", error);
@@ -26,7 +24,6 @@ export const deleteWorkspaceF = async (
 ) => {
   try {
     dispatch(deleteWorkspace(workspaceId));
-    dispatch(clearCurrentWorkspace());
   } catch (error) {
     console.error("Error deleting workspace:", error);
   }
@@ -42,7 +39,6 @@ export const addNewWorkspaceF = async (
     console.error("Error deleting survey:", error);
   }
 };
-
 
 export const retrunSearchData = (
   allWorkspaces: WorkSpaceModel[],
@@ -62,4 +58,3 @@ export const retrunSearchData = (
     surveys: filteredSurveys,
   };
 };
-

@@ -44,9 +44,8 @@ export interface QuestionModel {
 export interface SubmissionModelForBuilder {
   id: string;
   surveyId: string;
-  email: string;
+  participantId: string;
   phoneNumber: string;
-  studentId: string;
   createdAt: Date;
   updatedAt: Date;
   totalPoints: number;

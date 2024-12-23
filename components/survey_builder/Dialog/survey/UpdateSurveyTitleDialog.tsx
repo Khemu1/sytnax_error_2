@@ -18,19 +18,18 @@ const UpdateSurveyTitleDialog: React.FC<UpdateSurveyTitleDialogProps> = ({
 }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  //todo: call the selector once
-  const currentSurveyState = useSelector(
-    (state: RootState) => state.currentSurvey
-  );
-  const currentWorkspaceState = useSelector(
-    (state: RootState) => state.currentWorkspace
+  const { currentSurveyState, currentWorkspaceState } = useSelector(
+    (state: RootState) => ({
+      currentSurveyState: state.survey.currentSurvey,
+      currentWorkspaceState: state.workspace.currentWorkspace,
+    })
   );
 
   const [name, setName] = useState(
-    currentSurveyState.currentSurvey?.name || ""
+    currentSurveyState?.name || ""
   );
   const [errors, setErros] = useState<Record<string, string> | null>(null);
-  const { handleUpdateSurvey, isError, errorState, isSuccess,isPending } =
+  const { handleUpdateSurvey, isError, errorState, isSuccess, isPending } =
     useUpdateSurvey();
 
   const handleSave = async (e: React.FormEvent) => {
@@ -38,8 +37,8 @@ const UpdateSurveyTitleDialog: React.FC<UpdateSurveyTitleDialogProps> = ({
     e.preventDefault();
     setIsSubmitting(true);
 
-    const currentSurveyId = currentSurveyState.currentSurvey?.id;
-    const workspaceId = currentWorkspaceState.currentWorkspace?.id;
+    const currentSurveyId = currentSurveyState?.id;
+    const workspaceId = currentWorkspaceState?.id;
 
     if (!workspaceId || !currentSurveyId) {
       setIsSubmitting(false);

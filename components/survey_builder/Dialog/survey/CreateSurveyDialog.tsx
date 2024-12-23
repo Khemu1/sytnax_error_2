@@ -17,7 +17,7 @@ const CreateSurveyDialog: React.FC<CreateSurveyDialogProps> = ({
   onClose,
 }) => {
   const currentWorkspace = useSelector(
-    (state: RootState) => state.currentWorkspace.currentWorkspace
+    (state: RootState) => state.workspace.currentWorkspace
   );
   const [surveyName, setSurvayName] = useState("");
   const [errors, setErrors] = useState<Record<string, string> | null>(null);

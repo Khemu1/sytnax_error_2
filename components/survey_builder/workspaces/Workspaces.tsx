@@ -2,14 +2,14 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Workspace from "./Workspace";
 import { RootState } from "@/store/store";
-import { setCurrentWorkspace } from "@/store/slices/survey/currentWorkspaceSlice";
-import { setSurveys } from "@/store/slices/survey/surveySlice";
 import { WorkSpaceModel } from "@/types/survey";
+import { setSurveys } from "@/store/slices/survey/surveySlice";
+import { setCurrentWorkspace } from "@/store/slices/survey/workspaceSlice";
 
 const Workspaces = () => {
   const dispatch = useDispatch();
   const { currentWorkspace, workspaces } = useSelector((state: RootState) => ({
-    currentWorkspace: state.currentWorkspace.currentWorkspace,
+    currentWorkspace: state.workspace.currentWorkspace,
     workspaces: state.workspace.workspaces,
   }));
 

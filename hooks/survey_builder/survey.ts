@@ -1,11 +1,17 @@
 import { useMutation, useQuery, UseQueryOptions } from "@tanstack/react-query";
 import {
+  addMembersToSurvey,
   createNewSurvey,
+  deleteAllMembers,
   deleteSurveyFromWorkspace,
   duplicateSurvey,
   getSubmissions,
   getSurvey,
+  getSurveyParticipants,
   moveSurveyToWorkspace,
+  removeMembersFromSurvey,
+  resetAllMembersAttempts,
+  resetMembersAttempts,
   updateSurveySettings,
   updateSurveyStatus,
   updateSurveyTitle,
@@ -13,6 +19,7 @@ import {
 import { useState } from "react";
 import {
   SurveyModel,
+  SurveyParticipantModel,
   SurveySettings,
   UpdateSurveyTitleProps,
 } from "@/types/survey";
@@ -23,6 +30,11 @@ import {
   moveSurveyF,
   updateSurveyF,
   duplicateSurveyF,
+  deleteMembersFromSurveyF,
+  addMembersToSurveyF,
+  resetMembersAttemptsF,
+  resetAllMembersAttemptsF,
+  deleteAllMembersF,
 } from "@/utils/survey_builder/survey";
 import { useDispatch } from "react-redux";
 import { SubmissionModelForBuilder } from "@/types/buildSurvey";
@@ -339,13 +351,12 @@ export const useGetSurvey = (workspaceId: string, surveyId: string) => {
 
   // Check if workspaceId and surveyId are valid before running the query
   const shouldFetch = workspaceId && surveyId;
-  console.log("shouldFetch", shouldFetch);
   const {
     data: survey,
     isError,
     isLoading,
   } = useQuery<SurveyModel, CustomError>({
-    queryKey:  ["getSurvey", workspaceId, surveyId] ,
+    queryKey: ["getSurvey", workspaceId, surveyId],
     queryFn: async () => {
       try {
         if (!shouldFetch) {
@@ -465,6 +476,341 @@ export const useUpdateSurveySettings = () => {
 
   return {
     handleUpdateSurveySettings,
+    isError,
+    isSuccess,
+    errorState,
+    isPending,
+  };
+};
+
+// members
+
+export const useGetSurveyParticipants = (
+  workspaceId: string,
+  surveyId: string
+) => {
+  const [errorState, setErrorState] = useState<Record<string, string> | null>(
+    null
+  );
+
+  const shouldFetch = surveyId && workspaceId;
+  const {
+    data: participants,
+    isError,
+    isLoading,
+    isFetched,
+    refetch
+  } = useQuery<SurveyParticipantModel[], CustomError>({
+    queryKey: ["getSurveyParticipants", surveyId, workspaceId],
+    queryFn: async () => {
+      try {
+        if (!shouldFetch) {
+          throw new Error("Missing workspaceId or surveyId");
+        }
+
+        setErrorState(null);
+        const participants = await getSurveyParticipants(workspaceId, surveyId);
+        return participants;
+      } catch (error) {
+        const message =
+          error instanceof CustomError
+            ? error.errors || { message: error.message }
+            : { message: "Unknown Error" };
+        setErrorState(message);
+        throw error;
+      }
+    },
+
+    enabled: !!shouldFetch,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchOnMount: "always",
+  });
+
+  return { participants, isError, isLoading, errorState, isFetched, refetch };
+};
+
+export const useAddMembersToSurvey = () => {
+  const dispatch = useDispatch();
+  const [errorState, setErrorState] = useState<Record<string, string> | null>(
+    null
+  );
+
+  const mutation = useMutation<
+    {
+      surveyId: string;
+      members: SurveyParticipantModel[];
+    },
+    CustomError | unknown,
+    {
+      workspaceId: string;
+      surveyId: string;
+      members: string[];
+    }
+  >({
+    mutationFn: async ({
+      workspaceId,
+      surveyId,
+      members,
+    }: {
+      workspaceId: string;
+      surveyId: string;
+      members: string[];
+    }) => {
+      setErrorState(null);
+
+      return await addMembersToSurvey(workspaceId, surveyId, members);
+    },
+    onSuccess: async (data) => {
+      addMembersToSurveyF(data.surveyId, data.members, dispatch);
+    },
+    onError: (err: CustomError | unknown) => {
+      const message =
+        err instanceof CustomError
+          ? err.errors || { message: err.message }
+          : { message: "Unknown Error" };
+      setErrorState(message);
+      console.error("Error adding members to survey:", err);
+    },
+  });
+
+  const {
+    mutateAsync: handleAddMembersToSurvey,
+    isError,
+    isSuccess,
+    isPending,
+  } = mutation;
+
+  return {
+    handleAddMembersToSurvey,
+    isError,
+    isSuccess,
+    errorState,
+    isPending,
+  };
+};
+
+export const useDeleteMembersFromSurvey = () => {
+  const dispatch = useDispatch();
+  const [errorState, setErrorState] = useState<Record<string, string> | null>(
+    null
+  );
+
+  const mutation = useMutation<
+    {
+      surveyId: string;
+      members: SurveyParticipantModel[];
+    },
+    CustomError | unknown,
+    {
+      workspaceId: string;
+      surveyId: string;
+      members: string[];
+    }
+  >({
+    mutationFn: async ({
+      workspaceId,
+      surveyId,
+      members,
+    }: {
+      workspaceId: string;
+      surveyId: string;
+      members: string[];
+    }) => {
+      setErrorState(null);
+
+      return await removeMembersFromSurvey(workspaceId, surveyId, members);
+    },
+    onSuccess: async (data) => {
+      deleteMembersFromSurveyF(data.surveyId, data.members, dispatch);
+    },
+    onError: (err: CustomError | unknown) => {
+      const message =
+        err instanceof CustomError
+          ? err.errors || { message: err.message }
+          : { message: "Unknown Error" };
+      setErrorState(message);
+      console.error("Error removing members from survey:", err);
+    },
+  });
+
+  const {
+    mutateAsync: handleDeleteMembersFromSurvey,
+    isError,
+    isSuccess,
+    isPending,
+  } = mutation;
+
+  return {
+    handleDeleteMembersFromSurvey,
+    isError,
+    isSuccess,
+    errorState,
+    isPending,
+  };
+};
+
+export const useResetMembersAttempts = () => {
+  const dispatch = useDispatch();
+  const [errorState, setErrorState] = useState<Record<string, string> | null>(
+    null
+  );
+
+  const mutation = useMutation<
+    {
+      surveyId: string;
+      members: SurveyParticipantModel[];
+    },
+    CustomError | unknown,
+    {
+      workspaceId: string;
+      surveyId: string;
+      members: string[];
+    }
+  >({
+    mutationFn: async ({
+      workspaceId,
+      surveyId,
+      members,
+    }: {
+      workspaceId: string;
+      surveyId: string;
+      members: string[];
+    }) => {
+      setErrorState(null);
+
+      return await resetMembersAttempts(workspaceId, surveyId, members);
+    },
+    onSuccess: async (data) => {
+      resetMembersAttemptsF(data.surveyId, data.members, dispatch);
+    },
+    onError: (err: CustomError | unknown) => {
+      const message =
+        err instanceof CustomError
+          ? err.errors || { message: err.message }
+          : { message: "Unknown Error" };
+      setErrorState(message);
+      console.error("Error resetting members attempts:", err);
+    },
+  });
+
+  const {
+    mutateAsync: handleResetMembersAttempts,
+    isError,
+    isSuccess,
+    isPending,
+  } = mutation;
+
+  return {
+    handleResetMembersAttempts,
+    isError,
+    isSuccess,
+    errorState,
+    isPending,
+  };
+};
+
+export const useDeleteAllMembers = () => {
+  const dispatch = useDispatch();
+  const [errorState, setErrorState] = useState<Record<string, string> | null>(
+    null
+  );
+
+  const mutation = useMutation<
+    { surveyId: string },
+    CustomError | unknown,
+    {
+      workspaceId: string;
+      surveyId: string;
+    }
+  >({
+    mutationFn: async ({
+      workspaceId,
+      surveyId,
+    }: {
+      workspaceId: string;
+      surveyId: string;
+    }) => {
+      setErrorState(null);
+
+      return await deleteAllMembers(workspaceId, surveyId);
+    },
+    onSuccess: async (data) => {
+      deleteAllMembersF(data.surveyId, dispatch);
+    },
+    onError: (err: CustomError | unknown) => {
+      const message =
+        err instanceof CustomError
+          ? err.errors || { message: err.message }
+          : { message: "Unknown Error" };
+      setErrorState(message);
+      console.error("Error deleting all members attempts:", err);
+    },
+  });
+
+  const {
+    mutateAsync: handleDeleteAllMembers,
+    isError,
+    isSuccess,
+    isPending,
+  } = mutation;
+
+  return {
+    handleDeleteAllMembers,
+    isError,
+    isSuccess,
+    errorState,
+    isPending,
+  };
+};
+
+export const useResetAllMembersAttempts = () => {
+  const dispatch = useDispatch();
+  const [errorState, setErrorState] = useState<Record<string, string> | null>(
+    null
+  );
+
+  const mutation = useMutation<
+    { surveyId: string },
+    CustomError | unknown,
+    {
+      workspaceId: string;
+      surveyId: string;
+    }
+  >({
+    mutationFn: async ({
+      workspaceId,
+      surveyId,
+    }: {
+      workspaceId: string;
+      surveyId: string;
+    }) => {
+      setErrorState(null);
+
+      return await resetAllMembersAttempts(workspaceId, surveyId);
+    },
+    onSuccess: async (data) => {
+      resetAllMembersAttemptsF(data.surveyId, dispatch);
+    },
+    onError: (err: CustomError | unknown) => {
+      const message =
+        err instanceof CustomError
+          ? err.errors || { message: err.message }
+          : { message: "Unknown Error" };
+      setErrorState(message);
+      console.error("Error resetting all members attempts:", err);
+    },
+  });
+
+  const {
+    mutateAsync: handleResetAllMembersAttempts,
+    isError,
+    isSuccess,
+    isPending,
+  } = mutation;
+
+  return {
+    handleResetAllMembersAttempts,
     isError,
     isSuccess,
     errorState,

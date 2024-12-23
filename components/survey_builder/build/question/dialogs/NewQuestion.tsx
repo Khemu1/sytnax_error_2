@@ -61,7 +61,7 @@ const NewQuestion: React.FC<NewQuestionDialogProps> = ({ isOpen, onClose }) => {
     answers: state.question.answers,
     correctAnswers: state.question.correctAnswers,
     points: state.question.points,
-    currentSurvey: state.currentSurvey.currentSurvey,
+    currentSurvey: state.survey.currentSurvey,
   }));
 
   const [file, setFile] = useState<File | null>(null);

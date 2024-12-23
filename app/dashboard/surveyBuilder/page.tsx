@@ -35,7 +35,7 @@ const SurveyBuilder = () => {
 
   const { currentWorkspace, workspaces, authState } = useSelector(
     (state: RootState) => ({
-      currentWorkspace: state.currentWorkspace.currentWorkspace,
+      currentWorkspace: state.workspace.currentWorkspace,
       workspaces: state.workspace.workspaces,
       authState: state.auth,
     })
@@ -57,7 +57,7 @@ const SurveyBuilder = () => {
   const [isCreateWorkspaceOpen, setIsCreateWorkspaceOpen] = useState(false);
 
   const [isGroupProfileOpen, setIsGroupProfileOpen] = useState(false);
-  const { handleDeleteWorkspace,isPending } = useDeleteWorkspace();
+  const { handleDeleteWorkspace, isPending } = useDeleteWorkspace();
 
   const deleteWorkspace = async (workspaceId: string) => {
     try {

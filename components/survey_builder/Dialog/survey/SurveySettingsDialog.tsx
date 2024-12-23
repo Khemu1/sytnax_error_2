@@ -17,7 +17,7 @@ const SurveySettingsDialog: React.FC<SurveySettingsProps> = ({
   onClose,
 }) => {
   const currentSurvey = useSelector(
-    (state: RootState) => state.currentSurvey.currentSurvey
+    (state: RootState) => state.survey.currentSurvey
   );
   const [surveySettings, setSurveySettings] = useState({
     startTime: currentSurvey?.startTime

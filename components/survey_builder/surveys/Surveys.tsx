@@ -2,18 +2,18 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import CreateSurveyDialog from "../Dialog/survey/CreateSurveyDialog";
 import { RootState } from "@/store/store";
-import { setCurrentSurvey } from "@/store/slices/survey/currentSurveySlice";
 import { SurveyModel } from "@/types/survey";
 import Image from "next/image";
 import Survey from "./Survey";
+import { setCurrentSurvey } from "@/store/slices/survey/surveySlice";
 
 const Surveys = () => {
   const dispatch = useDispatch();
 
   const { surveys } = useSelector((state: RootState) => ({
-    currentWorkspace: state.currentWorkspace.currentWorkspace,
+    currentWorkspace: state.workspace.currentWorkspace,
     surveys: state.survey.surveys,
-    currentSurvey: state.currentSurvey.currentSurvey,
+    currentSurvey: state.survey.currentSurvey,
   }));
   const [selectedSurvey, setSelectedSurvey] = useState<SurveyModel | null>(
     null

@@ -5,7 +5,6 @@ import NewQuestion from "@/components/survey_builder/build/question/dialogs/NewQ
 import Questions from "@/components/survey_builder/build/Questions";
 import { useGetSurvey } from "@/hooks/survey_builder/survey";
 import { logout } from "@/store/slices/authSlice";
-import { setCurrentSurvey } from "@/store/slices/survey/currentSurveySlice";
 import { setQuestions } from "@/store/slices/survey/questionsSlice";
 import { RootState } from "@/store/store";
 import Link from "next/link";
@@ -14,6 +13,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Submissions from "@/components/survey_builder/build/question/submissions/Submissions";
 import { useParams } from "next/navigation";
+import { setCurrentSurvey } from "@/store/slices/survey/surveySlice";
 
 const BuildSurvey: React.FC = () => {
   const dispatch = useDispatch();

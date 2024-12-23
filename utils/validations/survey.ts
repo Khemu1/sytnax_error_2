@@ -1,4 +1,4 @@
-import { object, string, date, number } from "zod";
+import { object, string, date, number, array } from "zod";
 
 const allowedGradesVisibility = [
   "visible",
@@ -75,5 +75,42 @@ export const surveySettingsSchema = () => {
         path: ["startTime"],
       });
     }
+  });
+};
+
+export const addNembersSchema = () => {
+  return object({
+    members: array(
+      string()
+        .min(1, "Student ID is required")
+        .max(100, "Member ID is too long")
+    ).min(1, "Members are required"),
+  }).superRefine((vals, ctx) => {
+    const { members } = vals;
+    if (members.length === 0) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["members"],
+        message: "Members are required",
+      });
+    }
+    members.forEach((member, index) => {
+      // 2201576
+      if (!member.match(/^\d{7}$/)) {
+        ctx.addIssue({
+          code: "custom",
+          path: [`members[${index}]`],
+          message: "Invalid Member ID: Must be 7 digits long.",
+        });
+      }
+    });
+  });
+};
+
+export const removeOrUpdateMembersSchema = () => {
+  return object({
+    members: array(
+      string().min(1, "Member ID is required").max(100, "Member ID is too long")
+    ).min(1, "Members are required"),
   });
 };

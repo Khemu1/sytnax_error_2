@@ -18,7 +18,7 @@ const UpdateWorkspaceTitleDialog: React.FC<
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const currentWorkspaceState = useSelector(
-    (state: RootState) => state.currentWorkspace
+    (state: RootState) => state.workspace.currentWorkspace
   );
 
   const [workspaceName, setworkspaceName] = useState("");
@@ -36,7 +36,7 @@ const UpdateWorkspaceTitleDialog: React.FC<
     e.preventDefault();
     setIsSubmitting(true);
 
-    const workspaceId = currentWorkspaceState.currentWorkspace?.id;
+    const workspaceId = currentWorkspaceState?.id;
 
     if (!workspaceId) {
       setIsSubmitting(false);
@@ -66,10 +66,10 @@ const UpdateWorkspaceTitleDialog: React.FC<
   }, [isSuccess]);
 
   useEffect(() => {
-    if (isOpen && currentWorkspaceState.currentWorkspace) {
-      setworkspaceName(currentWorkspaceState.currentWorkspace.name);
+    if (isOpen && currentWorkspaceState) {
+      setworkspaceName(currentWorkspaceState.name);
     }
-  }, [isOpen, currentWorkspaceState.currentWorkspace]);
+  }, [isOpen, currentWorkspaceState]);
 
   if (!currentWorkspaceState) {
     return <div>loading...</div>;

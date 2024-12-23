@@ -17,5 +17,5 @@ model Survey {
   workspace        Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   submissions SurveySubmission[]
   questions   Question[]
-  
+  surveyParticipants SurveyParticipant[]
 }

@@ -8,20 +8,22 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
-import UpdateSurveyTitleDialog from "../Dialog/survey/UpdateSurveyTitleDialog";
-import MoveSurveyDialog from "../Dialog/survey/MoveSurveyDialog";
-import DuplicateSurveyDialog from "../Dialog/survey/DuplicateSurveyDialog";
-import SurveySettingsDialog from "../Dialog/survey/SurveySettingsDialog";
-import { setCurrentSurvey } from "@/store/slices/survey/currentSurveySlice";
+import UpdateSurveyTitleDialog from "@/components/survey_builder/Dialog/survey/UpdateSurveyTitleDialog";
+import MoveSurveyDialog from "@/components/survey_builder/Dialog/survey/MoveSurveyDialog";
+import DuplicateSurveyDialog from "@/components/survey_builder/Dialog/survey/DuplicateSurveyDialog";
+import SurveySettingsDialog from "@/components/survey_builder/Dialog/survey/SurveySettingsDialog";
 import { getSurveyStatus } from "@/utils";
 import { useDispatch } from "react-redux";
 import Toast from "@/components/skeletons/Toast";
+import AllowedMembersDialog from "../Dialog/survey/AllowedMembers";
+import { setCurrentSurvey } from "@/store/slices/survey/surveySlice";
 const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isUpdateDialogOpen, setUpdateDialogOpen] = useState(false);
   const [isMoveDialogOpen, setMoveDialogOpen] = useState(false);
   const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
   const [isSettingsDialogOpen, setSettingsDialogOpen] = useState(false);
+  const [isMembersDialogOpen, setMembersDialogOpen] = useState(false);
   const surveyCardMenuRef = useRef<HTMLDivElement>(null);
   const toggleButtonRef = useRef<HTMLButtonElement>(null);
   const { isActive, startTime, endTime } = getSurveyStatus(
@@ -39,11 +41,11 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
     useChangeSurveyStatus();
 
   const currentWorkspace = useSelector(
-    (state: RootState) => state.currentWorkspace.currentWorkspace
+    (state: RootState) => state.workspace.currentWorkspace
   );
 
   const handleOpenDialog = (
-    dialogType: "update" | "move" | "duplicate" | "settings"
+    dialogType: "update" | "move" | "duplicate" | "settings" | "members"
   ) => {
     setMenuOpen(false);
     switch (dialogType) {
@@ -60,6 +62,10 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
         dispatch(setCurrentSurvey(survey));
         setSettingsDialogOpen(true);
         break;
+      case "members":
+        dispatch(setCurrentSurvey(survey));
+        setMembersDialogOpen(true);
+        break;
     }
   };
 
@@ -68,6 +74,7 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
     setMoveDialogOpen(false);
     setDuplicateDialogOpen(false);
     setSettingsDialogOpen(false);
+    setMembersDialogOpen(false);
   };
 
   const handleDelete = () => {
@@ -233,6 +240,12 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
                   Settings
                 </button>
                 <button
+                  className="py-2 text-start "
+                  onClick={() => handleOpenDialog("members")}
+                >
+                  Members
+                </button>
+                <button
                   className="py-2"
                   onClick={() => {
                     window.navigator.clipboard.writeText(
@@ -274,6 +287,14 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
         <SurveySettingsDialog
           isOpen={isSettingsDialogOpen}
           onClose={handleCloseDialogs}
+        />
+      )}
+      {isMembersDialogOpen && (
+        <AllowedMembersDialog
+          isOpen={isMembersDialogOpen}
+          onClose={handleCloseDialogs}
+          surveyId={survey.id}
+          workspaceId={survey.workspaceId}
         />
       )}
       {toast && (

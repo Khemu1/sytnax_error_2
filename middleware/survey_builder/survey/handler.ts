@@ -7,6 +7,8 @@ import {
   validateNewSurvey,
   checkSurveyForDuplicatingOrMoving,
   validateSurveySettings,
+  checkMembersForAdding,
+  checkForSurveyMembers,
 } from "./index";
 import {
   authenticateUser,
@@ -31,6 +33,7 @@ const performCommonSurveyChecks = async (
     surveyId: string;
     targetWorkspaceId: string;
     settings: SurveySettings;
+    members: string[];
   };
   body.surveyId = body.surveyId ?? surveyId;
 
@@ -88,6 +91,24 @@ const handleUpdateSurvey = async (req: NextRequest, authUser: NextResponse) => {
     surveyId
   );
   return await checkSurveyTitle(req, checkMemberShip, body.name);
+};
+
+const handleAddMembersToSurvey = async (
+  req: NextRequest,
+  authUser: NextResponse
+) => {
+  const surveyId = req.nextUrl.pathname.split("/")[4];
+  const { body } = await performCommonSurveyChecks(req, authUser, surveyId);
+  return await checkMembersForAdding(body.members, body.surveyId);
+};
+
+const handleCheckForMembers = async (
+  req: NextRequest,
+  authUser: NextResponse
+) => {
+  const surveyId = req.nextUrl.pathname.split("/")[4];
+  const { body } = await performCommonSurveyChecks(req, authUser, surveyId);
+  return await checkForSurveyMembers(body.surveyId, body.members);
 };
 
 const handleUpdateSurveySettings = async (
@@ -155,10 +176,31 @@ export const surveyBuilderRoutes = async (req: NextRequest) => {
           if (pathName === "/api/survey_builder/survey/submissions") {
             return handleGetSurvey(req, authUser);
           }
+          if (pathName === "/api/survey_builder/survey/get-members") {
+            const { checkMemberShip } = await performCommonSurveyChecks(
+              req,
+              authUser
+            );
+            return checkMemberShip;
+          }
+          if (pathName === `/api/survey_builder/survey/add-members`) {
+            return handleAddMembersToSurvey(req, authUser);
+          }
+
           break;
         case "DELETE":
           if (pathName === `/api/survey_builder/survey/delete`) {
             return handleDeleteSurvey(req, authUser);
+          }
+          if (pathName === `/api/survey_builder/survey/remove-members`) {
+            return handleCheckForMembers(req, authUser);
+          }
+          if (pathName === `/api/survey_builder/survey/delete-all-members`) {
+            const { checkMemberShip } = await performCommonSurveyChecks(
+              req,
+              authUser
+            );
+            return checkMemberShip;
           }
           break;
         case "PATCH":
@@ -175,6 +217,17 @@ export const surveyBuilderRoutes = async (req: NextRequest) => {
             );
             return checkMemberShip;
           }
+          if (pathName === `/api/survey_builder/survey/reset-all-members`) {
+            const { checkMemberShip } = await performCommonSurveyChecks(
+              req,
+              authUser
+            );
+            return checkMemberShip;
+          }
+          if (pathName === `/api/survey_builder/survey/reset-members`) {
+            return handleCheckForMembers(req, authUser);
+          }
+
           break;
         default:
           return NextResponse.json(

@@ -79,7 +79,7 @@ const Nav = () => {
   return (
     <nav ref={navRef} className="bg-base-300 sticky top-0 z-[15]">
       <Link
-        className="flex items-center hover:bg-gray-800 py-1 px-2 rounded-lg gap-2 active:scale-95 transition-all"
+        className="flex items-center sm:hover:bg-gray-800 w-max py-1 px-2 rounded-lg gap-2 active:scale-95 transition-all"
         href={"/"}
       >
         <Image

@@ -2,7 +2,9 @@ import { CustomError } from "@/middleware/CustomError";
 import { CustomNextRequest } from "@/types";
 import { SurveySettings, WorkSpaceModel } from "@/types/survey";
 import {
+  addNembersSchema,
   newSurveySchema,
+  removeOrUpdateMembersSchema,
   surveySettingsSchema,
 } from "@/utils/validations/survey";
 import { validateWithSchema } from "@/utils/validations/validations";
@@ -284,6 +286,7 @@ export const validateSurveySettings = async (
       startTime: settings.startTime ? new Date(settings.startTime) : null,
       endTime: settings.endTime ? new Date(settings.endTime) : null,
     });
+
     const response = NextResponse.next();
     return response;
   } catch (error) {
@@ -295,5 +298,95 @@ export const validateSurveySettings = async (
       "",
       validateWithSchema(error)
     );
+  }
+};
+
+export const checkForSurveyMembers = async (
+  surveyId: string,
+  incomingMembers: string[]
+) => {
+  try {
+    removeOrUpdateMembersSchema().parse({ members: incomingMembers });
+    if (incomingMembers.length === 0) {
+      throw new CustomError("Members are required", 400, "survey", false);
+    }
+
+    const members = await prisma.surveyParticipant.findMany({
+      where: {
+        surveyId,
+        id: {
+          in: incomingMembers,
+        },
+      },
+      select: {
+        studentId: true,
+      },
+    });
+
+    if (members.length !== incomingMembers.length) {
+      throw new CustomError("Invalid Members IDs", 400, "survey", true, "");
+    }
+    const response = NextResponse.next();
+    return response;
+  } catch (error) {
+    throw new CustomError(
+      "Error checking for members",
+      400,
+      "survey",
+      true,
+      "",
+      validateWithSchema(error)
+    );
+  }
+};
+
+export const checkMembersForAdding = async (
+  incomingMembers: string[],
+  surveyId: string
+) => {
+  try {
+    addNembersSchema().parse({ members: incomingMembers });
+
+    const existingMembers = await prisma.surveyParticipant.findMany({
+      where: {
+        surveyId,
+        studentId: {
+          in: incomingMembers,
+        },
+      },
+    });
+
+    const existingMemberIds = existingMembers.map((member) => member.studentId);
+
+    const duplicateMembers = incomingMembers.filter((member) =>
+      existingMemberIds.includes(member)
+    );
+
+    if (duplicateMembers.length > 0) {
+      console.log("yeees");
+      throw new CustomError(
+        `The following members already exist in the survey: ${duplicateMembers.join(
+          ", "
+        )}`,
+        400,
+        "survey",
+        true,
+        ""
+      );
+    }
+
+    return NextResponse.next();
+  } catch (error) {
+    if (error instanceof ZodError) {
+      throw new CustomError(
+        "Error Validating Members",
+        400,
+        "survey",
+        true,
+        "",
+        validateWithSchema(error)
+      );
+    }
+    throw error;
   }
 };

@@ -15,7 +15,7 @@ import Toast from "@/components/skeletons/Toast";
 const Questions = () => {
   const { questions, currentSurvey } = useSelector((state: RootState) => ({
     questions: state.questions.items,
-    currentSurvey: state.currentSurvey.currentSurvey,
+    currentSurvey: state.survey.currentSurvey,
   }));
 
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);

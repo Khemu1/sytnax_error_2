@@ -29,7 +29,6 @@ export const addSurveyService = async (workspaceId: string, name: string) => {
 };
 
 export const deleteSurveyService = async (surveyId: string) => {
-  // todo make a helper instead
   const questions = await prisma.question.findMany({
     where: { surveyId },
     include: {
@@ -369,5 +368,115 @@ export const duplicateSurveyService = async (
           500,
           "duplicating survey"
         );
+  }
+};
+
+export const getMembersForSurveyService = async (surveyId: string) => {
+  try {
+    const members = await prisma.surveyParticipant.findMany({
+      where: {
+        surveyId: surveyId,
+      },
+    });
+
+    return members;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const addMembersToSurveyService = async (
+  surveyId: string,
+  members: string[]
+) => {
+  try {
+    const addedMembers = await Promise.all(
+      members.map(async (studentId) => {
+        return await prisma.surveyParticipant.create({
+          data: {
+            surveyId: surveyId,
+            studentId: studentId,
+          },
+        });
+      })
+    );
+
+    return addedMembers; 
+  } catch (error) {
+    throw error; 
+  }
+};
+
+export const deleteMembersFromSurveyService = async (
+  surveyId: string,
+  members: string[]
+) => {
+  try {
+    const removedMembers = await prisma.surveyParticipant.deleteMany({
+      where: {
+        surveyId: surveyId,
+        studentId: {
+          in: members,
+        },
+      },
+    });
+
+    return removedMembers;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const resetMembersAttemptsService = async (
+  surveyId: string,
+  members: string[]
+) => {
+  try {
+    const updatedMembers = await prisma.surveyParticipant.updateMany({
+      where: {
+        surveyId: surveyId,
+        id: {
+          in: members,
+        },
+      },
+      data: {
+        attempts: 1,
+      },
+    });
+
+    return updatedMembers;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const deleteAllMembersFromSurveyService = async (surveyId: string) => {
+  try {
+    const deletedMembers = await prisma.surveyParticipant.deleteMany({
+      where: {
+        surveyId: surveyId,
+      },
+    });
+
+    return deletedMembers;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const resetAllMembersAttemptsService = async (surveyId: string) => {
+  try {
+    const updatedMembers = await prisma.surveyParticipant.updateMany({
+      where: {
+        surveyId: surveyId,
+      },
+      data: {
+        attempts: 1,
+      },
+    });
+
+    return updatedMembers;
+  } catch (error) {
+    throw error;
   }
 };
