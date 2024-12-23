@@ -45,7 +45,7 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
   );
 
   const handleOpenDialog = (
-    dialogType: "update" | "move" | "duplicate" | "settings" | "members"
+    dialogType: "update" | "move" | "duplicate" | "settings" | "participants"
   ) => {
     setMenuOpen(false);
     switch (dialogType) {
@@ -62,7 +62,7 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
         dispatch(setCurrentSurvey(survey));
         setSettingsDialogOpen(true);
         break;
-      case "members":
+      case "participants":
         dispatch(setCurrentSurvey(survey));
         setMembersDialogOpen(true);
         break;
@@ -241,9 +241,9 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
                 </button>
                 <button
                   className="py-2 text-start "
-                  onClick={() => handleOpenDialog("members")}
+                  onClick={() => handleOpenDialog("participants")}
                 >
-                  Members
+                  Participants
                 </button>
                 <button
                   className="py-2"

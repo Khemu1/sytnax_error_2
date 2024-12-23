@@ -9,6 +9,7 @@ export function parseAndValidateQuizParticipantFormData(rawFormData: FormData) {
   const rawSurveyId = rawFormData.get("surveyId");
   const cleanRaw = rawFormData.get("clean");
   const rawSubmissionDate = rawFormData.get("submissionDate");
+  const rawParticipantId = rawFormData.get("participantId");
 
   if (!userInfoRaw) {
     throw new CustomError("Missing 'userInfo' field", 400, "new question");
@@ -36,6 +37,9 @@ export function parseAndValidateQuizParticipantFormData(rawFormData: FormData) {
       "new question"
     );
   }
+  if (!rawParticipantId) {
+    throw new CustomError("Missing 'participantId' field", 400, "new question");
+  }
 
   try {
     const userInfo = JSON.parse(String(userInfoRaw)) as QuizUserFormProps;
@@ -49,6 +53,7 @@ export function parseAndValidateQuizParticipantFormData(rawFormData: FormData) {
     const surveyId = JSON.parse(String(rawSurveyId)) as string;
     const clean = JSON.parse(String(cleanRaw)) as boolean;
     const submissionDate = new Date(JSON.parse(String(rawSubmissionDate)));
+    const participantId = JSON.parse(String(rawParticipantId)) as string;
 
     return {
       userInfo,
@@ -57,6 +62,7 @@ export function parseAndValidateQuizParticipantFormData(rawFormData: FormData) {
       surveyId,
       clean,
       submissionDate,
+      participantId,
     };
   } catch (error) {
     throw error;

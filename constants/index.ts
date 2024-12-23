@@ -58,24 +58,6 @@ export const joinCourseFields = [
     name: "course",
     label: "Course you prefer to purchase *",
     type: "select",
-    options: [
-      { value: "Networking CCNA (300 LE)", label: "Networking CCNA (300 LE)" },
-      { value: "OOP (200 LE)", label: "OOP (200 LE)" },
-      { value: "Database (250 LE)", label: "Database (250 LE)" },
-      { value: "All Courses (500 LE)", label: "All Courses (500 LE)" },
-      {
-        value: "OOP Final Revision (100 LE)",
-        label: "OOP Final Revision (100 LE)",
-      },
-      {
-        value: "Database Final Revision (100 LE)",
-        label: "Database Final Revision (100 LE)",
-      },
-      {
-        value: "Network Final Revision (75 LE)",
-        label: "Network Final Revision (75 LE)",
-      },
-    ],
   },
   { name: "whatsapp", label: "WhatsApp number *", type: "phone" },
   { name: "email", label: "Email *", type: "email" },
@@ -84,13 +66,6 @@ export const joinCourseFields = [
 ];
 
 export const quizUserForm = [
-  { name: "email", label: "Email *", type: "email", onChangeType: "email" },
-  {
-    name: "studentId",
-    label: "Student ID *",
-    type: "text",
-    onChangeType: "studentId",
-  },
   {
     name: "phoneNumber",
     label: "WhatsApp number *",

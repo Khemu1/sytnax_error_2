@@ -151,7 +151,6 @@ export const useDeleteCourse = () => {
   return { handleDeleteCourse, loading, error, success };
 };
 
-
 export const useRegisterCourse = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Record<string, string> | null>(null);

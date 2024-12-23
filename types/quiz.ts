@@ -1,8 +1,7 @@
 import { QuestionModel } from "./buildSurvey";
 
 export interface QuizUserFormProps {
-  email: string;
-  studentId: string;
+
   phoneNumber: string;
   countryCode: string;
 }
@@ -20,6 +19,7 @@ export interface QuizParticipantFormProps {
   userInfo: QuizUserFormProps;
   userQuizAnswers: participantAnswers[];
   questions: Omit<QuestionModel, "correctAnswers">[];
+  participantId: string;
   surveyId: string;
   clean: boolean;
 }

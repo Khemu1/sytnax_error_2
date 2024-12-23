@@ -84,7 +84,7 @@ export const getAllCoursesService = async () => {
       where: { deletedAt: null },
       include: { urlData: true },
       relationLoadStrategy: "join",
-      // cacheStrategy: { ttl: 60 },
+      cacheStrategy: { ttl: 60 },
     });
 
     const modifiedCourses = courses.map((course) => {
@@ -98,9 +98,6 @@ export const getAllCoursesService = async () => {
         id: Mcourse.id,
         title: Mcourse.title,
         price: Mcourse.price,
-        totalSessions: Mcourse.totalSessions,
-        totalSessionPerWeek: Mcourse.totalSessionPerWeek,
-        totalQuizez: Mcourse.totalTasks,
         courseImage: courseImages.length > 0 ? courseImages[0].url : null,
       };
     });
@@ -126,7 +123,7 @@ export const getCourseService = async (id: number) => {
       where: { id: +id, deletedAt: null },
       relationLoadStrategy: "join",
       include: { urlData: true },
-      // cacheStrategy: { ttl: 60 },
+      cacheStrategy: { ttl: 60 },
     });
 
     if (!course?.urlData) {

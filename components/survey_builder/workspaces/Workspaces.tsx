@@ -8,10 +8,13 @@ import { setCurrentWorkspace } from "@/store/slices/survey/workspaceSlice";
 
 const Workspaces = () => {
   const dispatch = useDispatch();
-  const { currentWorkspace, workspaces } = useSelector((state: RootState) => ({
-    currentWorkspace: state.workspace.currentWorkspace,
-    workspaces: state.workspace.workspaces,
-  }));
+
+  const currentWorkspace = useSelector(
+    (state: RootState) => state.workspace.currentWorkspace
+  );
+  const workspaces = useSelector(
+    (state: RootState) => state.workspace.workspaces
+  );
 
   useEffect(() => {
     if (workspaces.length > 0 && !currentWorkspace) {

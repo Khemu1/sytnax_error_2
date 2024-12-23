@@ -31,6 +31,7 @@ export interface SurveyParticipantModel {
   submittedAt: Date;
   survey: SurveyModel;
   submission?: SubmissionModelForBuilder;
+  hasAccess: boolean;
 }
 
 export interface SurveyPreviewModel {
@@ -116,11 +117,6 @@ export interface UpdateSurveyTitleProps {
 
 export interface UpdateSurveyTitleResponse {
   name: string;
-  updatedAt: Date;
-}
-
-export interface UpdateSurveyUrlResponse {
-  url: string;
   updatedAt: Date;
 }
 

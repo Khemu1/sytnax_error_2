@@ -94,6 +94,23 @@ export const validateQuizParticipant = async (
     quizUserFormschema().parse(data.userInfo);
     console.log("validating quiz data");
     newQuizSchema().parse(data);
+    // checking if there are attempts left on Submit
+    const participant = await prisma.surveyParticipant.findUnique({
+      where: {
+        id: data.participantId,
+      },
+    });
+    if (!participant) {
+      throw new CustomError("Participant not found", 400, "quizParticipant");
+    }
+    if (participant.attempts < 1) {
+      throw new CustomError(
+        "You have reached the max attempts",
+        400,
+        "quizParticipant",
+        true
+      );
+    }
     return NextResponse.next();
   } catch (error) {
     throw new CustomError(

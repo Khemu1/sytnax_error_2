@@ -100,26 +100,15 @@ export const newQuizSchema = () => {
 export const quizUserFormschema = () => {
   return object({
     phoneNumber: string().min(1, "WhatsApp number is required"),
-    email: string({ required_error: "Email is required" }).email({
-      message: "Invalid email address",
-    }),
-    studentId: string().min(1, "Student ID is required"),
+
     countryCode: string().min(1, "Country code is required"),
   }).superRefine((val, ctx) => {
-    const { phoneNumber, countryCode, studentId } = val;
+    const { phoneNumber, countryCode } = val;
     if (!validatePhoneNumber(phoneNumber, countryCode)) {
       ctx.addIssue({
         code: "custom",
         message: "Invalid WhatsApp number",
         path: ["phoneNumber"],
-      });
-    }
-    // 2201576
-    if (!studentId.match(/^\d{7}$/)) {
-      ctx.addIssue({
-        code: "custom",
-        message: "Invalid Student ID: Must be 7 digits long.",
-        path: ["studentId"],
       });
     }
   });

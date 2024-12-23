@@ -499,7 +499,10 @@ export const useGetSurveyParticipants = (
     isError,
     isLoading,
     isFetched,
-    refetch
+    refetch,
+    isPending,
+    isSuccess,
+    isFetching,
   } = useQuery<SurveyParticipantModel[], CustomError>({
     queryKey: ["getSurveyParticipants", surveyId, workspaceId],
     queryFn: async () => {
@@ -527,7 +530,17 @@ export const useGetSurveyParticipants = (
     refetchOnMount: "always",
   });
 
-  return { participants, isError, isLoading, errorState, isFetched, refetch };
+  return {
+    participants,
+    isError,
+    isLoading,
+    errorState,
+    isFetched,
+    refetch,
+    isSuccess,
+    isPending,
+    isFetching,
+  };
 };
 
 export const useAddMembersToSurvey = () => {

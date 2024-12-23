@@ -8,6 +8,7 @@ import {
   useDeleteMembersFromSurvey,
   useGetSurveyParticipants,
   useResetAllMembersAttempts,
+  useResetMembersAttempts,
 } from "@/hooks/survey_builder/survey";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -15,6 +16,11 @@ import {
   clearCurrentSurvey,
 } from "@/store/slices/survey/surveySlice";
 import { RootState } from "@/store/store";
+import {
+  addNembersSchema,
+  removeOrUpdateMembersSchema,
+} from "@/utils/validations/survey";
+import { validateWithSchema } from "@/utils/validations/validations";
 
 interface AllowedMembersDialogProps {
   isOpen: boolean;
@@ -30,8 +36,13 @@ const AllowedMembersDialog: React.FC<AllowedMembersDialogProps> = ({
   workspaceId,
 }) => {
   const dispatch = useDispatch();
-  const { participants, isLoading, isError, isFetched, refetch } =
-    useGetSurveyParticipants(workspaceId, surveyId);
+  const {
+    participants,
+    isLoading,
+    isError,
+
+    isFetching,
+  } = useGetSurveyParticipants(workspaceId, surveyId);
   const currentSurvey = useSelector(
     (state: RootState) => state.survey.currentSurvey
   );
@@ -50,28 +61,45 @@ const AllowedMembersDialog: React.FC<AllowedMembersDialogProps> = ({
   } = useAddMembersToSurvey();
 
   const {
+    handleResetMembersAttempts,
+    isPending: isResetAttemptsPending,
+    isError: isResetAttemptsError,
+    errorState: resetMembersError,
+    isSuccess: isResetMembersSuccess,
+    isError: isResetMembersError,
+  } = useResetMembersAttempts();
+
+  const {
     handleDeleteMembersFromSurvey,
     isPending: isRemoveMemberPending,
-    isError: isRemoveMemberError,
+    isError: isDeleteMembersError,
     isSuccess: isRemoveMemberSuccess,
     errorState: deleteMemebersError,
+    isSuccess: isDeleteMembersSuccess,
   } = useDeleteMembersFromSurvey();
 
   const {
     handleDeleteAllMembers,
     isPending: isDeleteAllMembersPending,
     errorState: deleteAllMembersError,
+    isSuccess: isDeleteAllMembersSuccess,
+    isError: isDeleteAllMembersError,
   } = useDeleteAllMembers();
 
   const {
     handleResetAllMembersAttempts,
-    isPending: isResetAttemptsPending,
-    isError: isResetAttemptsError,
-    errorState: resetMembersError,
+    isPending: isResetAllAttemptsPending,
+    isError: isResetAllAttemptsError,
+    errorState: resetAllMembersError,
+    isSuccess: isResetAllAttemptsSuccess,
   } = useResetAllMembersAttempts();
 
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
   const [text, setText] = useState<string>("");
+  const [validationError, setValidationError] = useState<Record<
+    string,
+    string
+  > | null>(null);
 
   const handleToggle = (member: string) => {
     setSelectedMembers((prevSelectedMembers) =>
@@ -86,15 +114,61 @@ const AllowedMembersDialog: React.FC<AllowedMembersDialogProps> = ({
     onClose();
     dispatch(clearCurrentSurvey());
   }, [onClose]);
+
   useEffect(() => {
-    if (isAddMembersSuccess || isRemoveMemberSuccess) {
+    if (isAddMembersSuccess) {
       setToast({
-        message: "Members updated successfully",
+        message: "Members added successfully",
         type: "success",
       });
-    } else if (isAddMembersError || isRemoveMemberError) {
+    } else if (isRemoveMemberSuccess) {
       setToast({
-        message: "Something went wrong, please try again",
+        message: "Member removed successfully",
+        type: "success",
+      });
+    } else if (isResetAllAttemptsSuccess) {
+      setToast({
+        message: "All attempts reset successfully",
+        type: "success",
+      });
+    } else if (isResetMembersSuccess) {
+      setToast({
+        message: "Members reset successfully",
+        type: "success",
+      });
+    } else if (isDeleteAllMembersSuccess) {
+      setToast({
+        message: "All members deleted successfully",
+        type: "success",
+      });
+    } else if (isDeleteMembersSuccess) {
+      setToast({
+        message: "Members deleted successfully",
+        type: "success",
+      });
+    } else if (isAddMembersError) {
+      setToast({
+        message: "Error adding members, please try again",
+        type: "error",
+      });
+    } else if (isDeleteMembersError) {
+      setToast({
+        message: "Error removing member, please try again",
+        type: "error",
+      });
+    } else if (isResetAllAttemptsError) {
+      setToast({
+        message: "Error resetting all attempts, please try again",
+        type: "error",
+      });
+    } else if (isResetMembersError) {
+      setToast({
+        message: "Error resetting members, please try again",
+        type: "error",
+      });
+    } else if (isDeleteAllMembersError) {
+      setToast({
+        message: "Error deleting all members, please try again",
         type: "error",
       });
     }
@@ -102,17 +176,18 @@ const AllowedMembersDialog: React.FC<AllowedMembersDialogProps> = ({
     isAddMembersSuccess,
     isRemoveMemberSuccess,
     isAddMembersError,
-    isRemoveMemberError,
+    isResetAllAttemptsSuccess,
+    isResetMembersSuccess,
+    isDeleteAllMembersSuccess,
+    isResetAllAttemptsError,
+    isResetMembersError,
+    isDeleteMembersSuccess,
+    isDeleteAllMembersError,
+    isDeleteMembersError,
   ]);
-  useEffect(() => {
-    if (isOpen) {
-      refetch(); // Trigger refetch when dialog is opened
-    }
-  }, [isOpen, refetch]);
 
   useEffect(() => {
     if (participants) {
-      console.log(participants);
       dispatch(
         addMembersToSurveyFirstTime({ members: participants, surveyId })
       );
@@ -120,37 +195,129 @@ const AllowedMembersDialog: React.FC<AllowedMembersDialogProps> = ({
   }, [dispatch, participants, surveyId]);
 
   const handleAddMembers = () => {
-    if (text.trim()) {
-      const processedIds = text
-        .split(/\s+/)
-        .map((id) => id.trim())
-        .filter((id) => id.length === 7);
-
-      handleAddMembersToSurvey({
-        surveyId,
-        workspaceId,
-        members: processedIds,
-      });
-      setText("");
+    setValidationError(null);
+    try {
+      if (text.trim()) {
+        const processedIds = text
+          .split(/\s+/)
+          .map((id) => id.trim())
+          .filter((id) => id.length === 7);
+        addNembersSchema().parse({ members: processedIds });
+        handleAddMembersToSurvey({
+          surveyId,
+          workspaceId,
+          members: processedIds,
+        });
+        setText("");
+      }
+    } catch (error) {
+      setValidationError(validateWithSchema(error));
+      console.error(validationError);
     }
   };
 
   const handleRemoveSelectedMembers = () => {
-    handleDeleteMembersFromSurvey({
-      surveyId,
-      workspaceId,
-      members: selectedMembers,
-    });
+    setValidationError(null);
+    setSelectedMembers([]);
+
+    try {
+      removeOrUpdateMembersSchema().parse({ members: selectedMembers });
+      handleDeleteMembersFromSurvey({
+        surveyId,
+        workspaceId,
+        members: selectedMembers,
+      });
+      setSelectedMembers([]);
+    } catch (error) {
+      setValidationError(validateWithSchema(error));
+      console.error(validationError);
+    }
   };
 
   const handleRemoveAllMembers = () => {
-    handleDeleteAllMembers({ surveyId, workspaceId });
+    setValidationError(null);
+
+    try {
+      setSelectedMembers([]);
+      const ids = currentSurvey?.participants.map((member) => member.studentId);
+
+      removeOrUpdateMembersSchema().parse({
+        members: ids ?? [],
+      });
+      handleDeleteAllMembers({ surveyId, workspaceId });
+    } catch (error) {
+      setValidationError(validateWithSchema(error));
+      console.error(validationError);
+    }
   };
 
   const handleResetAllAttempts = () => {
-    handleResetAllMembersAttempts({ workspaceId, surveyId });
+    setValidationError(null);
+
+    try {
+      const ids = currentSurvey?.participants.map((member) => member.studentId);
+
+      removeOrUpdateMembersSchema().parse({
+        members: ids ?? [],
+      });
+      handleResetAllMembersAttempts({ workspaceId, surveyId });
+    } catch (error) {
+      setValidationError(validateWithSchema(error));
+      console.error(validationError);
+    }
+  };
+  const handleMembersResetAttempts = () => {
+    setValidationError(null);
+    try {
+      removeOrUpdateMembersSchema().parse({ members: selectedMembers });
+      handleResetMembersAttempts({
+        surveyId,
+        workspaceId,
+        members: selectedMembers,
+      });
+    } catch (error) {
+      setValidationError(validateWithSchema(error));
+      console.error(validationError);
+    }
   };
 
+  if (isFetching || !currentSurvey?.participants) {
+    return (
+      <Transition show={isOpen} as={Fragment}>
+        <Dialog
+          open={isOpen}
+          onClose={handleClose}
+          className="relative z-50"
+          aria-labelledby="dialog-title"
+          aria-describedby="dialog-description"
+        >
+          <div
+            className="fixed inset-0 bg-black bg-opacity-30"
+            aria-hidden="true"
+          />
+          <div className="fixed inset-0 flex items-center justify-center p-4 overflow-y-scroll">
+            <DialogPanel className="w-full max-w-md rounded-xl bg-white/5 p-6 backdrop-blur-2xl h-max overflow-x-hidden  ">
+              <button
+                className="w-full flex justify-end pr-2"
+                type="button"
+                onClick={handleClose}
+              >
+                <Image
+                  src="/assets/icons/close.svg"
+                  alt="close"
+                  width={25}
+                  height={25}
+                />
+              </button>
+              <div className="flex flex-col gap-3 p-6 text-white rounded-md">
+                <span className="flex items-center justify-center mx-auto loading loading-spinner loading-lg"></span>
+              </div>
+            </DialogPanel>
+          </div>
+        </Dialog>
+      </Transition>
+    );
+  }
   return (
     <Transition show={isOpen} as={Fragment}>
       <Dialog
@@ -179,9 +346,7 @@ const AllowedMembersDialog: React.FC<AllowedMembersDialogProps> = ({
               />
             </button>
             <div className="flex flex-col gap-3 p-6 text-white rounded-md">
-              {isLoading || !isFetched ? (
-                <span className="flex items-center justify-center mx-auto loading loading-spinner loading-lg"></span>
-              ) : isError ? (
+              {isError ? (
                 <p className="text-red-600 text-center font-semibold">
                   Failed to load participants
                 </p>
@@ -232,6 +397,17 @@ const AllowedMembersDialog: React.FC<AllowedMembersDialogProps> = ({
                         "Remove Members"
                       )}
                     </button>
+                    <button
+                      className="px-3 py-2 bg-orange-700 hover:bg-orange-800 text-sm rounded-md transition-all basis-[150px]"
+                      onClick={handleMembersResetAttempts}
+                      disabled={isResetAttemptsPending}
+                    >
+                      {isResetAttemptsPending ? (
+                        <span className="flex items-center justify-center mx-auto loading loading-spinner loading-xs"></span>
+                      ) : (
+                        "Reset Members"
+                      )}
+                    </button>
                   </div>
 
                   <h4 className="font-semibold mt-4 mb-2 text-[#e4e4e4]">
@@ -255,6 +431,15 @@ const AllowedMembersDialog: React.FC<AllowedMembersDialogProps> = ({
                           <span className="block text-ellipsis overflow-hidden">
                             {member.studentId}
                           </span>
+                          <span
+                            className={`font-semibold ${
+                              member.attempts > 0
+                                ? "text-green-600"
+                                : "text-red-600"
+                            }`}
+                          >
+                            {member.attempts}
+                          </span>
                         </li>
                       ))}
                     </ul>
@@ -263,13 +448,18 @@ const AllowedMembersDialog: React.FC<AllowedMembersDialogProps> = ({
                   )}
 
                   <div>
+                    {validationError && validationError.members && (
+                      <p className="text-red-600 text-center font-semibold">
+                        {validationError.members}
+                      </p>
+                    )}
                     {isAddMembersError && addMembersError?.message && (
                       <p className="text-red-600 text-center font-semibold">
                         Add Members Error: {addMembersError?.message}
                       </p>
                     )}
 
-                    {isRemoveMemberError && deleteMemebersError?.message && (
+                    {isDeleteMembersError && deleteMemebersError?.message && (
                       <p className="text-red-600 text-center font-semibold">
                         Remove Members Error: {deleteMemebersError?.message}
                       </p>
@@ -282,6 +472,12 @@ const AllowedMembersDialog: React.FC<AllowedMembersDialogProps> = ({
                       </p>
                     )}
 
+                    {isResetAllAttemptsError &&
+                      resetAllMembersError?.message && (
+                        <p className="text-red-600 text-center font-semibold">
+                          Reset Attempts Error: {resetAllMembersError?.message}
+                        </p>
+                      )}
                     {isResetAttemptsError && resetMembersError?.message && (
                       <p className="text-red-600 text-center font-semibold">
                         Reset Attempts Error: {resetMembersError?.message}
@@ -293,9 +489,9 @@ const AllowedMembersDialog: React.FC<AllowedMembersDialogProps> = ({
                     <button
                       className="px-3 py-2 bg-red-700 hover:bg-red-800 text-sm rounded-md transition-all basis-[170px]"
                       onClick={handleResetAllAttempts}
-                      disabled={isResetAttemptsPending}
+                      disabled={isResetAllAttemptsPending}
                     >
-                      {isResetAttemptsPending ? (
+                      {isResetAllAttemptsPending ? (
                         <span className="flex items-center justify-center mx-auto loading loading-spinner loading-xs"></span>
                       ) : (
                         "Reset All Attempts"

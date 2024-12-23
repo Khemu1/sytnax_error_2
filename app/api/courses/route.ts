@@ -14,7 +14,6 @@ export const POST = async (req: NextRequest) => {
     const form = await req.formData();
     const courseData = processFormData(form) as NewCourseProps;
 
-    // Now you have the course data in a usable object format
     const newCourse = await addCourseService(courseData, +userId);
     return NextResponse.json(newCourse, { status: 201 });
   } catch (error) {

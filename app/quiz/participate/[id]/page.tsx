@@ -7,17 +7,32 @@ import { QuizFormErrors, QuizUserFormProps } from "@/types/quiz";
 import { validateWithSchema } from "@/utils/validations/validations";
 import Quiz from "@/components/quiz/Quiz";
 import { notFound, useParams } from "next/navigation";
-import { useAddQuizParticipant, useGetSurveyForQuiz } from "@/hooks/quiz";
+import {
+  useAddQuizParticipant,
+  useGetParticipantForQuiz,
+  useGetSurveyForQuiz,
+} from "@/hooks/quiz";
 import { newQuizSchema, quizUserFormschema } from "@/utils/validations/quiz";
 import Toast from "@/components/skeletons/Toast";
 import { transformDataIntoFormData } from "@/utils/survey_builder/build/questions";
 import { getSurveyStatus } from "@/utils";
 import Link from "next/link";
+import Image from "next/image";
 
 const QuizParticipate: React.FC = () => {
   const params = useParams();
+  const [startSearch, setStartSearch] = useState(false);
+  const [text, setText] = useState<string>("");
+  const { participant, isFetching: isParticipantFetching } =
+    useGetParticipantForQuiz(text, params.id as string, startSearch);
+  const [participantData, setParticipantData] = useState<QuizUserFormProps>({
+    phoneNumber: "",
+    countryCode: "EG",
+  });
   const { isError, isLoading, survey } = useGetSurveyForQuiz(
-    params.id as string
+    params.id as string,
+    participant?.id ?? null,
+    participant?.attempts ?? 0
   );
   const {
     handleAddQuizParticipant,
@@ -25,13 +40,6 @@ const QuizParticipate: React.FC = () => {
     isSuccess: quizSuccess,
     data,
   } = useAddQuizParticipant();
-
-  const [participantData, setParticipantData] = useState<QuizUserFormProps>({
-    email: "",
-    studentId: "",
-    phoneNumber: "",
-    countryCode: "EG",
-  });
 
   const [userQuizAnswers, setUserQuizAnswers] = useState<
     Array<{ questionId: string; choosenAnswersIds: string[]; values: string[] }>
@@ -42,6 +50,10 @@ const QuizParticipate: React.FC = () => {
     type: "success" | "error";
   } | null>(null);
   const [formErrors, setFormErrors] = useState<QuizFormErrors>({});
+  const [validationError, setValidationError] = useState<Record<
+    string,
+    string
+  > | null>(null);
   const [startQuiz, setStartQuiz] = useState(false);
   const [validatingQuiz, setValidatingQuiz] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -68,7 +80,6 @@ const QuizParticipate: React.FC = () => {
     }
   }, [survey]);
 
-  // is a fallback incase the quiz get fetched but the user don't enter
   useEffect(() => {
     const interval = setInterval(() => {
       if (endTime) {
@@ -77,12 +88,12 @@ const QuizParticipate: React.FC = () => {
         if (currentTime > endimeTime) {
           setIsQuizStillOpen(false);
           setDuration(null);
-          clearInterval(interval); 
+          clearInterval(interval);
         }
       }
-    }, 1000); 
+    }, 1000);
 
-    return () => clearInterval(interval); 
+    return () => clearInterval(interval);
   }, [endTime]);
 
   const handleFormChange = (
@@ -95,7 +106,17 @@ const QuizParticipate: React.FC = () => {
     }));
   };
 
-  // Start quiz and validate data
+  const handleStudentIdSearch = (text: string) => {
+    setValidationError(null);
+    if (!text.match(/^\d{7}$/)) {
+      setValidationError({
+        studentId: "Invalid Student ID",
+      });
+      return;
+    }
+    setStartSearch(true);
+  };
+
   const handleQuizStart = () => {
     setValidatingQuiz(true);
     setFormErrors({});
@@ -111,7 +132,6 @@ const QuizParticipate: React.FC = () => {
     }
   };
 
-  // Submit quiz data
   const handleQuizSubmit = (clean = true) => {
     const submissionDate = new Date();
     submissionDate.setMilliseconds(0);
@@ -129,6 +149,7 @@ const QuizParticipate: React.FC = () => {
         userInfo: participantData,
         clean,
         surveyId: params.id,
+        participantId: participant?.id ?? 0,
       };
       const formData = new FormData();
       transformDataIntoFormData(prepData, formData);
@@ -143,7 +164,6 @@ const QuizParticipate: React.FC = () => {
     }
   };
 
-  // Handle answer selection for quiz
   const handleAnswerSelection = (
     questionId: string,
     selectedAnswers: string[],
@@ -158,7 +178,6 @@ const QuizParticipate: React.FC = () => {
     );
   };
 
-  // Toast notifications for success and error
   useEffect(() => {
     if (quizSuccess) {
       setToast({ message: "You have successfully submitted", type: "success" });
@@ -168,11 +187,12 @@ const QuizParticipate: React.FC = () => {
     }
   }, [quizSuccess, quizError]);
 
-  // Early return for errors or loading state
+  useEffect(() => {
+    console.log("participant", participant);
+  }, [participant]);
   if (!params.id || (isError && !survey)) {
     return notFound();
   }
-
   if (isLoading) {
     return (
       <div className="flex w-full h-full flex-1 justify-center items-center">
@@ -180,7 +200,93 @@ const QuizParticipate: React.FC = () => {
       </div>
     );
   }
-
+  if (!participant) {
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        <div className="flex flex-col bg-base-300 justify-center p-6 rounded-md min-h-[300px] w-[300px] shadow-lg gap-4">
+          <div className="flex justify-center">
+            {" "}
+            <Image
+              alt="logo"
+              src={"/assets/imgs/logo.png"}
+              width={75}
+              height={50}
+            />
+          </div>
+          <label
+            htmlFor="studentId"
+            className="text-lg  text-center mb-2 font-semibold"
+          >
+            Enter Your Student ID
+          </label>
+          <input
+            type="text"
+            name="studentId"
+            id="studentId"
+            placeholder="Student ID"
+            className="w-full px-4 py-2 bg-[#2b2b2b] text-[#d1d1d1]  overflow-y-scroll resize-none rounded-md border border-[#3d3d3d] focus:outline-none focus:border-[#4b6ef5] transition-all"
+            onChange={(e) => setText(e.target.value)}
+            value={text}
+          />
+          <div className="flex justify-center">
+            <button
+              className="w-[125px] text-xl flex justify-center pr-2 bg-blue-600 font-semibold  p-2 rounded-md shadow-md hover:bg-blue-700 hover:text-white transition duration-300"
+              disabled={isParticipantFetching}
+              onClick={() => handleStudentIdSearch(text)}
+            >
+              {isParticipantFetching ? (
+                <span className="flex items-center justify-center mx-auto loading loading-spinner loading-md"></span>
+              ) : (
+                "Check"
+              )}
+            </button>
+          </div>
+          {validationError && validationError.studentId && (
+            <p className="text-red-600 text-center font-semibold">
+              {validationError.studentId}
+            </p>
+          )}
+        </div>
+        <Analytics />
+      </div>
+    );
+  }
+  if (participant && !participant.hasAccess) {
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        <div className="flex flex-col bg-base-300 justify-center p-6 rounded-md min-h-[300px] w-[300px] shadow-lg gap-4">
+          <div className="flex-1 flex items-center justify-center">
+            <div className="bg-red-700 text-white p-4 rounded-md flex items-center space-x-2">
+              <div className="flex-1">
+                <p className="text-xl text-center font-semibold">
+                  You don{"'"}t have access to this Quizz
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <Analytics />
+      </div>
+    );
+  }
+  if (participant && participant.attempts < 1) {
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        <div className="flex flex-col bg-base-300 justify-center p-6 rounded-md min-h-[300px] w-[300px] shadow-lg gap-4">
+          <div className="flex-1 flex items-center justify-center">
+            <div className="bg-red-700 text-white p-4 rounded-md flex items-center space-x-2">
+              <div className="flex-1">
+                <p className="text-xl text-center font-semibold">
+                  You have reached the max attempts
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <Analytics />
+      </div>
+    );
+  }
   return (
     <>
       <div
@@ -190,26 +296,34 @@ const QuizParticipate: React.FC = () => {
       >
         {isQuizStillOpen && duration !== null ? (
           <>
-            {!startQuiz && survey && !quizSuccess && (
-              <QuizForm
-                studentData={participantData}
-                formErrors={formErrors}
-                handleChange={handleFormChange}
-                handleSubmit={handleQuizStart}
-                isValidating={validatingQuiz}
-              />
-            )}
-            {startQuiz && survey && !quizSuccess && (
-              <Quiz
-                survey={survey}
-                questions={survey.questions}
-                handleSubmit={handleQuizSubmit}
-                handleAnswerSelection={handleAnswerSelection}
-                isSubmitting={isSubmitting}
-                setIsSubmitting={setIsSubmitting}
-                duration={duration}
-              />
-            )}
+            {!startQuiz &&
+              survey &&
+              participant &&
+              participant.attempts > 0 &&
+              !quizSuccess && (
+                <QuizForm
+                  studentData={participantData}
+                  formErrors={formErrors}
+                  handleChange={handleFormChange}
+                  handleSubmit={handleQuizStart}
+                  isValidating={validatingQuiz}
+                />
+              )}
+            {startQuiz &&
+              survey &&
+              participant &&
+              participant.attempts > 0 &&
+              !quizSuccess && (
+                <Quiz
+                  survey={survey}
+                  questions={survey.questions}
+                  handleSubmit={handleQuizSubmit}
+                  handleAnswerSelection={handleAnswerSelection}
+                  isSubmitting={isSubmitting}
+                  setIsSubmitting={setIsSubmitting}
+                  duration={duration}
+                />
+              )}
           </>
         ) : (
           <div className="flex-1 flex items-center justify-center">
@@ -303,7 +417,6 @@ const QuizParticipate: React.FC = () => {
             </div>
           </div>
         )}
-
         <Analytics />
       </div>
 

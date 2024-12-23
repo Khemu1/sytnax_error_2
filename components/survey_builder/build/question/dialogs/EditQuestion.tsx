@@ -47,37 +47,42 @@ const EditQuestion: React.FC<NewQuestionDialogProps> = ({
   question: currentQuestion,
 }) => {
   const dispatch = useDispatch();
-  const {
-    label,
-    isDescriptionEnabled,
-    isImageUploadEnabled,
-    previewImageUrl,
-    description,
-    questions,
-    allowMultipleAnswers,
-    points,
-    addedAnswers,
-    addedCorrectAnswers,
-    deletedCorrectAnswers,
-    deletedAnswers,
-    questionAnswers,
-    correctAnswers,
-  } = useSelector((state: RootState) => ({
-    label: state.editQuestion.label,
-    description: state.editQuestion.description,
-    isImageUploadEnabled: state.editQuestion.isImageUploadEnabled,
-    isDescriptionEnabled: state.editQuestion.isDescriptionEnabled,
-    previewImageUrl: state.editQuestion.previewImageUrl ?? "",
-    questions: state.questions.items,
-    allowMultipleAnswers: state.editQuestion.allowMultipleAnswers,
-    points: state.editQuestion.points,
-    addedAnswers: state.editQuestion.addedAnswers,
-    addedCorrectAnswers: state.editQuestion.addedCorrectAnswers,
-    deletedAnswers: state.editQuestion.deletedAnswers,
-    deletedCorrectAnswers: state.editQuestion.deletedCorrectAnswers,
-    questionAnswers: state.editQuestion.questionAnswers,
-    correctAnswers: state.editQuestion.correctAnswers,
-  }));
+  const label = useSelector((state: RootState) => state.editQuestion.label);
+  const description = useSelector(
+    (state: RootState) => state.editQuestion.description
+  );
+  const isImageUploadEnabled = useSelector(
+    (state: RootState) => state.editQuestion.isImageUploadEnabled
+  );
+  const isDescriptionEnabled = useSelector(
+    (state: RootState) => state.editQuestion.isDescriptionEnabled
+  );
+  const previewImageUrl = useSelector(
+    (state: RootState) => state.editQuestion.previewImageUrl ?? ""
+  );
+  const allowMultipleAnswers = useSelector(
+    (state: RootState) => state.editQuestion.allowMultipleAnswers
+  );
+  const points = useSelector((state: RootState) => state.editQuestion.points);
+  const addedAnswers = useSelector(
+    (state: RootState) => state.editQuestion.addedAnswers
+  );
+  const addedCorrectAnswers = useSelector(
+    (state: RootState) => state.editQuestion.addedCorrectAnswers
+  );
+  const deletedAnswers = useSelector(
+    (state: RootState) => state.editQuestion.deletedAnswers
+  );
+  const deletedCorrectAnswers = useSelector(
+    (state: RootState) => state.editQuestion.deletedCorrectAnswers
+  );
+  const questionAnswers = useSelector(
+    (state: RootState) => state.editQuestion.questionAnswers
+  );
+  const correctAnswers = useSelector(
+    (state: RootState) => state.editQuestion.correctAnswers
+  );
+  const questions = useSelector((state: RootState) => state.questions.items);
 
   const [file, setFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);

@@ -10,11 +10,7 @@ import { setCurrentSurvey } from "@/store/slices/survey/surveySlice";
 const Surveys = () => {
   const dispatch = useDispatch();
 
-  const { surveys } = useSelector((state: RootState) => ({
-    currentWorkspace: state.workspace.currentWorkspace,
-    surveys: state.survey.surveys,
-    currentSurvey: state.survey.currentSurvey,
-  }));
+  const surveys = useSelector((state: RootState) => state.survey.surveys);
   const [selectedSurvey, setSelectedSurvey] = useState<SurveyModel | null>(
     null
   );

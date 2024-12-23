@@ -1,4 +1,5 @@
 import { Decimal } from "@prisma/client/runtime/library";
+import { SurveyParticipantModel } from "./survey";
 
 export interface PrismaQuestion {
   id: string;
@@ -53,6 +54,7 @@ export interface SubmissionModelForBuilder {
   submittedAt: Date;
   cleanSubmission: boolean;
   answers: AnsweredQuestion[];
+  surveyParticipant: SurveyParticipantModel;
 }
 
 export interface AnsweredQuestion {

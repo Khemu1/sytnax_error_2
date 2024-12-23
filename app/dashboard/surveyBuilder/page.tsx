@@ -3,7 +3,7 @@
 import "../../../styles/surveyBuilder.css";
 
 import { setWorkspaces } from "@/store/slices/survey/workspaceSlice";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import Image from "next/image";
 import Workspaces from "@/components/survey_builder/workspaces/Workspaces";
 import Surveys from "@/components/survey_builder/surveys/Surveys";
@@ -33,13 +33,14 @@ const SurveyBuilder = () => {
   const dispatch = useDispatch();
   const routeTo = useRouter();
 
-  const { currentWorkspace, workspaces, authState } = useSelector(
-    (state: RootState) => ({
-      currentWorkspace: state.workspace.currentWorkspace,
-      workspaces: state.workspace.workspaces,
-      authState: state.auth,
-    })
+  const currentWorkspace = useSelector(
+    (state: RootState) => state.workspace.currentWorkspace
   );
+  const workspaces = useSelector(
+    (state: RootState) => state.workspace.workspaces
+  );
+  const authState = useSelector((state: RootState) => state.auth);
+
   const [menuOpen, setMenuOpen] = useState(false);
 
   const workspaceChangeMenuRef = useRef<HTMLDivElement>(null);
@@ -59,17 +60,18 @@ const SurveyBuilder = () => {
   const [isGroupProfileOpen, setIsGroupProfileOpen] = useState(false);
   const { handleDeleteWorkspace, isPending } = useDeleteWorkspace();
 
-  const deleteWorkspace = async (workspaceId: string) => {
-    try {
-      if (!workspaceId) {
-        return;
+  const deleteWorkspace = useCallback(
+    async (workspaceId: string) => {
+      if (!workspaceId) return;
+      try {
+        await handleDeleteWorkspace({ workspaceId });
+        setMenuOpen(false);
+      } catch (error) {
+        console.error("Error deleting workspace:", error);
       }
-      await handleDeleteWorkspace({ workspaceId });
-      setMenuOpen(false);
-    } catch (error) {
-      console.error("Error deleting workspace:", error);
-    }
-  };
+    },
+    [handleDeleteWorkspace]
+  );
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

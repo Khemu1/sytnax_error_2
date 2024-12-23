@@ -5,21 +5,19 @@ import { useSelector } from "react-redux";
 import "@/styles/quiz.css";
 
 const PreviewSurvey = () => {
-  const { questions, currentSurvey } = useSelector((state: RootState) => ({
-    questions: state.questions.items,
-    currentSurvey: state.currentSurvey.currentSurvey,
-  }));
+  const questions = useSelector((state: RootState) => state.questions.items);
+  const currentSurvey = useSelector(
+    (state: RootState) => state.survey.currentSurvey
+  );
 
   const [currentPage, setCurrentPage] = useState(1);
   const startIndex = (currentPage - 1) * (currentSurvey?.questionsPerPage || 1);
 
-  // Calculate the total number of pages
   const totalPages = useMemo(() => {
     if (!currentSurvey) return 0;
     return Math.ceil(questions.length / currentSurvey.questionsPerPage);
   }, [questions.length, currentSurvey?.questionsPerPage]);
 
-  // Calculate the current questions to display based on the page
   const currentQuestions = useMemo(() => {
     if (!currentSurvey) return [];
     const start = (currentPage - 1) * currentSurvey.questionsPerPage;
@@ -27,7 +25,6 @@ const PreviewSurvey = () => {
     return questions.slice(start, end);
   }, [currentPage, questions, currentSurvey?.questionsPerPage]);
 
-  // Pagination logic
   const pagination = useMemo(() => {
     const pages = [];
     if (totalPages <= 3) {
@@ -46,7 +43,6 @@ const PreviewSurvey = () => {
     return pages;
   }, [currentPage, totalPages]);
 
-  // Handle page change
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);

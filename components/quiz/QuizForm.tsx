@@ -23,8 +23,8 @@ const QuizForm: React.FC<{
   isValidating,
 }) => {
   return (
-    <div className="my-8 flex flex-1 flex-col w-full h-full bg-base-200 justify-center items-center gap-6">
-      <div className="flex flex-col items-center bg-base-100 shadow-xl rounded-lg p-6 w-[85dvw] sm:w-full sm:max-w-screen-sm">
+    <div className=" flex flex-1 my-auto flex-col w-full h-full bg-base-200 justify-center items-center gap-6">
+      <div className="flex flex-col items-center bg-base-100 shadow-xl rounded-lg p-6 sm:w-[400px] ">
         <div className="flex flex-col items-center text-center mb-5">
           <Image
             alt="logo"
@@ -42,7 +42,9 @@ const QuizForm: React.FC<{
         <form className={formStyle.form}>
           {quizUserForm.map((field) => (
             <div key={field.name} className="form-group ">
-              <label htmlFor={field.name}>{field.label}</label>
+              <label htmlFor={field.name} className="!mb-2">
+                {field.label}
+              </label>
               {field.type === "phone" ? (
                 <ReactPhoneInput
                   inputProps={{

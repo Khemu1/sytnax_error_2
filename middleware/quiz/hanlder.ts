@@ -40,6 +40,10 @@ export const quizRoutes = (req: NextRequest) => {
           if (pathName === "/api/quiz/add-participant") {
             return handleAddQuizParticipant(req);
           }
+        case "POST":
+          if (pathName === "/api/quiz/get-particpant") {
+            return NextResponse.next();
+          }
 
         default:
           return NextResponse.json(

@@ -225,6 +225,7 @@ export const returnSurveySubmissionsService = async (surveyId: string) => {
                 },
               },
             },
+            surveyParticipant: true,
           },
           orderBy: {
             createdAt: "desc",
@@ -401,9 +402,9 @@ export const addMembersToSurveyService = async (
       })
     );
 
-    return addedMembers; 
+    return addedMembers;
   } catch (error) {
-    throw error; 
+    throw error;
   }
 };
 
@@ -412,14 +413,16 @@ export const deleteMembersFromSurveyService = async (
   members: string[]
 ) => {
   try {
-    const removedMembers = await prisma.surveyParticipant.deleteMany({
-      where: {
-        surveyId: surveyId,
-        studentId: {
-          in: members,
-        },
-      },
-    });
+    const removedMembers = await Promise.all(
+      members.map(async (member) => {
+        return await prisma.surveyParticipant.delete({
+          where: {
+            surveyId: surveyId,
+            id: member,
+          },
+        });
+      })
+    );
 
     return removedMembers;
   } catch (error) {
@@ -432,17 +435,19 @@ export const resetMembersAttemptsService = async (
   members: string[]
 ) => {
   try {
-    const updatedMembers = await prisma.surveyParticipant.updateMany({
-      where: {
-        surveyId: surveyId,
-        id: {
-          in: members,
-        },
-      },
-      data: {
-        attempts: 1,
-      },
-    });
+    const updatedMembers = await Promise.all(
+      members.map(async (member) => {
+        return await prisma.surveyParticipant.update({
+          where: {
+            surveyId: surveyId,
+            id: member,
+          },
+          data: {
+            attempts: 1,
+          },
+        });
+      })
+    );
 
     return updatedMembers;
   } catch (error) {

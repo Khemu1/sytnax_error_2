@@ -5,8 +5,8 @@ import { returnSurveySubmissionsService } from "@/backendServices/survey_builder
 export const POST = async (req: NextRequest) => {
   try {
     const { surveyId } = await req.json();
+    console.log("arrived in submissions route");
     const res = await returnSurveySubmissionsService(surveyId);
-    console.log("res", res);
     return NextResponse.json(res, { status: 200 });
   } catch (error) {
     return errorHandler(error);

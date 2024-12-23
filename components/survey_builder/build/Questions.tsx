@@ -13,10 +13,10 @@ import {
 import Toast from "@/components/skeletons/Toast";
 
 const Questions = () => {
-  const { questions, currentSurvey } = useSelector((state: RootState) => ({
-    questions: state.questions.items,
-    currentSurvey: state.survey.currentSurvey,
-  }));
+  const questions = useSelector((state: RootState) => state.questions.items);
+  const currentSurvey = useSelector(
+    (state: RootState) => state.survey.currentSurvey
+  );
 
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);

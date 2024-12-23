@@ -94,12 +94,12 @@ export const addNembersSchema = () => {
         message: "Members are required",
       });
     }
-    members.forEach((member, index) => {
+    members.forEach((member) => {
       // 2201576
       if (!member.match(/^\d{7}$/)) {
         ctx.addIssue({
           code: "custom",
-          path: [`members[${index}]`],
+          path: [`members`],
           message: "Invalid Member ID: Must be 7 digits long.",
         });
       }

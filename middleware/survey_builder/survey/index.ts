@@ -307,9 +307,6 @@ export const checkForSurveyMembers = async (
 ) => {
   try {
     removeOrUpdateMembersSchema().parse({ members: incomingMembers });
-    if (incomingMembers.length === 0) {
-      throw new CustomError("Members are required", 400, "survey", false);
-    }
 
     const members = await prisma.surveyParticipant.findMany({
       where: {
@@ -318,10 +315,9 @@ export const checkForSurveyMembers = async (
           in: incomingMembers,
         },
       },
-      select: {
-        studentId: true,
-      },
     });
+    console.log(members.length);
+    console.log(incomingMembers.length);
 
     if (members.length !== incomingMembers.length) {
       throw new CustomError("Invalid Members IDs", 400, "survey", true, "");

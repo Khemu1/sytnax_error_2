@@ -217,14 +217,14 @@ export const surveyBuilderRoutes = async (req: NextRequest) => {
             );
             return checkMemberShip;
           }
-          if (pathName === `/api/survey_builder/survey/reset-all-members`) {
+          if (pathName === `/api/survey_builder/survey/reset-all-attempts`) {
             const { checkMemberShip } = await performCommonSurveyChecks(
               req,
               authUser
             );
             return checkMemberShip;
           }
-          if (pathName === `/api/survey_builder/survey/reset-members`) {
+          if (pathName === `/api/survey_builder/survey/reset-attempts`) {
             return handleCheckForMembers(req, authUser);
           }
 

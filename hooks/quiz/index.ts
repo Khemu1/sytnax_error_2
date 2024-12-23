@@ -1,27 +1,34 @@
 import {
   addQuizParticipantService,
+  getParticpantForQuiz,
   getQuizGrade,
 } from "@/frontendServices/quiz";
 import { getSurveyForQuiz } from "@/frontendServices/survey_builder/survey";
 import { CustomError } from "@/middleware/CustomError";
-import { SurveyModel } from "@/types/survey";
+import { SurveyModel, SurveyParticipantModel } from "@/types/survey";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
-export const useGetSurveyForQuiz = (surveyId: string) => {
+export const useGetSurveyForQuiz = (
+  surveyId: string,
+  participantId: string | null,
+  attempts: number
+) => {
   const [errorState, setErrorState] = useState<Record<string, string> | null>(
     null
   );
 
   // Check if workspaceId and surveyId are valid before running the query
-  const shouldFetch = surveyId;
+  const shouldFetch = surveyId && participantId && attempts > 0;
 
   const {
     data: survey,
     isError,
     isLoading,
   } = useQuery<Omit<SurveyModel, "correctAnswers">, CustomError>({
-    queryKey: shouldFetch ? ["getSurvey", surveyId] : [],
+    queryKey: shouldFetch
+      ? ["getSurvey", surveyId, participantId, attempts]
+      : [],
     queryFn: async () => {
       try {
         if (!shouldFetch) {
@@ -47,6 +54,60 @@ export const useGetSurveyForQuiz = (surveyId: string) => {
   });
 
   return { survey, isError, isLoading, errorState };
+};
+export const useGetParticipantForQuiz = (
+  studentId: string,
+  surveyId: string,
+  fetch: boolean
+) => {
+  const [errorState, setErrorState] = useState<Record<string, string> | null>(
+    null
+  );
+
+  const shouldFetch = studentId && surveyId && fetch;
+
+  const {
+    data: participant,
+    isError,
+    isLoading,
+    isSuccess,
+    isPending,
+    isFetching,
+  } = useQuery<SurveyParticipantModel, CustomError>({
+    queryKey: shouldFetch ? ["getParticpant", studentId, surveyId, fetch] : [],
+    queryFn: async () => {
+      try {
+        if (!shouldFetch) {
+          throw new Error("Missing workspaceId or surveyId");
+        }
+
+        setErrorState(null);
+        const particpants = await getParticpantForQuiz(studentId, surveyId);
+        return particpants;
+      } catch (error) {
+        const message =
+          error instanceof CustomError
+            ? error.errors || { message: error.message }
+            : { message: "Unknown Error" };
+        setErrorState(message);
+        throw error;
+      }
+    },
+    enabled: !!shouldFetch,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchOnMount: "always",
+  });
+
+  return {
+    participant,
+    isError,
+    isLoading,
+    errorState,
+    isSuccess,
+    isPending,
+    isFetching,
+  };
 };
 
 export const useAddQuizParticipant = () => {
@@ -99,7 +160,7 @@ export const useGetGrade = (quizId: string) => {
   // Check if workspaceId and surveyId are valid before running the query
   const shouldFetch = quizId;
 
-  const { data, isError, isLoading,isSuccess } = useQuery<
+  const { data, isError, isLoading, isSuccess } = useQuery<
     {
       totalPoints: number | null;
       givenPoints: number | null;

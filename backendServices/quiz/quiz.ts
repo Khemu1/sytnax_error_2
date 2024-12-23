@@ -45,12 +45,12 @@ export const addQuizParticipant = async (data: QuizParticipantFormProps) => {
   console.log("Total Given Points:", totalGivenPoints);
 
   // Create a SurveySubmission entry with the total score and given points
+  console.log("data.participantId", data.participantId);
   const submission = await prisma.surveySubmission.create({
     data: {
-      email: data.userInfo.email,
       phoneNumber: data.userInfo.phoneNumber,
-      studentId: data.userInfo.studentId,
       surveyId: data.surveyId,
+      participantId: data.participantId,
       totalPoints: totalScore,
       givenPoints: totalGivenPoints,
       submittedAt: new Date(),
@@ -107,6 +107,19 @@ export const addQuizParticipant = async (data: QuizParticipantFormProps) => {
       },
     },
   });
+  // fire and forget update attempts
+  prisma.surveyParticipant
+    .update({
+      where: {
+        id: data.participantId,
+      },
+      data: {
+        attempts: 0,
+      },
+    })
+    .catch((error) => {
+      console.error("Failed to update attempts:", error);
+    });
 
   const submissionData = {
     id: submission.id,
@@ -211,6 +224,29 @@ export const getQuizSubmission = async (quizId: string) => {
     data.cleanSubmission = cleanSubmission;
 
     return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getParticpantForQuizService = async (
+  studentId: string,
+  surveyId: string
+) => {
+  try {
+    if (!studentId.match(/^\d{7}$/)) {
+      throw new CustomError("Invalid Student ID", 400, "getParticpant");
+    }
+    const participant = await prisma.surveyParticipant.findFirst({
+      where: {
+        studentId: studentId,
+        surveyId: surveyId,
+      },
+    });
+    if (!participant) {
+      return { hasAccess: false };
+    }
+    return { ...participant, hasAccess: true };
   } catch (error) {
     throw error;
   }

@@ -38,31 +38,31 @@ interface NewQuestionDialogProps {
 
 const NewQuestion: React.FC<NewQuestionDialogProps> = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
-  const {
-    label,
-    isDescriptionEnabled,
-    isImageUploadEnabled,
-    previewImageUrl,
-    description,
-    questions,
-    allowMultipleAnswers,
-    answers,
-    correctAnswers,
-    points,
-    currentSurvey,
-  } = useSelector((state: RootState) => ({
-    label: state.question.label,
-    description: state.question.description,
-    isImageUploadEnabled: state.question.isImageUploadEnabled,
-    isDescriptionEnabled: state.question.isDescriptionEnabled,
-    previewImageUrl: state.question.previewImageUrl,
-    questions: state.questions.items,
-    allowMultipleAnswers: state.question.allowMultipleAnswers,
-    answers: state.question.answers,
-    correctAnswers: state.question.correctAnswers,
-    points: state.question.points,
-    currentSurvey: state.survey.currentSurvey,
-  }));
+  const label = useSelector((state: RootState) => state.question.label);
+  const description = useSelector(
+    (state: RootState) => state.question.description
+  );
+  const isImageUploadEnabled = useSelector(
+    (state: RootState) => state.question.isImageUploadEnabled
+  );
+  const isDescriptionEnabled = useSelector(
+    (state: RootState) => state.question.isDescriptionEnabled
+  );
+  const previewImageUrl = useSelector(
+    (state: RootState) => state.question.previewImageUrl
+  );
+  const allowMultipleAnswers = useSelector(
+    (state: RootState) => state.question.allowMultipleAnswers
+  );
+  const answers = useSelector((state: RootState) => state.question.answers);
+  const correctAnswers = useSelector(
+    (state: RootState) => state.question.correctAnswers
+  );
+  const points = useSelector((state: RootState) => state.question.points);
+  const currentSurvey = useSelector(
+    (state: RootState) => state.survey.currentSurvey
+  );
+  const questions = useSelector((state: RootState) => state.questions.items);
 
   const [file, setFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);

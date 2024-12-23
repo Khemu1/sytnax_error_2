@@ -14,6 +14,6 @@ export const PATCH = async (req: NextRequest) => {
       { status: 200 }
     );
   } catch (error) {
-    return errorHandler;
+    return errorHandler(error);
   }
 };
