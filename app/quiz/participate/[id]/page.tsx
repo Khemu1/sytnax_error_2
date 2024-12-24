@@ -225,7 +225,13 @@ const QuizParticipate: React.FC = () => {
             id="studentId"
             placeholder="Student ID"
             className="w-full px-4 py-2 bg-[#2b2b2b] text-[#d1d1d1]  overflow-y-scroll resize-none rounded-md border border-[#3d3d3d] focus:outline-none focus:border-[#4b6ef5] transition-all"
-            onChange={(e) => setText(e.target.value)}
+            onChange={(e) => {
+              const newValue = e.target.value
+                .replace(/\s+/g, "")
+                .replace(/\D/g, "")
+                .slice(0, 7);
+              setText(newValue);
+            }}
             value={text}
           />
           <div className="flex justify-center">
