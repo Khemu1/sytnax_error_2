@@ -268,87 +268,89 @@ export const dashboardAdminsService = async () => {
 
 export const dashboardNewAdminsService = async (adminData: SignUpProps) => {
   try {
-    const existingUser = await prisma.user.findFirst({
-      where: {
-        OR: [{ username: adminData.username }, { email: adminData.email }],
-      },
-    });
+    return await prisma.$transaction(async (prisma) => {
+      const existingUser = await prisma.user.findFirst({
+        where: {
+          OR: [{ username: adminData.username }, { email: adminData.email }],
+        },
+      });
 
-    if (existingUser?.email === adminData.email) {
-      const errors = {
-        email: "email already exists.",
+      if (existingUser?.email === adminData.email) {
+        const errors = {
+          email: "Email already exists.",
+        };
+        throw new CustomError(
+          "User already exists",
+          409,
+          "user creation",
+          true,
+          "",
+          errors
+        );
+      } else if (existingUser?.username === adminData.username) {
+        const errors = {
+          username: "Username already exists.",
+        };
+        throw new CustomError(
+          "User already exists",
+          409,
+          "user creation",
+          true,
+          "",
+          errors
+        );
+      }
+
+      const hashedPassword = bcrypt.hashSync(adminData.password, 10);
+
+      const newAdmin = await prisma.user.create({
+        data: {
+          username: adminData.username,
+          email: adminData.email,
+          passwordHash: hashedPassword,
+        },
+      });
+
+      console.log("admin created");
+
+      const role = await prisma.role.findUnique({
+        where: {
+          name: "admin",
+        },
+        select: { id: true },
+      });
+
+      if (!role) {
+        throw new CustomError("Admin role not found", 404, "role lookup", true);
+      }
+
+      console.log("role founded", role.id);
+
+      await prisma.userRole.create({
+        data: {
+          userId: newAdmin.id,
+          roleId: role.id,
+        },
+      });
+      console.log("user role created");
+
+      await prisma.group.create({
+        data: {
+          name: `${newAdmin.username}'s group`,
+          ownerId: newAdmin.id,
+        },
+      });
+
+      return {
+        username: newAdmin.username,
+        id: newAdmin.id,
+        email: newAdmin.email,
+        createdAt: newAdmin.createdAt,
+        updatedAt: newAdmin.updatedAt,
       };
-      throw new CustomError(
-        "User already exists",
-        409,
-        "user creation",
-        true,
-        "",
-        errors
-      );
-    } else if (existingUser?.username === adminData.username) {
-      const errors = {
-        username: "username already exists.",
-      };
-      throw new CustomError(
-        "User already exists",
-        409,
-        "user creation",
-        true,
-        "",
-        errors
-      );
-    }
-    const hashedPassword = bcrypt.hashSync(adminData.password, 10);
-    const newAdmin = await prisma.user.create({
-      data: {
-        username: adminData.username,
-        email: adminData.email,
-        passwordHash: hashedPassword,
-      },
     });
-
-    const role = await prisma.role.findUnique({
-      where: {
-        name: "admin",
-      },
-      select: { id: true },
-    });
-
-    if (!role) {
-      throw new CustomError("Admin role not found", 404, "role lookup", true);
-    }
-
-    await prisma.userRole.create({
-      data: {
-        userId: newAdmin.id,
-        roleId: role.id,
-      },
-    });
-
-    await prisma.group.create({
-      data: {
-        name: `${newAdmin.username}'s group`,
-        ownerId: newAdmin.id,
-      },
-    });
-
-    // will use this when inviting users to groups instead
-    // await prisma.userGroup.create({
-    //   data: {
-    //     ownerId: newAdmin.id,
-    //     groupId: group.id,
-    //   },
-    // });
-
-    return {
-      username: newAdmin.username,
-      id: newAdmin.id,
-      email: newAdmin.email,
-      createdAt: newAdmin.createdAt,
-      updatedAt: newAdmin.updatedAt,
-    };
   } catch (error) {
+    console.error(error);
     throw error;
   }
 };

@@ -135,174 +135,175 @@ const SurveyBuilder = () => {
   }
 
   return (
-    <div className="home">
-      <div className="ml-2 mt-5 lg:hidden">
-        <button
-          className="flex left-4 top-3 w-[32px] h-[32px]"
-          onClick={() => setIsMobileAsideOpen(true)}
-        >
-          <Image
-            alt="sidebar"
-            src={"/assets/icons/sidebar.svg"}
-            width={32}
-            height={32}
-          />
-        </button>
-      </div>
-      <aside>
-        <div className="w-full flex items-end justify-between font-semibold mb-5">
-          <p className="p-1">Workspaces</p>
-          <div className="flex flex-wrap items-center gap-5">
-            <button
-              className="p-1 cursor-pointer transition-all hover:bg-[#6272a4] rounded-md"
-              aria-label="Add Workspace"
-              onClick={() => setIsCreateWorkspaceOpen(true)}
-            >
-              <Image
-                src="/assets/icons/plus.svg"
-                alt="Add Workspace"
-                className="w-[20px]"
-                width={20}
-                height={20}
-              />
-            </button>
-            {workspaces.length > 1 && (
-              <button
-                onClick={() => setIsWorkspaceSearchOpen(true)}
-                className="p-1 cursor-pointer transition-all hover:bg-[#6272a4] rounded-md"
-                aria-label="Search Workspaces"
-              >
-                <Image
-                  src="/assets/icons/search.svg"
-                  alt="Search Workspaces"
-                  width={20}
-                  height={20}
-                />
-              </button>
-            )}
-          </div>
+    <>
+      <div className="home">
+        <div className="ml-2 mt-5 lg:hidden">
+          <button
+            className="flex left-4 top-3 w-[32px] h-[32px]"
+            onClick={() => setIsMobileAsideOpen(true)}
+          >
+            <Image
+              alt="sidebar"
+              src={"/assets/icons/sidebar.svg"}
+              width={32}
+              height={32}
+            />
+          </button>
         </div>
-        <Workspaces />
-      </aside>
-
-      {/* mobile aside */}
-
-      <aside
-        className={`bg-base-100 aside_mobile ${
-          !isMobileAsideOpen ? "aside_mobile_closed" : ""
-        }`}
-      >
-        <button
-          className="text-white flex justify-center bg-blue-600 mb-5 h-max text-2xl py-2"
-          onClick={() => setIsMobileAsideOpen(false)}
-        >
-          Close SideBar
-        </button>{" "}
-        <div className="w-full flex items-end justify-between font-semibold mb-5">
-          <p className="p-1">Workspaces</p>
-          <div className="flex flex-wrap items-center gap-5">
-            <button
-              className="p-1 cursor-pointer transition-all hover:bg-[#6272a4] rounded-md"
-              aria-label="Add Workspace"
-              onClick={() => setIsCreateWorkspaceOpen(true)}
-            >
-              <Image
-                src="/assets/icons/plus.svg"
-                alt="Add Workspace"
-                className="w-[20px]"
-                width={20}
-                height={20}
-              />
-            </button>
-            {workspaces.length > 1 && (
+        <aside>
+          <div className="w-full flex items-end justify-between font-semibold mb-5">
+            <p className="p-1">Workspaces</p>
+            <div className="flex flex-wrap items-center gap-5">
               <button
-                onClick={() => setIsWorkspaceSearchOpen(true)}
                 className="p-1 cursor-pointer transition-all hover:bg-[#6272a4] rounded-md"
-                aria-label="Search Workspaces"
+                aria-label="Add Workspace"
+                onClick={() => setIsCreateWorkspaceOpen(true)}
               >
                 <Image
-                  src="/assets/icons/search.svg"
-                  alt="Search Workspaces"
-                  width={20}
-                  height={20}
-                />
-              </button>
-            )}
-          </div>
-        </div>
-        <Workspaces />
-      </aside>
-
-      <section>
-        <div className="flex flex-col gap-2">
-          {currentWorkspace && (
-            <div className="flex items-end gap-5 mb-5 relative w-max">
-              <p className="font-extrabold text-gray-300 text-xl max-w-[250px] text-ellipsis overflow-hidden">
-                {currentWorkspace?.name}
-              </p>
-
-              <button
-                className="p-[.5px] bg-[#292c2e] cursor-pointer transition-all hover:bg-[#6272a4] rounded-md relative "
-                onClick={toggleMenu}
-                ref={toggleButtonRef}
-              >
-                <Image
-                  src="/assets/icons/dots.svg"
-                  alt="More Options"
+                  src="/assets/icons/plus.svg"
+                  alt="Add Workspace"
                   className="w-[20px]"
                   width={20}
                   height={20}
                 />
               </button>
-              {menuOpen && (
-                <div
-                  className="flex w-[200px] flex-col text-left  top-[30px] text-sm absolute font-semibold bg-[#0e0e0e] p-2 rounded-md shadow-md z-10"
-                  ref={workspaceChangeMenuRef}
+              {workspaces.length > 1 && (
+                <button
+                  onClick={() => setIsWorkspaceSearchOpen(true)}
+                  className="p-1 cursor-pointer transition-all hover:bg-[#6272a4] rounded-md"
+                  aria-label="Search Workspaces"
                 >
-                  <span
-                    className="survey_card_buttons"
-                    onClick={() => setIsUpdateWorkspaceTitleOpen(true)}
-                  >
-                    Rename Workspace
-                  </span>
-                  <button
-                    disabled={isPending}
-                    className="survey_card_buttons text-red-600"
-                    onClick={() => {
-                      deleteWorkspace(currentWorkspace?.id);
-                    }}
-                  >
-                    {isPending ? (
-                      <span className="loading loading-spinner loading-sm"></span>
-                    ) : (
-                      "Delete"
-                    )}
-                  </button>
-                </div>
+                  <Image
+                    src="/assets/icons/search.svg"
+                    alt="Search Workspaces"
+                    width={20}
+                    height={20}
+                  />
+                </button>
               )}
             </div>
-          )}
-        </div>
-        {currentWorkspace ? (
-          <Surveys />
-        ) : (
-          <div className="text-center font-semibold text-2xl">
-            Create a workspace to start
           </div>
-        )}
-      </section>
-      <button
-        className="flex items-start absolute right-0"
-        onClick={() => setIsGroupProfileOpen(true)}
-      >
-        <Image
-          src={"/assets/icons/group.svg"}
-          alt="Group"
-          width={64}
-          height={64}
-        />
-      </button>
+          <Workspaces />
+        </aside>
 
+        {/* mobile aside */}
+
+        <aside
+          className={`bg-base-100 aside_mobile ${
+            !isMobileAsideOpen ? "aside_mobile_closed" : ""
+          }`}
+        >
+          <button
+            className="text-white flex justify-center bg-blue-600 mb-5 h-max text-2xl py-2"
+            onClick={() => setIsMobileAsideOpen(false)}
+          >
+            Close SideBar
+          </button>{" "}
+          <div className="w-full flex items-end justify-between font-semibold mb-5">
+            <p className="p-1">Workspaces</p>
+            <div className="flex flex-wrap items-center gap-5">
+              <button
+                className="p-1 cursor-pointer transition-all hover:bg-[#6272a4] rounded-md"
+                aria-label="Add Workspace"
+                onClick={() => setIsCreateWorkspaceOpen(true)}
+              >
+                <Image
+                  src="/assets/icons/plus.svg"
+                  alt="Add Workspace"
+                  className="w-[20px]"
+                  width={20}
+                  height={20}
+                />
+              </button>
+              {workspaces.length > 1 && (
+                <button
+                  onClick={() => setIsWorkspaceSearchOpen(true)}
+                  className="p-1 cursor-pointer transition-all hover:bg-[#6272a4] rounded-md"
+                  aria-label="Search Workspaces"
+                >
+                  <Image
+                    src="/assets/icons/search.svg"
+                    alt="Search Workspaces"
+                    width={20}
+                    height={20}
+                  />
+                </button>
+              )}
+            </div>
+          </div>
+          <Workspaces />
+        </aside>
+
+        <section>
+          <div className="flex flex-col gap-2">
+            {currentWorkspace && (
+              <div className="flex items-end gap-5 mb-5 relative w-max">
+                <p className="font-extrabold text-gray-300 text-xl max-w-[250px] text-ellipsis overflow-hidden">
+                  {currentWorkspace?.name}
+                </p>
+
+                <button
+                  className="p-[.5px] bg-[#292c2e] cursor-pointer transition-all hover:bg-[#6272a4] rounded-md relative "
+                  onClick={toggleMenu}
+                  ref={toggleButtonRef}
+                >
+                  <Image
+                    src="/assets/icons/dots.svg"
+                    alt="More Options"
+                    className="w-[20px]"
+                    width={20}
+                    height={20}
+                  />
+                </button>
+                {menuOpen && (
+                  <div
+                    className="flex w-[200px] flex-col text-left  top-[30px] text-sm absolute font-semibold bg-[#0e0e0e] p-2 rounded-md shadow-md z-10"
+                    ref={workspaceChangeMenuRef}
+                  >
+                    <span
+                      className="survey_card_buttons"
+                      onClick={() => setIsUpdateWorkspaceTitleOpen(true)}
+                    >
+                      Rename Workspace
+                    </span>
+                    <button
+                      disabled={isPending}
+                      className="survey_card_buttons text-red-600"
+                      onClick={() => {
+                        deleteWorkspace(currentWorkspace?.id);
+                      }}
+                    >
+                      {isPending ? (
+                        <span className="loading loading-spinner loading-sm"></span>
+                      ) : (
+                        "Delete"
+                      )}
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+          {currentWorkspace ? (
+            <Surveys />
+          ) : (
+            <div className="text-center font-semibold text-2xl">
+              Create a workspace to start
+            </div>
+          )}
+        </section>
+        <button
+          className="flex items-start absolute right-0"
+          onClick={() => setIsGroupProfileOpen(true)}
+        >
+          <Image
+            src={"/assets/icons/group.svg"}
+            alt="Group"
+            width={64}
+            height={64}
+          />
+        </button>
+      </div>
       <CreateWorkspaceDialog
         isOpen={isCreateWorkspaceOpen}
         onClose={() => setIsCreateWorkspaceOpen(false)}
@@ -319,7 +320,7 @@ const SurveyBuilder = () => {
         isOpen={isGroupProfileOpen}
         onClose={() => setIsGroupProfileOpen(false)}
       />
-    </div>
+    </>
   );
 };
 

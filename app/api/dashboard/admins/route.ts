@@ -36,6 +36,7 @@ export const POST = async (req: NextRequest) => {
     const newAdmin = await dashboardNewAdminsService(data);
     return NextResponse.json(newAdmin, { status: 201 });
   } catch (error) {
+    console.log(error);
     return errorHandler(error);
   }
 };

@@ -37,7 +37,9 @@ export const getWorkSpacesService = async (userId: number) => {
     const groupIds = userGroups
       .map((group) => group.groupId)
       .filter((groupId) => groupId !== userGroupAndGroupMembers?.id);
-    console.log;
+
+    console.log("groupIds", groupIds);
+
     const myWorkspaces = await prisma.workspace.findMany({
       where: { userId },
       include: {
@@ -59,6 +61,8 @@ export const getWorkSpacesService = async (userId: number) => {
         WorkspaceGroup: true,
       },
     });
+
+    console.log("groupWorkspaces", groupWorkspaces);
 
     const allWorkspaces = [...myWorkspaces, ...groupWorkspaces].sort(
       (a, b) =>

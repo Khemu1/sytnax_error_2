@@ -308,7 +308,7 @@ footer {
   @apply font-semibold;
 }
 .profile_input {
-  @apply w-[250px] p-3 rounded-md font-semibold  bg-base-300 shadow-md  transition-all focus:outline-none focus:ring-2 focus:ring-blue-500;
+  @apply w-[250px] p-3 rounded-md font-semibold  bg-base-300 shadow-md  transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 !important;
 }
 
 .feat {

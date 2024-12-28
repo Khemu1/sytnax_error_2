@@ -53,7 +53,7 @@ const QuizGrade = () => {
 
             {data?.gradesVisibility === "visibleAfterSurveyCloses" &&
               data.cleanSubmission &&
-              !data.isOpen &&
+              data.isOpen &&
               data.endTime && (
                 <>
                   <div className="text-xl font-semibold text-white">
