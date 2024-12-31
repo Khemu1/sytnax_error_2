@@ -408,7 +408,11 @@ const QuizParticipate: React.FC = () => {
                     className="py-2 px-4 w-[200px] bg-blue-600 text-white rounded-md shadow-md hover:bg-blue-700 transition duration-300"
                     onClick={() => {
                       window.navigator.clipboard.writeText(
-                        `${process.env.NEXT_PUBLIC_BASE_URL}/quiz/check-grade/${data?.id}`
+                        `${
+                          process.env.NODE_ENV === "development"
+                            ? process.env.NEXT_PUBLIC_BASE_URL
+                            : process.env.NEXT_PUBLIC_DEV_URL
+                        }/quiz/check-grade/${data?.id}`
                       );
                       setToast({
                         message: "Link copied to clipboard",
