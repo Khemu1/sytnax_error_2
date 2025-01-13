@@ -119,7 +119,9 @@ const SignInForm: React.FC<Props> = ({ changeTabTo }) => {
 
           {apiErrors?.message && (
             <p className="mx-auto text-center mb-5 h-[10px] font-semibold text-xl text-red-600">
-              {apiErrors?.message}
+              {apiErrors?.message.includes("prisma.user.findFirst()")
+                ? "Something went wrong"
+                : apiErrors?.message}
             </p>
           )}
 
