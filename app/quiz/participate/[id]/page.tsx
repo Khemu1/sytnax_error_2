@@ -133,17 +133,15 @@ const QuizParticipate: React.FC = () => {
   };
 
   const returnUrl = useMemo(() => {
-    if (!data?.id) {
-      notFound();
-      return "";
+    if (data?.id) {
+      if (process.env.NEXT_PUBLIC_NODE_ENV === "development") {
+        return `${process.env.NEXT_PUBLIC_DEV_URL}quiz/check-grade/${data?.id}`;
+      }
+      if (process.env.NEXT_PUBLIC_NODE_ENV === "production") {
+        return `${process.env.NEXT_PUBLIC_BASE_URL}quiz/check-grade/${data?.id}`;
+      }
+      return `${process.env.NEXT_PUBLIC_LOCAL_URL}quiz/check-grade/${data?.id}`;
     }
-    if (process.env.NEXT_PUBLIC_NODE_ENV === "development") {
-      return `${process.env.NEXT_PUBLIC_DEV_URL}quiz/check-grade/${data?.id}`;
-    }
-    if (process.env.NEXT_PUBLIC_NODE_ENV === "production") {
-      return `${process.env.NEXT_PUBLIC_BASE_URL}quiz/check-grade/${data?.id}`;
-    }
-    return `${process.env.NEXT_PUBLIC_LOCAL_URL}quiz/check-grade/${data?.id}`;
   }, [data?.id]);
 
   const handleQuizSubmit = (clean = true) => {
@@ -167,8 +165,6 @@ const QuizParticipate: React.FC = () => {
       };
       const formData = new FormData();
       transformDataIntoFormData(prepData, formData);
-      console.log(survey?.questions);
-      console.log(userQuizAnswers);
       handleAddQuizParticipant({ quizData: formData });
 
       setToast({ message: "Submitting", type: "success" });
@@ -201,9 +197,7 @@ const QuizParticipate: React.FC = () => {
     }
   }, [quizSuccess, quizError]);
 
-  useEffect(() => {
-    console.log("participant", participant);
-  }, [participant]);
+  useEffect(() => {}, [participant]);
   if (!params.id || (isError && !survey)) {
     return notFound();
   }
@@ -421,7 +415,7 @@ const QuizParticipate: React.FC = () => {
                   <button
                     className="py-2 px-4 w-[200px] bg-blue-600 text-white rounded-md shadow-md hover:bg-blue-700 transition duration-300"
                     onClick={() => {
-                      window.navigator.clipboard.writeText(returnUrl);
+                      window.navigator.clipboard.writeText(returnUrl ?? "/");
                       setToast({
                         message: "Link copied to clipboard",
                         type: "success",
