@@ -410,8 +410,8 @@ const QuizParticipate: React.FC = () => {
                       window.navigator.clipboard.writeText(
                         `${
                           process.env.NODE_ENV === "development"
-                            ? process.env.NEXT_PUBLIC_BASE_URL
-                            : process.env.NEXT_PUBLIC_DEV_URL
+                            ? process.env.NEXT_PUBLIC_DEV_URL
+                            : process.env.NEXT_PUBLIC_BASE_URL
                         }/quiz/check-grade/${data?.id}`
                       );
                       setToast({

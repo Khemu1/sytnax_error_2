@@ -249,10 +249,10 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
                   className="py-2"
                   onClick={() => {
                     window.navigator.clipboard.writeText(
-                      ` R${
+                      `${
                         process.env.NODE_ENV === "development"
-                          ? process.env.NEXT_PUBLIC_BASE_URL
-                          : process.env.NEXT_PUBLIC_DEV_URL
+                          ? process.env.NEXT_PUBLIC_DEV_URL
+                          : process.env.NEXT_PUBLIC_BASE_URL
                       }/quiz/participate/${survey.id}`
                     );
                     setToast({
