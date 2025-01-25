@@ -99,6 +99,11 @@ const handleDashboardRoutes = async (req: NextRequest) => {
 };
 
 export async function middleware(req: CustomNextRequest) {
+  const maintenanceMode = process.env.MAINTENANCE_MODE === "true";
+
+  if (maintenanceMode && !req.nextUrl.pathname.startsWith("/maintenance")) {
+    return NextResponse.redirect(new URL("/maintenance", req.url));
+  }
   try {
     // await checkRateLimit(req); // Check general rate limits
     const { pathname } = req.nextUrl;
