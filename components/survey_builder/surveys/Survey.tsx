@@ -6,7 +6,7 @@ import { RootState } from "@/store/store";
 import { SurveyProps } from "@/types/survey";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import UpdateSurveyTitleDialog from "@/components/survey_builder/Dialog/survey/UpdateSurveyTitleDialog";
 import MoveSurveyDialog from "@/components/survey_builder/Dialog/survey/MoveSurveyDialog";
@@ -68,6 +68,16 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
         break;
     }
   };
+
+  const returnUrl = useMemo(() => {
+    if (process.env.NEXT_PUBLIC_NODE_ENV === "development") {
+      return `${process.env.NEXT_PUBLIC_DEV_URL}//quiz/participate/${survey.id}`;
+    }
+    if (process.env.NEXT_PUBLIC_NODE_ENV === "production") {
+      return `${process.env.NEXT_PUBLIC_BASE_URL}/quiz/participate/${survey.id}`;
+    }
+    return `${process.env.NEXT_PUBLIC_LOCAL_URL}/quiz/participate/${survey.id}`;
+  }, [survey.id]);
 
   const handleCloseDialogs = () => {
     setUpdateDialogOpen(false);
@@ -248,18 +258,8 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
                 <button
                   className="py-2"
                   onClick={() => {
-                    console.log(
-                      process.env.NODE_ENV,
-                      process.env.NEXT_PUBLIC_DEV_URL,
-                      process.env.NEXT_PUBLIC_BASE_URL
-                    );
-                    window.navigator.clipboard.writeText(
-                      `${
-                        process.env.NODE_ENV === "development"
-                          ? process.env.NEXT_PUBLIC_DEV_URL
-                          : process.env.NEXT_PUBLIC_BASE_URL
-                      }/quiz/participate/${survey.id}`
-                    );
+                    console.log(process.env.NEXT_PUBLIC_NODE_ENV);
+                    window.navigator.clipboard.writeText(returnUrl);
                     setToast({
                       message: "Link copied to clipboard",
                       type: "success",

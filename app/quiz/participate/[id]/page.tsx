@@ -2,7 +2,7 @@
 
 import { Analytics } from "@vercel/analytics/react";
 import QuizForm from "@/components/quiz/QuizForm";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { QuizFormErrors, QuizUserFormProps } from "@/types/quiz";
 import { validateWithSchema } from "@/utils/validations/validations";
 import Quiz from "@/components/quiz/Quiz";
@@ -131,6 +131,20 @@ const QuizParticipate: React.FC = () => {
       setValidatingQuiz(false);
     }
   };
+
+  const returnUrl = useMemo(() => {
+    if (!data?.id) {
+      notFound();
+      return "";
+    }
+    if (process.env.NEXT_PUBLIC_NODE_ENV === "development") {
+      return `${process.env.NEXT_PUBLIC_DEV_URL}quiz/check-grade/${data?.id}`;
+    }
+    if (process.env.NEXT_PUBLIC_NODE_ENV === "production") {
+      return `${process.env.NEXT_PUBLIC_BASE_URL}quiz/check-grade/${data?.id}`;
+    }
+    return `${process.env.NEXT_PUBLIC_LOCAL_URL}quiz/check-grade/${data?.id}`;
+  }, [data?.id]);
 
   const handleQuizSubmit = (clean = true) => {
     const submissionDate = new Date();
@@ -407,13 +421,7 @@ const QuizParticipate: React.FC = () => {
                   <button
                     className="py-2 px-4 w-[200px] bg-blue-600 text-white rounded-md shadow-md hover:bg-blue-700 transition duration-300"
                     onClick={() => {
-                      window.navigator.clipboard.writeText(
-                        `${
-                          process.env.NODE_ENV === "development"
-                            ? process.env.NEXT_PUBLIC_DEV_URL
-                            : process.env.NEXT_PUBLIC_BASE_URL
-                        }/quiz/check-grade/${data?.id}`
-                      );
+                      window.navigator.clipboard.writeText(returnUrl);
                       setToast({
                         message: "Link copied to clipboard",
                         type: "success",
