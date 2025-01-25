@@ -248,6 +248,11 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
                 <button
                   className="py-2"
                   onClick={() => {
+                    console.log(
+                      process.env.NODE_ENV,
+                      process.env.NEXT_PUBLIC_DEV_URL,
+                      process.env.NEXT_PUBLIC_BASE_URL
+                    );
                     window.navigator.clipboard.writeText(
                       `${
                         process.env.NODE_ENV === "development"
