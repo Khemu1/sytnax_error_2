@@ -77,81 +77,104 @@ const Nav = () => {
   }, [isMenuOpen]);
 
   return (
-    <nav ref={navRef} className="bg-base-300 sticky top-0 z-[15]">
+    <nav ref={navRef} className="bg-base-300 sticky top-0 z-[15] p-3">
+      {/* Logo Section */}
       <Link
-        className="flex items-center sm:hover:bg-gray-800 w-max py-1 px-2 rounded-lg gap-2 active:scale-95 transition-all"
-        href={"/"}
+        href="/"
+        className="flex items-center sm:hover:bg-gray-800 py-1 px-3 rounded-lg gap-2 active:scale-95 transition-all"
+        aria-label="Home"
       >
-        <Image
-          src={"/assets/imgs/logo.png"}
-          alt={"logo"}
-          width={45}
-          height={10}
-        />
-        <span className="font-extrabold whitespace-nowrap text-sm md:text-2xl text-white">
+        <Image src="/assets/imgs/logo.png" alt="Logo" width={45} height={10} />
+        <span className="font-extrabold text-sm md:text-2xl text-white whitespace-nowrap">
           Syntax Error
         </span>
       </Link>
-      <div className="hidden sm:flex gap-5 w-auto">
-        <ul className="flex items-center m-0 text-xl gap-5 font-semibold list-none h-max">
+
+      {/* Desktop Navigation */}
+      <div className="hidden sm:flex gap-6">
+        <ul className="flex items-center text-lg font-semibold space-x-5">
           <li className="nav_buttons">
-            <Link href={"/"}>Home</Link>
+            <Link href="/">Home</Link>
           </li>
           <li className="nav_buttons">
-            <Link href={"/courses"}>Courses</Link>
+            <Link href="/courses">Courses</Link>
           </li>
-          {authState.isAuthenticated && (authState.role === 1 || 2) && (
-            <li onClick={() => setIsMenuOpen(false)} className="nav_buttons">
-              <Link href={"/dashboard"}>Dashboard</Link>
-            </li>
-          )}
+          {authState.isAuthenticated &&
+            (authState.role === 1 || authState.role === 2) && (
+              <li className="nav_buttons">
+                <Link href="/dashboard">Dashboard</Link>
+              </li>
+            )}
           {!authState.isAuthenticated ? (
             <li className="nav_buttons">
-              <Link href={"/authportal"}>Sign In</Link>
+              <Link href="/authportal">Sign In</Link>
             </li>
           ) : (
-            <li className="nav_buttons" onClick={handleSignOut}>
-              <button type="button">Sign Out</button>
+            <li className="nav_buttons">
+              <button onClick={handleSignOut} type="button">
+                Sign Out
+              </button>
             </li>
           )}
         </ul>
-        <div className="flex font-semibold"></div>
       </div>
-      <div className="sm:hidden flex justify-end w-full relative">
-        <div
-          className="w-[50px] h-[50px] relative"
-          onClick={() => setIsMenuOpen((prev) => !prev)}
-        >
-          <Image alt="nav menu" src={"/assets/icons/menu.svg"} fill={true} />
-          <ul
-            className={`nav_menu items-center ${
-              isMenuOpen ? "" : "nav_menu_closed"
-            } list-none `}
-            ref={menuRef}
-          >
-            <li onClick={() => setIsMenuOpen(false)}>
-              <Link href={"/"}>Home</Link>
-            </li>
-            <li onClick={() => setIsMenuOpen(false)}>
-              <Link href={"/courses"}>Courses</Link>
-            </li>
-            {authState.isAuthenticated && (authState.role === 1 || 2) && (
-              <li onClick={() => setIsMenuOpen(false)}>
-                <Link href={"/dashboard"}>Dashboard</Link>
-              </li>
-            )}
 
-            {!authState.isAuthenticated ? (
+      {/* Mobile Navigation Menu */}
+      <div className="sm:hidden relative">
+        <button
+          className="w-10 h-10"
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          aria-label="Toggle Menu"
+        >
+          <Image
+            src="/assets/icons/menu.svg"
+            alt="Menu"
+            width={40}
+            height={40}
+          />
+        </button>
+
+        {/* Mobile Menu */}
+        <ul
+          ref={menuRef}
+          className={`absolute top-12 right-0 w-40 bg-base-300 shadow-md rounded-lg p-3 space-y-3 text-lg transition-all ${
+            isMenuOpen
+              ? "opacity-100 scale-100"
+              : "opacity-0 scale-95 pointer-events-none"
+          }`}
+        >
+          <li>
+            <Link href="/" onClick={() => setIsMenuOpen(false)}>
+              Home
+            </Link>
+          </li>
+          <li>
+            <Link href="/courses" onClick={() => setIsMenuOpen(false)}>
+              Courses
+            </Link>
+          </li>
+          {authState.isAuthenticated &&
+            (authState.role === 1 || authState.role === 2) && (
               <li>
-                <Link href={"/authportal"}>Sign In</Link>
-              </li>
-            ) : (
-              <li onClick={handleSignOut}>
-                <button type="button">Sign Out</button>
+                <Link href="/dashboard" onClick={() => setIsMenuOpen(false)}>
+                  Dashboard
+                </Link>
               </li>
             )}
-          </ul>
-        </div>
+          {!authState.isAuthenticated ? (
+            <li>
+              <Link href="/authportal" onClick={() => setIsMenuOpen(false)}>
+                Sign In
+              </Link>
+            </li>
+          ) : (
+            <li>
+              <button onClick={handleSignOut} type="button">
+                Sign Out
+              </button>
+            </li>
+          )}
+        </ul>
       </div>
     </nav>
   );

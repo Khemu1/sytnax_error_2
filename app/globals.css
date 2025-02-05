@@ -53,12 +53,12 @@ body {
 }
 
 nav {
-  @apply mx-auto p-2 flex w-[100%] justify-between items-center sticky top-0 z-[15] bg-base-100;
+  @apply mx-auto p-2 flex w-[100%] justify-between items-center sticky top-0 z-[15] bg-base-100 shadow-lg;
   transition: 400ms ease-in-out;
 }
 
 .nav_scrolled {
-  @apply lg:w-[75vw];
+  @apply lg:w-[75vw] rounded-md;
   backdrop-filter: blur(10px);
   background-color: transparent;
   transition: 400ms ease-in-out;

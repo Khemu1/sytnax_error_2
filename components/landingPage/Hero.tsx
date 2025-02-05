@@ -1,5 +1,4 @@
 import { Analytics } from "@vercel/analytics/react";
-
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -8,34 +7,28 @@ import { courses } from "@/constants";
 export const Hero = () => {
   return (
     <div className="flex flex-col w-full">
-      <div className="relative w-full overflow-hidden">
+      {/* Hero Section */}
+      <div className="relative w-full h-[70vh] overflow-hidden">
         <Image
           className="rounded-lg shadow-lg object-cover"
           src="https://i.imgur.com/cfKyIGv.png"
           alt="Cover"
           priority={true}
-          width={1920}
-          height={1080}
+          fill
           sizes="100vw"
         />
         <div className="absolute inset-0 bg-black opacity-50"></div>
 
-        <div className="absolute inset-0 flex flex-col justify-center items-center z-[10] text-center text-white px-14">
-          <h1 className="text-[1.3rem] md:text-5xl font-bold mb-4 fade-in">
+        <div className="absolute inset-0 flex flex-col justify-center items-center z-[10] text-center text-white px-4">
+          <h1 className="text-4xl md:text-6xl font-bold mb-4 animate-fade-in">
             Welcome to Syntax Error
           </h1>
-          <div>
-            <p
-              className="text-xl font-light mb-3 sm:mb-6 fade-in w-full"
-              style={{ animationDelay: "0.5s" }}
-            >
-              Master your coding skills with expert-led courses.
-            </p>
-          </div>
+          <p className="text-xl md:text-2xl font-light mb-6 animate-fade-in delay-500">
+            Master your coding skills with expert-led courses.
+          </p>
           <Link
-            href={"/courses"}
-            className="CTA"
-            style={{ animationDelay: "1s" }}
+            href="/courses"
+            className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 hover:scale-105 transition-all duration-300 animate-fade-in delay-1000"
           >
             Get Started
           </Link>
@@ -43,19 +36,16 @@ export const Hero = () => {
       </div>
 
       {/* Team Introduction Section */}
-      <div className="px-2 flex justify-center items-center py-10 bg-base-200">
-        <div className="flex flex-col sm:flex-row items-center gap-8 my-8">
-          {/* Team Logo */}
-          <div className="relative rounded-full overflow-hidden h-[100px] w-[100px] md:w-[150px] md:h-[150px] hero_logo">
-            <Image src={"/assets/imgs/logo.png"} alt={"logo"} fill={true} />
+      <div className="px-4 py-16 bg-base-200">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center gap-8">
+          <div className="relative rounded-full overflow-hidden h-[150px] w-[150px] md:w-[200px] md:h-[200px] animate-fade-in border-4 border-blue-500">
+            <Image src="/assets/imgs/logo.png" alt="logo" fill />
           </div>
-
-          {/* Team Information */}
-          <div className="flex flex-col items-center text-center">
-            <h1 className="text-4xl font-bold text-white text-wrap text-center ">
+          <div className="flex flex-col items-center sm:items-start text-center sm:text-left">
+            <h1 className="text-4xl font-bold text-white mb-4 animate-fade-in">
               Who Are We
             </h1>
-            <p className="text-lg mt-2 px-4 max-w-2xl text-white">
+            <p className="text-lg text-gray-300 max-w-2xl animate-fade-in delay-500">
               Syntax Error is a team of passionate developers and educators
               committed to helping individuals master the world of coding
               through expertly designed courses.
@@ -65,12 +55,28 @@ export const Hero = () => {
       </div>
 
       {/* Team Mission Section */}
-      <div className="px-2 flex justify-center items-center py-10 bg-base-100">
-        <div className="max-w-4xl text-center">
-          <h2 className="text-3xl font-semibold mb-4 text-blue-500 text-wrap text-center ">
+      <div className="px-4 py-16 bg-base-100">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="flex justify-center mb-6">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-12 w-12 text-blue-500"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+              />
+            </svg>
+          </div>
+          <h2 className="text-4xl font-bold mb-6 text-blue-500 animate-fade-in">
             Our Mission
           </h2>
-          <p className="text-lg px-4 text-white">
+          <p className="text-lg text-gray-300 animate-fade-in delay-500">
             Our mission is to make learning to code accessible, engaging, and
             practical for everyone. We believe that hands-on, project-based
             learning is key to mastering any skill. Whether you&apos;re just
@@ -82,12 +88,28 @@ export const Hero = () => {
       </div>
 
       {/* Team Expertise Section */}
-      <div className="px-2 flex justify-center items-center py-10 bg-base-200">
-        <div className="max-w-4xl text-center">
-          <h2 className="text-3xl font-semibold mb-4 text-green-500 text-wrap text-center ">
+      <div className="px-4 py-16 bg-base-200">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="flex justify-center mb-6">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-12 w-12 text-green-500"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+              />
+            </svg>
+          </div>
+          <h2 className="text-4xl font-bold mb-6 text-green-500 animate-fade-in">
             Our Expertise
           </h2>
-          <p className="text-lg px-4 text-white">
+          <p className="text-lg text-gray-300 animate-fade-in delay-500">
             With a team of instructors who have years of experience in the tech
             industry, we offer courses that are not only comprehensive but also
             up-to-date with the latest trends and technologies. Our goal is to
@@ -98,12 +120,28 @@ export const Hero = () => {
       </div>
 
       {/* Team Values Section */}
-      <div className="px-2 flex justify-center items-center py-10 bg-base-100">
-        <div className="max-w-4xl text-center">
-          <h2 className="text-3xl font-semibold mb-4 text-[#FFD700] text-wrap text-center ">
+      <div className="px-4 py-16 bg-base-100">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="flex justify-center mb-6">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-12 w-12 text-[#FFD700]"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M13 10V3L4 14h7v7l9-11h-7z"
+              />
+            </svg>
+          </div>
+          <h2 className="text-4xl font-bold mb-6 text-[#FFD700] animate-fade-in">
             Our Values
           </h2>
-          <p className="text-lg px-4 text-white">
+          <p className="text-lg text-gray-300 animate-fade-in delay-500">
             At Syntax Error, we value collaboration, continuous learning, and
             innovation. We are constantly evolving to ensure that our learners
             have access to the best resources and support. By focusing on
@@ -112,23 +150,29 @@ export const Hero = () => {
           </p>
         </div>
       </div>
-      <div className="px-2 flex flex-col w-full items-center gap-8 py-8 bg-base-200">
-        <h2 className="text-3xl font-semibold text-[#FFD700] text-wrap text-center ">
-          Courses We Specializes At
-        </h2>
-        <div className="flex flex-col gap-4">
-          {courses.map((course) => (
-            <div key={course.title} className="feat">
-              <span className="font-semibold text-xl whitespace-nowrap">
-                {course.title}
-              </span>
-              <span className="flex text-sm md:text-base">
-                {course.description}
-              </span>
-            </div>
-          ))}
+
+      {/* Courses Section */}
+      <div className="px-4 py-16 bg-base-200">
+        <div className="max-w-6xl mx-auto flex flex-col items-center gap-8">
+          <h2 className="text-4xl font-bold text-[#FFD700] animate-fade-in">
+            Courses We Specialize In
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+            {courses.map((course) => (
+              <div
+                key={course.title}
+                className="hover:scale-[105%] transition-all duration-300 bg-base-100 p-6 rounded-lg shadow-lg hover:shadow-xl  "
+              >
+                <h3 className="text-xl font-semibold text-white mb-2">
+                  {course.title}
+                </h3>
+                <p className="text-sm text-gray-300">{course.description}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
+
       <Analytics />
     </div>
   );
