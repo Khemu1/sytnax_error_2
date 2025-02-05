@@ -74,9 +74,9 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
       return `${process.env.NEXT_PUBLIC_DEV_URL}/quiz/participate/${survey.id}`;
     }
     if (process.env.NEXT_PUBLIC_NODE_ENV === "production") {
-      return `${process.env.NEXT_PUBLIC_BASE_URL}/quiz/participate/${survey.id}`;
+      return `${process.env.NEXT_PUBLIC_VERCEL_URL}/quiz/participate/${survey.id}`;
     }
-    return `${process.env.NEXT_PUBLIC_LOCAL_URL}/quiz/participate/${survey.id}`;
+    return `${process.env.NEXT_PUBLIC_VERCEL_URL}/quiz/participate/${survey.id}`;
   }, [survey.id]);
 
   const handleCloseDialogs = () => {

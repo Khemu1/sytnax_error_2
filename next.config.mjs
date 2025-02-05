@@ -10,8 +10,11 @@ const nextConfig = {
       },
     ],
   },
+  env: {
+    NEXT_PUBLIC_VERCEL_URL: process.env.VERCEL_URL,
+  },
 
-  webpack: (config,) => {
+  webpack: (config) => {
     // Prevent duplicate CKEditor modules
     config.externals = config.externals || {};
     config.externals["@ckeditor/ckeditor5-build-classic"] =
