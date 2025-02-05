@@ -63,7 +63,6 @@ export const useAddQuestion = () => {
     isPending,
   };
 };
-
 export const useDeleteQuestion = () => {
   const dispatch = useDispatch();
   const [errorState, setErrorState] = useState<Record<
@@ -82,11 +81,15 @@ export const useDeleteQuestion = () => {
   >({
     mutationFn: async ({ questionId, surveyId, workspaceId }) => {
       setErrorState(null);
+      console.log("Deleting question:", questionId);
 
       const response = await deleteQuestion(questionId, surveyId, workspaceId);
+      console.log("Delete response:", response);
+
       return response;
     },
     onSuccess: (questionId) => {
+      console.log("Question deleted successfully:", questionId);
       deleteQuestionFromArrayF(questionId, dispatch);
     },
     onError: (err: CustomError | unknown) => {
@@ -95,7 +98,7 @@ export const useDeleteQuestion = () => {
           ? err.errors || { message: err.message }
           : { message: "Unknown Error" };
       setErrorState(message);
-      console.error("Error creating new survey:", err);
+      console.error("Error deleting question:", err);
     },
   });
 

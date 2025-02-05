@@ -71,7 +71,7 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
 
   const returnUrl = useMemo(() => {
     if (process.env.NEXT_PUBLIC_NODE_ENV === "development") {
-      return `${process.env.NEXT_PUBLIC_DEV_URL}//quiz/participate/${survey.id}`;
+      return `${process.env.NEXT_PUBLIC_DEV_URL}/quiz/participate/${survey.id}`;
     }
     if (process.env.NEXT_PUBLIC_NODE_ENV === "production") {
       return `${process.env.NEXT_PUBLIC_BASE_URL}/quiz/participate/${survey.id}`;
