@@ -114,7 +114,7 @@ const MoveSurveyDialog: React.FC<MoveSurveyDialogProps> = ({
               >
                 <div className="relative">
                   <ComboboxInput
-                    className="w-full rounded-lg border-none bg-white/5 py-1.5 px-3 text-sm text-white outline-none placeholder-gray-400"
+                    className="w-full rounded-lg border-none bg-white/5 py-1.5 px-3 text-sm text-white outline-0 placeholder-gray-400"
                     onChange={(event) => setQuery(event.target.value)}
                     placeholder="Write workspace name"
                     displayValue={(workspaceId) =>

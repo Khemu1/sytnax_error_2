@@ -5,8 +5,8 @@ import {
 } from "@/frontendServices/quiz";
 import { getSurveyForQuiz } from "@/frontendServices/survey_builder/survey";
 import { CustomError } from "@/middleware/CustomError";
-import { SurveyModel, SurveyParticipantModel } from "@/types/survey";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { SurveyParticipantModel, SurveyStatusResponse } from "@/types/survey";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 
 export const useGetSurveyForQuiz = (
@@ -25,7 +25,7 @@ export const useGetSurveyForQuiz = (
     data: survey,
     isError,
     isLoading,
-  } = useQuery<Omit<SurveyModel, "correctAnswers">, CustomError>({
+  } = useQuery<Omit<SurveyStatusResponse, "correctAnswers">, CustomError>({
     queryKey: shouldFetch
       ? ["getSurvey", surveyId, participantId, attempts]
       : [],
@@ -60,6 +60,7 @@ export const useGetParticipantForQuiz = (
   surveyId: string,
   fetch: boolean
 ) => {
+  const queryClient = useQueryClient();
   const [errorState, setErrorState] = useState<Record<string, string> | null>(
     null
   );
@@ -74,16 +75,14 @@ export const useGetParticipantForQuiz = (
     isPending,
     isFetching,
   } = useQuery<SurveyParticipantModel, CustomError>({
-    queryKey: shouldFetch ? ["getParticpant", studentId, surveyId, fetch] : [],
+    queryKey: shouldFetch ? ["getParticpant", studentId, surveyId] : [],
     queryFn: async () => {
       try {
         if (!shouldFetch) {
           throw new Error("Missing workspaceId or surveyId");
         }
-
         setErrorState(null);
-        const particpants = await getParticpantForQuiz(studentId, surveyId);
-        return particpants;
+        return await getParticpantForQuiz(studentId, surveyId);
       } catch (error) {
         const message =
           error instanceof CustomError
@@ -99,6 +98,10 @@ export const useGetParticipantForQuiz = (
     refetchOnMount: "always",
   });
 
+  const resetParticipant = () => {
+    queryClient.clear();
+  };
+
   return {
     participant,
     isError,
@@ -107,6 +110,7 @@ export const useGetParticipantForQuiz = (
     isSuccess,
     isPending,
     isFetching,
+    resetParticipant,
   };
 };
 

@@ -10,7 +10,6 @@ const prisma = new PrismaClient().$extends(withAccelerate());
 export const checkSurveyExistsForQuiz = async (
   _req: NextRequest,
   surveyId: string,
-  submissionData?: Date
 ) => {
   try {
     if (!surveyId) {
@@ -41,12 +40,6 @@ export const checkSurveyExistsForQuiz = async (
       );
     }
     console.log("survey has intervals");
-    const currrentDate = submissionData ?? new Date();
-    const startTime = new Date(survey.startTime);
-    const endTime = new Date(survey.endTime);
-    if (currrentDate < startTime || currrentDate > endTime) {
-      throw new CustomError("Survey is not open", 403, "", true);
-    }
 
     console.log("survey existense check done for quiz");
     const repsonse = NextResponse.next();

@@ -263,7 +263,7 @@ const EditQuestion: React.FC<NewQuestionDialogProps> = ({
       <Dialog
         open={isOpen}
         as="div"
-        className="relative z-50 focus:outline-none"
+        className="relative z-50 focus:outline-0"
         onClose={onClose}
       >
         <div className="fixed inset-0 z-[100000] w-screen overflow-y-auto">

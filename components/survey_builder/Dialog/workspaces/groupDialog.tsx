@@ -111,7 +111,7 @@ const GroupDialog: React.FC<GroupDialogProps> = ({ isOpen, onClose }) => {
                     value={text}
                     onChange={(e) => setText(e.target.value)}
                     placeholder="Enter user's name"
-                    className="w-[350px] px-4 py-2 bg-[#2b2b2b] text-[#d1d1d1] rounded-md border border-[#3d3d3d] focus:outline-none focus:border-[#4b6ef5] transition-all"
+                    className="w-[350px] px-4 py-2 bg-[#2b2b2b] text-[#d1d1d1] rounded-md border border-[#3d3d3d] focus:outline-0 focus:border-[#4b6ef5] transition-all"
                   />
                   <button
                     disabled={isPending}
@@ -155,7 +155,7 @@ const GroupDialog: React.FC<GroupDialogProps> = ({ isOpen, onClose }) => {
                         type="button"
                         disabled={deletePending}
                         onClick={() => {
-                          removeMember(member.userId)
+                          removeMember(member.userId);
                           setCurrentlyDeleting(member.userId);
                         }}
                         className="text-red-400 hover:text-red-500 transition-all font-semibold"

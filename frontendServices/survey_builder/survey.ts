@@ -4,6 +4,7 @@ import {
   SurveyModel,
   SurveyParticipantModel,
   SurveySettings,
+  SurveyStatusResponse,
 } from "@/types/survey";
 
 export const updateSurveyTitle = async (
@@ -296,7 +297,7 @@ export const getSubmissions = async (
 
 export const getSurveyForQuiz = async (
   surveyId: string
-): Promise<Omit<SurveyModel, "correctAnswers">> => {
+): Promise<Omit<SurveyStatusResponse, "correctAnswers">> => {
   try {
     const response = await fetch(`/api/quiz/${surveyId}`, {
       method: "GET",

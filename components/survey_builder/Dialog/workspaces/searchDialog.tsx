@@ -1,4 +1,7 @@
-import { clearCurrentSurvey, setSurveys } from "@/store/slices/survey/surveySlice";
+import {
+  clearCurrentSurvey,
+  setSurveys,
+} from "@/store/slices/survey/surveySlice";
 import { setCurrentWorkspace } from "@/store/slices/survey/workspaceSlice";
 import { RootState } from "@/store/store";
 import { retrunSearchData } from "@/utils/survey_builder/workspace";
@@ -56,7 +59,7 @@ const SearchDialog: React.FC<SearchDialogProps> = ({ isOpen, onClose }) => {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="Search"
-                  className="w-full bg-[#2a2a2a] text-white border-none outline-none p-2 rounded-md"
+                  className="w-full bg-[#2a2a2a] text-white border-none outline-0 p-2 rounded-md"
                 />
                 <button
                   className="bg-red-700 py-2 px-4 rounded text-white"

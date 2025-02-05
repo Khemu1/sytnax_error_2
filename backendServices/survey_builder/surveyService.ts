@@ -172,7 +172,6 @@ export const returnSurveyForBuilderService = async (surveyId: string) => {
 
 export const returnSurveyQuizService = async (surveyId: string) => {
   try {
-    console.log("surveyId", surveyId);
     const survey = await prisma.survey.findUnique({
       where: { id: surveyId },
       include: {
@@ -187,6 +186,18 @@ export const returnSurveyQuizService = async (surveyId: string) => {
         },
       },
     });
+
+    // if survey has closed already
+    if (survey!.endTime && new Date() > new Date(survey!.endTime)) {
+      return { closed: true };
+    }
+
+    // if survey didn't open yet
+
+    if (survey!.startTime && new Date() < new Date(survey!.startTime)) {
+      return { closed: true, startDate: survey!.startTime };
+    }
+
     // is survey open || has questions  ?
     if (!survey || survey.questions.length === 0) {
       throw new CustomError(
@@ -201,7 +212,7 @@ export const returnSurveyQuizService = async (surveyId: string) => {
       question.points = question.points.toNumber();
     });
 
-    return survey;
+    return { ...survey, closed: false };
   } catch (error) {
     throw error;
   }

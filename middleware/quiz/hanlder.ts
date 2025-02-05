@@ -12,7 +12,7 @@ const handleGetSurveyForQuiz = async (req: NextRequest, surveyId: string) => {
 const handleAddQuizParticipant = async (req: NextRequest) => {
   const rawFormData = await req.formData();
   const data = parseAndValidateQuizParticipantFormData(rawFormData);
-  await checkSurveyExistsForQuiz(req, data.surveyId, data.submissionDate);
+  await checkSurveyExistsForQuiz(req, data.surveyId);
   console.log("know validing for new quiz participant");
   return validateQuizParticipant(req, data);
 };

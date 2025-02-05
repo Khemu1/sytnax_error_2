@@ -20,6 +20,22 @@ export interface SurveyModel {
   participants: SurveyParticipantModel[];
 }
 
+export interface SurveyStatusResponse {
+  id: string;
+  workspaceId: string;
+  name: string;
+  startTime: string | null;
+  endTime: string | null;
+  gradesVisibility: "hidden" | "visible" | "visibleAfterSurveyCloses";
+  duration: number;
+  questionsPerPage: number;
+  updatedAt?: Date;
+  questions: QuestionModel[];
+  participants: SurveyParticipantModel[];
+  closed: boolean;
+  startDate?: string | null;
+}
+
 export interface SurveyParticipantModel {
   id: string;
   surveyId: string;

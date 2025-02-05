@@ -370,13 +370,13 @@ const AllowedMembersDialog: React.FC<AllowedMembersDialogProps> = ({
                       onChange={(e) => setText(e.target.value)}
                       placeholder="Enter user IDs (space or newline separated)"
                       rows={4}
-                      className="w-full px-4 py-2 bg-[#2b2b2b] text-[#d1d1d1] h-[152px] overflow-y-scroll resize-none rounded-md border border-[#3d3d3d] focus:outline-none focus:border-[#4b6ef5] transition-all"
+                      className="w-full px-4 py-2 bg-[#2b2b2b] text-[#d1d1d1] h-[152px] overflow-y-scroll resize-none rounded-md border border-[#3d3d3d] focus:outline-0 focus:border-[#4b6ef5] transition-all"
                     />
                   </div>
 
                   <div className="flex flex-wrap gap-3 justify-center mt-4 font-semibold">
                     <button
-                      className="px-3 py-2 bg-green-700 hover:bg-green-800 text-sm rounded-md transition-all basis-[150px]"
+                      className="flex justify-center items-center px-3 py-2 bg-green-700 hover:bg-green-800 text-sm rounded-md transition-all basis-[150px] h-[36px]"
                       onClick={handleAddMembers}
                       disabled={isAddMembersPending}
                     >
@@ -387,7 +387,7 @@ const AllowedMembersDialog: React.FC<AllowedMembersDialogProps> = ({
                       )}
                     </button>
                     <button
-                      className="px-3 py-2 bg-orange-700 hover:bg-orange-800 text-sm rounded-md transition-all basis-[150px]"
+                      className="flex justify-center items-center px-3 py-2 bg-orange-700 hover:bg-orange-800 text-sm rounded-md transition-all basis-[150px] h-[36px]"
                       onClick={handleRemoveSelectedMembers}
                       disabled={isRemoveMemberPending}
                     >
@@ -398,7 +398,7 @@ const AllowedMembersDialog: React.FC<AllowedMembersDialogProps> = ({
                       )}
                     </button>
                     <button
-                      className="px-3 py-2 bg-orange-700 hover:bg-orange-800 text-sm rounded-md transition-all basis-[150px]"
+                      className="flex justify-center items-center px-3 py-2 bg-orange-700 hover:bg-orange-800 text-sm rounded-md transition-all basis-[150px] h-[36px]"
                       onClick={handleMembersResetAttempts}
                       disabled={isResetAttemptsPending}
                     >
@@ -487,18 +487,18 @@ const AllowedMembersDialog: React.FC<AllowedMembersDialogProps> = ({
 
                   <div className="flex justify-between flex-wrap w-full mt-6 font-semibold">
                     <button
-                      className="px-3 py-2 bg-red-700 hover:bg-red-800 text-sm rounded-md transition-all basis-[170px]"
+                      className="flex justify-center items-center px-3 py-2 bg-red-700 hover:bg-red-800 text-sm rounded-md transition-all basis-[170px] h-[36px]"
                       onClick={handleResetAllAttempts}
                       disabled={isResetAllAttemptsPending}
                     >
                       {isResetAllAttemptsPending ? (
-                        <span className="flex items-center justify-center mx-auto loading loading-spinner loading-xs"></span>
+                        <span className="flex items-center justify-center mx-auto loading loading-spinner loading-xs h-[36px]"></span>
                       ) : (
                         "Reset All Attempts"
                       )}
                     </button>
                     <button
-                      className="px-3 py-2 bg-red-700 hover:bg-red-800 text-sm rounded-md transition-all basis-[170px]"
+                      className="flex justify-center items-center px-3 py-2 bg-red-700 hover:bg-red-800 text-sm rounded-md transition-all basis-[170px] h-[36px]"
                       onClick={handleRemoveAllMembers}
                       disabled={isDeleteAllMembersPending}
                     >

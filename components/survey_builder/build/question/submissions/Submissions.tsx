@@ -55,7 +55,7 @@ const Submissions: React.FC = () => {
         <div className="w-[250px]">
           <input
             type="text"
-            className="w-full border-b-2 border-gray-200 focus:outline-none focus:border-gray-400 dark:border-gray-700 dark:focus:border-gray-600 rounded-lg p-2"
+            className="w-full border-b-2 border-gray-200 focus:outline-0 focus:border-gray-400 dark:border-gray-700 dark:focus:border-gray-600 rounded-lg p-2"
             placeholder="Search by student ID"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}

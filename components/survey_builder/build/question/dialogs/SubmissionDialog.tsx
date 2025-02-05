@@ -20,7 +20,7 @@ const SubmissionDialog: React.FC<SubmissionDialogProps> = ({
       <Dialog
         open={isOpen}
         as="div"
-        className="relative z-10 focus:outline-none overflow-hidden "
+        className="relative z-10 focus:outline-0 overflow-hidden "
         onClose={close}
       >
         <div className="fixed inset-0 z-10 w-screen overflow-hidden ">

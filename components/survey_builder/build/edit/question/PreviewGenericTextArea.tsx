@@ -26,7 +26,7 @@ const Preview: React.FC<PreviewProps> = ({
             res === "pc"
               ? "bg-blue-600 text-white"
               : "bg-gray-700 text-gray-400"
-          } transition-all hover:bg-blue-500 focus:outline-none`}
+          } transition-all hover:bg-blue-500 focus:outline-0`}
           onClick={() => setRes("pc")}
           aria-label="PC View"
           title="PC View"
@@ -44,7 +44,7 @@ const Preview: React.FC<PreviewProps> = ({
             res === "mobile"
               ? "bg-blue-600 text-white"
               : "bg-gray-700 text-gray-400"
-          } transition-all hover:bg-blue-500 focus:outline-none`}
+          } transition-all hover:bg-blue-500 focus:outline-0`}
           onClick={() => setRes("mobile")}
           aria-label="Mobile View"
           title="Mobile View"

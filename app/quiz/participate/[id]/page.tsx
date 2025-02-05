@@ -17,14 +17,25 @@ import Toast from "@/components/skeletons/Toast";
 import { transformDataIntoFormData } from "@/utils/survey_builder/build/questions";
 import { getSurveyStatus } from "@/utils";
 import Link from "next/link";
-import Image from "next/image";
+import NoAccess from "@/components/quiz/participation/NoAccess";
+import MaxAttemptsReached from "@/components/quiz/participation/MaxAttemptsReached";
+import SearchForID from "@/components/quiz/participation/SearchForID";
+import QuizEnded from "@/components/quiz/participation/QuizEnded";
+import HiddenGrades from "@/components/quiz/participation/results_messages/HiddenGrades";
+import VisibleAfterClosing from "@/components/quiz/participation/results_messages/VisibleAfterClosing";
+import VisibleGrades from "@/components/quiz/participation/results_messages/VisibleGrades";
+import EearlyTermination from "@/components/quiz/participation/early_termination/EearlyTermination";
+import QuizNotStarted from "@/components/quiz/participation/QuizNotStarted";
 
 const QuizParticipate: React.FC = () => {
   const params = useParams();
   const [startSearch, setStartSearch] = useState(false);
   const [text, setText] = useState<string>("");
-  const { participant, isFetching: isParticipantFetching } =
-    useGetParticipantForQuiz(text, params.id as string, startSearch);
+  const {
+    participant,
+    isFetching: isParticipantFetching,
+    resetParticipant,
+  } = useGetParticipantForQuiz(text, params.id as string, startSearch);
   const [participantData, setParticipantData] = useState<QuizUserFormProps>({
     phoneNumber: "",
     countryCode: "EG",
@@ -62,9 +73,17 @@ const QuizParticipate: React.FC = () => {
     survey?.startTime ?? null,
     survey?.endTime ?? null
   );
+  const [resetSearch, setResetSearch] = useState(false);
+
+  const handleReset = () => {
+    resetParticipant();
+    setResetSearch((prev) => !prev);
+    setText("");
+    setStartSearch(false);
+  };
 
   useEffect(() => {
-    if (survey) {
+    if (survey && !survey.closed) {
       const initialAnswers = survey.questions.map((question) => ({
         questionId: question.id,
         choosenAnswersIds: [],
@@ -114,7 +133,18 @@ const QuizParticipate: React.FC = () => {
       });
       return;
     }
+    setResetSearch(false);
     setStartSearch(true);
+  };
+
+  const handleStudentIdSearchChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const newValue = e.target.value
+      .replace(/\s+/g, "")
+      .replace(/\D/g, "")
+      .slice(0, 7);
+    setText(newValue);
   };
 
   const handleQuizStart = () => {
@@ -135,12 +165,12 @@ const QuizParticipate: React.FC = () => {
   const returnUrl = useMemo(() => {
     if (data?.id) {
       if (process.env.NEXT_PUBLIC_NODE_ENV === "development") {
-        return `${process.env.NEXT_PUBLIC_DEV_URL}quiz/check-grade/${data?.id}`;
+        return `${process.env.NEXT_PUBLIC_DEV_URL}/quiz/check-grade/${data?.id}`;
       }
       if (process.env.NEXT_PUBLIC_NODE_ENV === "production") {
-        return `${process.env.NEXT_PUBLIC_BASE_URL}quiz/check-grade/${data?.id}`;
+        return `${process.env.NEXT_PUBLIC_BASE_URL}/quiz/check-grade/${data?.id}`;
       }
-      return `${process.env.NEXT_PUBLIC_LOCAL_URL}quiz/check-grade/${data?.id}`;
+      return `${process.env.NEXT_PUBLIC_LOCAL_URL}/quiz/check-grade/${data?.id}`;
     }
   }, [data?.id]);
 
@@ -208,99 +238,27 @@ const QuizParticipate: React.FC = () => {
       </div>
     );
   }
-  if (!participant) {
+  if (!participant || resetSearch) {
     return (
-      <div className="flex-1 flex items-center justify-center">
-        <div className="flex flex-col bg-base-300 justify-center p-6 rounded-md min-h-[300px] w-[300px] shadow-lg gap-4">
-          <div className="flex justify-center">
-            {" "}
-            <Image
-              alt="logo"
-              src={"/assets/imgs/logo.png"}
-              width={75}
-              height={50}
-            />
-          </div>
-          <label
-            htmlFor="studentId"
-            className="text-lg  text-center mb-2 font-semibold"
-          >
-            Enter Your Student ID
-          </label>
-          <input
-            type="text"
-            name="studentId"
-            id="studentId"
-            placeholder="Student ID"
-            className="w-full px-4 py-2 bg-[#2b2b2b] text-[#d1d1d1]  overflow-y-scroll resize-none rounded-md border border-[#3d3d3d] focus:outline-none focus:border-[#4b6ef5] transition-all"
-            onChange={(e) => {
-              const newValue = e.target.value
-                .replace(/\s+/g, "")
-                .replace(/\D/g, "")
-                .slice(0, 7);
-              setText(newValue);
-            }}
-            value={text}
-          />
-          <div className="flex justify-center">
-            <button
-              className="w-[125px] text-xl flex justify-center pr-2 bg-blue-600 font-semibold  p-2 rounded-md shadow-md hover:bg-blue-700 hover:text-white transition duration-300"
-              disabled={isParticipantFetching}
-              onClick={() => handleStudentIdSearch(text)}
-            >
-              {isParticipantFetching ? (
-                <span className="flex items-center justify-center mx-auto loading loading-spinner loading-md"></span>
-              ) : (
-                "Check"
-              )}
-            </button>
-          </div>
-          {validationError && validationError.studentId && (
-            <p className="text-red-600 text-center font-semibold">
-              {validationError.studentId}
-            </p>
-          )}
-        </div>
-        <Analytics />
-      </div>
+      <SearchForID
+        text={text}
+        handleStudentIdSearch={handleStudentIdSearch}
+        handleStudentIdSearchChange={handleStudentIdSearchChange}
+        isParticipantFetching={isParticipantFetching}
+        validationError={validationError}
+      />
     );
   }
   if (participant && !participant.hasAccess) {
-    return (
-      <div className="flex-1 flex items-center justify-center">
-        <div className="flex flex-col bg-base-300 justify-center p-6 rounded-md min-h-[300px] w-[300px] shadow-lg gap-4">
-          <div className="flex-1 flex items-center justify-center">
-            <div className="bg-red-700 text-white p-4 rounded-md flex items-center space-x-2">
-              <div className="flex-1">
-                <p className="text-xl text-center font-semibold">
-                  You don{"'"}t have access to this Quizz
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <Analytics />
-      </div>
-    );
+    return <NoAccess resetParticipant={handleReset} />;
   }
   if (participant && participant.attempts < 1) {
-    return (
-      <div className="flex-1 flex items-center justify-center">
-        <div className="flex flex-col bg-base-300 justify-center p-6 rounded-md min-h-[300px] w-[300px] shadow-lg gap-4">
-          <div className="flex-1 flex items-center justify-center">
-            <div className="bg-red-700 text-white p-4 rounded-md flex items-center space-x-2">
-              <div className="flex-1">
-                <p className="text-xl text-center font-semibold">
-                  You have reached the max attempts
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <Analytics />
-      </div>
-    );
+    return <MaxAttemptsReached />;
   }
+  if (survey && survey.closed && survey.startDate) {
+    return <QuizNotStarted startDate={survey.startDate} />;
+  }
+
   return (
     <>
       <div
@@ -312,6 +270,7 @@ const QuizParticipate: React.FC = () => {
           <>
             {!startQuiz &&
               survey &&
+              !survey.closed &&
               participant &&
               participant.attempts > 0 &&
               !quizSuccess && (
@@ -325,6 +284,7 @@ const QuizParticipate: React.FC = () => {
               )}
             {startQuiz &&
               survey &&
+              !survey.closed &&
               participant &&
               participant.attempts > 0 &&
               !quizSuccess && (
@@ -340,13 +300,7 @@ const QuizParticipate: React.FC = () => {
               )}
           </>
         ) : (
-          <div className="flex-1 flex items-center justify-center">
-            <div className="bg-red-700 text-white p-4 rounded-md flex items-center space-x-2">
-              <div className="flex-1">
-                <p className="text-xl font-semibold">The quiz has ended</p>
-              </div>
-            </div>
-          </div>
+          <QuizEnded />
         )}
         {quizSuccess && (
           <div className="flex flex-col bg-base-300 justify-center  p-6 rounded-md min-h-[300px] w-[300px] shadow-lg">
@@ -355,63 +309,22 @@ const QuizParticipate: React.FC = () => {
             </Link>
             <div className="text-center space-y-4">
               {survey?.gradesVisibility === "hidden" && data?.clean && (
-                <>
-                  <div className="text-xl font-semibold text-white">
-                    The instructor has set the grades to be hidden. Please
-                    contact the instructor to see your grades.
-                  </div>
-                  <div className="text-sm text-gray-600">
-                    For more details about your grades, please contact{" "}
-                    <strong>+20 1080636980</strong>.
-                  </div>
+                <HiddenGrades />
+              )}
+              {survey?.gradesVisibility === "visibleAfterSurveyCloses" &&
+                data?.clean && <VisibleAfterClosing endTime={endTime} />}
+              {survey?.gradesVisibility === "visible" && data?.clean && (
+                <VisibleGrades
+                  totalUserScore={data.totalUserScore}
+                  QuizTotalScore={data?.QuizTotalScore}
+                />
+              )}
+              {!data?.clean && <EearlyTermination />}
+              {data?.clean && (
+                <div className="flex flex-col items-center justify-center mt-5 gap-[1rem]">
                   <div className="mt-4 text-sm text-gray-500">
                     Please save the following link to view your grades later:
                   </div>
-                </>
-              )}
-              {survey?.gradesVisibility === "visibleAfterSurveyCloses" &&
-                data?.clean && (
-                  <>
-                    <div className="text-xl font-semibold  text-white">
-                      The grades will be visible after the survey closes. Please
-                      check again after {endTime}.
-                    </div>
-                    <div className="text-sm text-gray-600">
-                      For more details about your grades, please contact{" "}
-                      <strong>+20 1080636980</strong>.
-                    </div>
-                    <div className="mt-4 text-sm text-gray-500">
-                      Please save the following link to view your grades later:
-                    </div>
-                  </>
-                )}
-              {survey?.gradesVisibility === "visible" && data?.clean && (
-                <>
-                  <div className="text-xl font-semibold text-white">
-                    You scored {data.totalUserScore} out of{" "}
-                    {data?.QuizTotalScore}.
-                  </div>
-                  <div className="text-sm text-gray-600 mt-2">
-                    If you wish to view your grades later, save the following
-                    link:
-                  </div>
-                </>
-              )}
-              {!data?.clean && (
-                <>
-                  <div className="bg-red-700 text-white p-4 rounded-md flex items-center space-x-2">
-                    <div className="flex-1">
-                      <p className="text-xl font-semibold">
-                        Your quiz has been submitted early due to inactivity
-                        (e.g., tapping out or unfocusing the window). Your data
-                        has already been submitted.
-                      </p>
-                    </div>
-                  </div>
-                </>
-              )}
-              {data?.clean && (
-                <div className="flex justify-center mt-5">
                   <button
                     className="py-2 px-4 w-[200px] bg-blue-600 text-white rounded-md shadow-md hover:bg-blue-700 transition duration-300"
                     onClick={() => {

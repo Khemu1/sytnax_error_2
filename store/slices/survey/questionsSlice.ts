@@ -31,11 +31,13 @@ const questionsSlice = createSlice({
       const index = state.items.findIndex(
         (question) => question.id === action.payload.orignalQuestionId
       );
+      console.log("index", index);
+
       if (index !== -1) {
         state.items = [
-          ...state.items.slice(0, index),
-          ...state.items.slice(index),
+          ...state.items.slice(0, index + 1),
           action.payload.question,
+          ...state.items.slice(index + 1),
         ];
       } else {
         console.error("Original question not found.");

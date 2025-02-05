@@ -50,7 +50,7 @@ const UserGroup = () => {
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Enter user's name"
-            className="w-[350px] px-4 py-2 bg-[#2b2b2b] text-[#d1d1d1] rounded-md border border-[#3d3d3d] focus:outline-none focus:border-[#4b6ef5] transition-all"
+            className="w-[350px] px-4 py-2 bg-[#2b2b2b] text-[#d1d1d1] rounded-md border border-[#3d3d3d] focus:outline-0 focus:border-[#4b6ef5] transition-all"
           />
           <button
             className="bg-[#4b6ef5] px-4 py-2 rounded-md text-sm font-semibold transition-all hover:bg-[#3d37a9]"

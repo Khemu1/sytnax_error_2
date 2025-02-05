@@ -3,7 +3,7 @@ import { useState, useMemo, useEffect } from "react";
 import { SurveyModel } from "@/types/survey";
 import { QuestionModel } from "@/types/buildSurvey";
 import { formatTimeForTimer } from "@/utils";
-import WarningDialog from "./WarningDialog";
+import WarningDialog from "./participation/WarningDialog";
 import "@/styles/quiz.css";
 
 const Quiz: React.FC<{
@@ -305,7 +305,7 @@ const Quiz: React.FC<{
             <button
               className="join-item btn btn-outline w-full sm:w-auto"
               onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
+              disabled={currentPage === 1 || isSubmitting}
             >
               Previous
             </button>
@@ -320,6 +320,7 @@ const Quiz: React.FC<{
                       : ""
                   }`}
                   onClick={() => handlePageChange(page)}
+                  disabled={isSubmitting}
                 >
                   {page}
                 </button>
@@ -329,7 +330,7 @@ const Quiz: React.FC<{
             <button
               className="join-item btn btn-outline w-full sm:w-auto"
               onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
+              disabled={currentPage === totalPages || isSubmitting}
             >
               Next
             </button>

@@ -25,9 +25,7 @@ const UpdateSurveyTitleDialog: React.FC<UpdateSurveyTitleDialogProps> = ({
     })
   );
 
-  const [name, setName] = useState(
-    currentSurveyState?.name || ""
-  );
+  const [name, setName] = useState(currentSurveyState?.name || "");
   const [errors, setErros] = useState<Record<string, string> | null>(null);
   const { handleUpdateSurvey, isError, errorState, isSuccess, isPending } =
     useUpdateSurvey();
@@ -99,7 +97,7 @@ const UpdateSurveyTitleDialog: React.FC<UpdateSurveyTitleDialogProps> = ({
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-[#2a2a2a] text-white border-none outline-none p-2 rounded-md"
+                  className="w-full bg-[#2a2a2a] text-white border-none outline-0 p-2 rounded-md"
                   disabled={isSubmitting}
                 />
               </div>

@@ -108,7 +108,7 @@ const UpdateWorkspaceTitleDialog: React.FC<
                   value={workspaceName}
                   onChange={(e) => setworkspaceName(e.target.value)}
                   placeholder="Enter Workspace Title"
-                  className="w-full bg-[#2a2a2a] text-white border-none outline-none p-2 rounded-md"
+                  className="w-full bg-[#2a2a2a] text-white border-none outline-0 p-2 rounded-md"
                   disabled={isSubmitting}
                 />
               </div>

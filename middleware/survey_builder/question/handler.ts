@@ -51,9 +51,7 @@ export const questionBuilderRoutes = async (req: NextRequest) => {
     const questionId = (rawFormData?.get("questionId") ||
       bodyData?.questionId) as string;
 
-    console.log("workspaceId", workspaceId);
-    console.log("surveyId", surveyId);
-    console.log("questionId", questionId);
+    console.log("inside question handler");
 
     const formDataNewQuestion = rawFormData
       ? parseAndValidateNewQuestionFormData(rawFormData)

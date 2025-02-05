@@ -69,7 +69,6 @@ export const addQuestionF = (
   orignalQuestionId: string | null = null
 ) => {
   try {
-    console.log("before adding",question, type, orignalQuestionId);
     dispatch(addQuestion({ question, type, orignalQuestionId }));
   } catch (error) {
     throw error;
@@ -136,6 +135,7 @@ export const deleteQuestionFromArrayF = (
   dispatch: Dispatch
 ) => {
   try {
+    console.log("deleting question from array", questionId);
     dispatch(deleteQuestion(questionId));
   } catch (error) {
     console.error("Error deleting question from array:", error);
