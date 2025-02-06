@@ -134,6 +134,7 @@ const JoinCourse: React.FC = () => {
                   </select>
                 ) : field.type === "phone" ? (
                   <ReactPhoneInput
+                    autoFormat={false}
                     inputProps={{
                       name: field.name,
                       required: true,

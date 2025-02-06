@@ -61,7 +61,7 @@ const PreviewSurvey = () => {
         </button>
       </div>
 
-      <div className="quiz-question-container">
+      <div className="quiz-question-container-review">
         {currentQuestions.map((question, index) => (
           <div
             key={question.id}
@@ -132,9 +132,9 @@ const PreviewSurvey = () => {
       </div>
 
       <footer className="staicky bottom-0 shadow-md p-4 bg-base-300">
-        <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
+        <div className="flex justify-center  sm:flex-row  items-center gap-4">
           <button
-            className="join-item btn btn-outline w-full sm:w-auto"
+            className="join-item btn btn-outline  "
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
           >
@@ -158,7 +158,7 @@ const PreviewSurvey = () => {
           </div>
 
           <button
-            className="join-item btn btn-outline w-full sm:w-auto"
+            className="join-item btn btn-outline "
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
           >

@@ -197,7 +197,7 @@ const Quiz: React.FC<{
 
   return (
     <>
-      <div className="flex-1 flex flex-col relative overflow-hidden">
+      <div className="flex-1 flex flex-col relative overflow-hidden max-h-[calc(100dvh-_0px)]">
         <div className="absolute w-full top-0 flex justify-between items-center p-2 z-10 bg-base-300">
           <div
             className={`flex justify-center items-center  border border-[#42484b] p-2 rounded-md font-semibold w-[100px] ${
@@ -292,6 +292,9 @@ const Quiz: React.FC<{
                         }
                         className="hidden"
                       />
+                      <span className="font-semibold flex items-center justify-left mr-2">
+                        {String.fromCharCode(65 + index)}.
+                      </span>{" "}
                       <span>{answer.answer}</span>
                     </label>
                   ))}
@@ -301,11 +304,11 @@ const Quiz: React.FC<{
           ))}
         </div>
         <footer className="staicky bottom-0 shadow-md p-4 bg-base-300">
-          <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
+          <div className="flex justify-center  sm:flex-row  items-center gap-4">
             <button
-              className="join-item btn btn-outline w-full sm:w-auto"
+              className="join-item btn btn-outline  "
               onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1 || isSubmitting}
+              disabled={currentPage === 1}
             >
               Previous
             </button>
@@ -320,7 +323,6 @@ const Quiz: React.FC<{
                       : ""
                   }`}
                   onClick={() => handlePageChange(page)}
-                  disabled={isSubmitting}
                 >
                   {page}
                 </button>
@@ -328,9 +330,9 @@ const Quiz: React.FC<{
             </div>
 
             <button
-              className="join-item btn btn-outline w-full sm:w-auto"
+              className="join-item btn btn-outline "
               onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages || isSubmitting}
+              disabled={currentPage === totalPages}
             >
               Next
             </button>

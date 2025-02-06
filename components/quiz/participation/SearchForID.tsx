@@ -1,7 +1,7 @@
 import { Analytics } from "@vercel/analytics/react";
 import React from "react";
 import Image from "next/image";
-
+import { AlertMessage } from "../QuizForm";
 
 const SearchForID: React.FC<{
   text: string;
@@ -18,7 +18,7 @@ const SearchForID: React.FC<{
 }) => {
   return (
     <div className={`flex-1 flex items-center justify-center`}>
-      <div className="flex flex-col bg-base-300 justify-center p-6 rounded-md min-h-[300px] w-[300px] shadow-lg gap-4">
+      <div className="flex flex-col bg-base-300 justify-center p-6 rounded-md min-h-[300px]  w-[95%] sm:w-[400px] shadow-lg gap-4">
         <div className="flex justify-center animate-bounce">
           {" "}
           <Image
@@ -28,6 +28,12 @@ const SearchForID: React.FC<{
             height={50}
           />
         </div>
+        <AlertMessage
+          messages={[
+            "Once you submit your student ID, you will be redirected to the quiz, and one attempt will be deducted.",
+            "Avoid refreshing or closing the window after submission.",
+          ]}
+        />
         <label
           htmlFor="studentId"
           className="text-lg  text-center mb-2 font-semibold"

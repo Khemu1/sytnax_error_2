@@ -121,7 +121,10 @@ const EditQuestion: React.FC<NewQuestionDialogProps> = ({
       );
     } else if (field === "allowMultipleChoice") {
       if (allowMultipleAnswers) {
-        dispatch(reduceCorrectAnswersTo1ForEdit());
+        if (correctAnswers.length > 1) {
+          dispatch(removeCorrectAnswerForEdit(addedCorrectAnswers[1]));
+          dispatch(reduceCorrectAnswersTo1ForEdit());
+        }
       }
       dispatch(
         updateCurrentEditQuestion({
@@ -192,13 +195,28 @@ const EditQuestion: React.FC<NewQuestionDialogProps> = ({
         deletedAnswers,
         deletedCorrectAnswers,
         addedAnswers,
-        addedCorrectAnswers,
+        addedCorrectAnswers: allowMultipleAnswers
+          ? addedCorrectAnswers.filter(
+              (answer) => !correctAnswers.some((ca) => ca.value === answer)
+            )
+          : addedCorrectAnswers,
         points: points !== currentQuestion.points ? points : undefined,
         allowMultipleAnswers:
           allowMultipleAnswers === currentQuestion.allowMultipleAnswers
             ? undefined
             : allowMultipleAnswers,
       };
+      console.log(allowMultipleAnswers);
+      console.log("orignal correact answers", correctAnswers);
+      console.log(
+        "added correct answers",
+        allowMultipleAnswers
+          ? addedCorrectAnswers.filter(
+              (answer) => !correctAnswers.some((ca) => ca.value === answer)
+            )
+          : addedCorrectAnswers
+      );
+      console.log("deleted correct answers outside", deletedCorrectAnswers);
       const options = questionOptionsSchema().parse({ ...preopOptions });
       const question = editQuestionSchema({ ...options }).parse({ ...data });
       const completeQuestion = {

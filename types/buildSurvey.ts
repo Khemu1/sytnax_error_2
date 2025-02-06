@@ -47,8 +47,8 @@ export interface SubmissionModelForBuilder {
   surveyId: string;
   participantId: string;
   phoneNumber: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
   totalPoints: number;
   givenPoints: number;
   submittedAt: Date;

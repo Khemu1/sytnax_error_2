@@ -161,7 +161,6 @@ export const getQuizSubmission = async (quizId: string) => {
         },
       },
     });
-    console.log("survey", submission?.survey);
     if (!submission) {
       throw new CustomError("Quiz not found", 404);
     }
@@ -245,6 +244,17 @@ export const getParticpantForQuizService = async (
     });
     if (!participant) {
       return { hasAccess: false };
+    }
+    if (participant.attempts > 0) {
+      await prisma.surveyParticipant.update({
+        where: {
+          id: participant.id,
+        },
+        data: {
+          attempts: participant.attempts - 1,
+          updatedAt: new Date(),
+        },
+      });
     }
     return { ...participant, hasAccess: true };
   } catch (error) {

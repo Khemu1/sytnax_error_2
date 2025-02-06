@@ -105,126 +105,76 @@ const editQuestionsSlice = createSlice({
     },
 
     addCorrectAnswerForEdit: (state, action: PayloadAction<string>) => {
-      // If multiple answers are allowed, we can add new answers
-      if (state.allowMultipleAnswers) {
-        if (state.addedCorrectAnswers.length < 2) {
-          const findCorrectAnswer = state.correctAnswers.find(
-            (ca) => ca.value === action.payload
-          );
+      const { payload: newAnswer } = action;
 
-          // Was it deleted?
-          const findDeletedCorrectAnswer = state.deletedCorrectAnswers.find(
-            (ca) => ca.value === action.payload
-          );
+      //make sure that the added answer didn't come with the question
+      if (state.addedCorrectAnswers.includes(newAnswer)) {
+        return;
+      }
 
-          // If yes, add it back
-          if (findCorrectAnswer && findDeletedCorrectAnswer) {
-            // Remove it from deletedCorrectAnswers based on value
-            state.deletedCorrectAnswers = state.deletedCorrectAnswers.filter(
-              (ca) => ca.id !== findDeletedCorrectAnswer.id
-            );
+      // Helper function to find a correct answer by value
+      const findCorrectAnswer = (value: string) =>
+        state.correctAnswers.find((ca) => ca.value === value);
 
-            // Add it to addedCorrectAnswers
-            state.addedCorrectAnswers.push(action.payload);
-          } else {
-            // Otherwise, just add it to addedCorrectAnswers
-            state.addedCorrectAnswers.push(action.payload);
-          }
-        }
-      } else if (state.addedCorrectAnswers.length === 2) {
-        const findCorrectAnswer = state.correctAnswers.find(
-          (ca) => ca.value === action.payload
+      // Helper function to find a deleted correct answer by value
+      const findDeletedCorrectAnswer = (value: string) =>
+        state.deletedCorrectAnswers.find((ca) => ca.value === value);
+
+      // Helper function to remove a correct answer from deletedCorrectAnswers
+      const removeFromDeletedCorrectAnswers = (value: string) => {
+        state.deletedCorrectAnswers = state.deletedCorrectAnswers.filter(
+          (ca) => ca.value !== value
         );
+      };
 
-        // Was it deleted?
-        const findDeletedCorrectAnswer = state.deletedCorrectAnswers.find(
-          (ca) => ca.value === action.payload
-        );
-
-        // Access the last correct answer in addedCorrectAnswers
-        const lastCorrectAnswerValue =
+      // Helper function to replace the last added correct answer
+      const replaceLastAddedCorrectAnswer = (newAnswer: string) => {
+        const lastAnswerValue =
           state.addedCorrectAnswers[state.addedCorrectAnswers.length - 1];
+        const lastAnswerWithId = findCorrectAnswer(lastAnswerValue);
 
-        const lastCorrectAnswerWithId = state.correctAnswers.find(
-          (ca) => ca.value === lastCorrectAnswerValue
-        );
-
-        if (lastCorrectAnswerWithId) {
-          state.deletedCorrectAnswers.push(lastCorrectAnswerWithId);
+        if (lastAnswerWithId) {
+          state.deletedCorrectAnswers.push(lastAnswerWithId);
         }
 
-        // If the answer exists in correctAnswers and deletedCorrectAnswers, replace the last one
-        if (findCorrectAnswer && findDeletedCorrectAnswer) {
-          // Remove it from deletedCorrectAnswers based on value
-          state.deletedCorrectAnswers = state.deletedCorrectAnswers.filter(
-            (ca) => ca.id !== findDeletedCorrectAnswer.id
-          );
+        state.addedCorrectAnswers = [
+          ...state.addedCorrectAnswers.slice(
+            0,
+            state.addedCorrectAnswers.length - 1
+          ),
+          newAnswer,
+        ];
+      };
 
-          // Replace the last added correct answer with the new one
-          state.addedCorrectAnswers = [
-            ...state.addedCorrectAnswers.slice(
-              0,
-              state.addedCorrectAnswers.length - 1
-            ),
-            action.payload,
-          ];
-        } else {
-          // Otherwise, replace the last added correct answer
-          state.addedCorrectAnswers = [
-            ...state.addedCorrectAnswers.slice(
-              0,
-              state.addedCorrectAnswers.length - 1
-            ),
-            action.payload,
-          ];
+      // Logic for adding or replacing correct answers
+      if (state.allowMultipleAnswers) {
+        // If multiple answers are allowed and we haven't reached the limit
+        if (state.addedCorrectAnswers.length < 2) {
+          const deletedAnswer = findDeletedCorrectAnswer(newAnswer);
+
+          if (deletedAnswer) {
+            removeFromDeletedCorrectAnswers(newAnswer);
+          }
+
+          state.addedCorrectAnswers.push(newAnswer);
+        } else if (state.addedCorrectAnswers.length === 2) {
+          const deletedAnswer = findDeletedCorrectAnswer(newAnswer);
+
+          if (deletedAnswer) {
+            removeFromDeletedCorrectAnswers(newAnswer);
+          }
+
+          replaceLastAddedCorrectAnswer(newAnswer);
         }
       } else {
-        const findCorrectAnswer = state.correctAnswers.find(
-          (ca) => ca.value === action.payload
-        );
+        // If only one answer is allowed, replace the last added correct answer
+        const deletedAnswer = findDeletedCorrectAnswer(newAnswer);
 
-        // Was it deleted?
-        const findDeletedCorrectAnswer = state.deletedCorrectAnswers.find(
-          (ca) => ca.value === action.payload
-        );
-
-        // Access the last correct answer in addedCorrectAnswers
-        const lastCorrectAnswerValue =
-          state.addedCorrectAnswers[state.addedCorrectAnswers.length - 1];
-
-        const lastCorrectAnswerWithId = state.correctAnswers.find(
-          (ca) => ca.value === lastCorrectAnswerValue
-        );
-
-        if (lastCorrectAnswerWithId) {
-          state.deletedCorrectAnswers.push(lastCorrectAnswerWithId);
+        if (deletedAnswer) {
+          removeFromDeletedCorrectAnswers(newAnswer);
         }
 
-        // If the answer exists in correctAnswers and deletedCorrectAnswers, replace the last one
-        if (findCorrectAnswer && findDeletedCorrectAnswer) {
-          // Remove it from deletedCorrectAnswers based on value
-          state.deletedCorrectAnswers = state.deletedCorrectAnswers.filter(
-            (ca) => ca.id !== findDeletedCorrectAnswer.id
-          );
-
-          // Replace the last added correct answer with the new one
-          state.addedCorrectAnswers = [
-            ...state.addedCorrectAnswers.slice(
-              0,
-              state.addedCorrectAnswers.length - 1
-            ),
-            action.payload,
-          ];
-        } else {
-          // Otherwise, replace the last added correct answer
-          state.addedCorrectAnswers = [
-            ...state.addedCorrectAnswers.slice(
-              0,
-              state.addedCorrectAnswers.length - 1
-            ),
-            action.payload,
-          ];
-        }
+        replaceLastAddedCorrectAnswer(newAnswer);
       }
     },
 
@@ -251,7 +201,14 @@ const editQuestionsSlice = createSlice({
     },
 
     reduceCorrectAnswersTo1ForEdit: (state) => {
-      state.correctAnswers = [state.correctAnswers[0]];
+      if (state.addedCorrectAnswers.length > 1) {
+        state.addedCorrectAnswers = [state.addedCorrectAnswers[0]];
+      }
+      console.log(
+        "total length for correct answers",
+        state.addedCorrectAnswers.length
+      );
+      
     },
     resetCurrentEditQuestion: () => initialState,
   },

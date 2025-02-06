@@ -1,6 +1,5 @@
-// Toast.tsx
 import { ToastProps } from "@/types";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 
 const Toast: React.FC<ToastProps> = ({
   message,
@@ -17,7 +16,7 @@ const Toast: React.FC<ToastProps> = ({
   }, [duration, onClose]);
 
   return (
-    <div className={`toast toast-end `}>
+    <div className={`toast toast-end  !border-0`}>
       <div
         className={`alert alert-${type} ${
           type === "success" ? "bg-blue-600" : "bg-red-600"

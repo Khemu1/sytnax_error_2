@@ -315,6 +315,19 @@ const validateQuestionsForEdit = (
   try {
     const issues: { path: string[]; message: string }[] = [];
 
+    // const alreadyAddedCorrectAnswers = addedCorrectAnswers.filter(
+    //   (answer) => correctAnswers.some((ca) => ca.value === answer)
+    // );
+
+    // if (alreadyAddedCorrectAnswers.length > 0) {
+    //   issues.push({
+    //     path: ["addedCorrectAnswers"],
+    //     message: `The following correct answers are already present in the question: ${alreadyAddedCorrectAnswers.join(
+    //       ", "
+    //     )}`,
+    //   });
+    // }
+
     // making sure that deleted answers exist in the questionAnswers list
     if (deletedAnswers.length > 0) {
       const deletedAnswerIds = deletedAnswers.map((answer) => answer.id);
@@ -405,6 +418,9 @@ const validateQuestionsForEdit = (
       addedCorrectAnswers.filter(
         (answer) => !correctAnswers.some((ca) => ca.value === answer)
       ).length;
+    console.log("remainingCorrectAnswers", remainingCorrectAnswers);
+    console.log("correctAnswers", correctAnswers);
+    console.log("deletedCorrectAnswers", deletedCorrectAnswers);
     if (remainingCorrectAnswers < 1) {
       issues.push({
         path: ["correctAnswers"],

@@ -25,7 +25,7 @@ const QuizForm: React.FC<{
 }) => {
   return (
     <div className="flex flex-1 my-auto flex-col w-full h-full bg-base-200 justify-center items-center gap-6">
-      <div className="flex flex-col items-center bg-base-100 shadow-xl rounded-lg p-6 sm:w-[400px]">
+      <div className="flex flex-col items-center bg-base-100 shadow-xl rounded-lg p-6 w-[95%] sm:w-[400px]">
         <div className="flex flex-col items-center text-center mb-5">
           <Image
             alt="logo"
@@ -41,7 +41,12 @@ const QuizForm: React.FC<{
           </div>
         </div>
 
-        <AlertMessage />
+        <AlertMessage
+          messages={[
+            "Please ensure that the information you provide is accurate. Submitting incorrect or invalid data may result in disqualification from the quiz.",
+            "Tapping out of the window or unfocusing the window will terminate the quiz.",
+          ]}
+        />
 
         <form className={formStyle.form}>
           {quizUserForm.map((field) => (
@@ -51,6 +56,7 @@ const QuizForm: React.FC<{
               </label>
               {field.type === "phone" ? (
                 <ReactPhoneInput
+                  autoFormat={false}
                   inputProps={{
                     name: field.name,
                     required: true,
@@ -118,7 +124,9 @@ const QuizForm: React.FC<{
   );
 };
 
-const AlertMessage: React.FC = () => {
+export const AlertMessage: React.FC<{ messages: string[] }> = ({
+  messages,
+}) => {
   const message = useMemo(() => {
     return (
       <div className="bg-red-800 border-l-8 border-red-500 text-white p-6 mb-6 w-full rounded-lg shadow-lg">
@@ -140,21 +148,12 @@ const AlertMessage: React.FC = () => {
           <div>
             <p className="font-bold text-lg mb-2">Important:</p>
             <ul className="space-y-2">
-              <li className="flex items-start">
-                <span className="w-2 h-2 bg-white rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                <span>
-                  Please ensure that the information you provide is accurate.
-                  Submitting incorrect or invalid data may result in
-                  disqualification from the quiz.
-                </span>
-              </li>
-              <li className="flex items-start">
-                <span className="w-2 h-2 bg-white rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                <span className="font-semibold">
-                  Tapping out of the window or unfocusing the window will
-                  terminate the quiz.
-                </span>
-              </li>
+              {messages.map((message, index) => (
+                <li key={index} className="flex items-start">
+                  <span className="w-2 h-2 bg-white rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                  <span>{message}</span>
+                </li>
+              ))}
             </ul>
           </div>
         </div>

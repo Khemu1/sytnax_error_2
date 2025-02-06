@@ -26,8 +26,7 @@ const CourseCard: React.FC<Props> = ({ course }) => {
 
         <div className="flex flex-col justify-between flex-grow w-full">
           <h3 className="m-[0] py-2 text-lg font-semibold text-white text-center  relative">
-            <span className="absolute inset-0 bg-gradient-to-r from-teal-400 to-cyan-500 opacity-60 transition-opacity duration-300 hover:opacity-80"></span>{" "}
-            <span className="relative z-10 text-shadow overflow-hidden text-ellipsis block px-2">
+            <span className=" bg-[#1E2A38] m rounded-md w-max mx-auto p-1 px-3 relative z-10 text-shadow overflow-hidden text-ellipsis block ">
               {course.title}
             </span>
           </h3>
@@ -35,8 +34,8 @@ const CourseCard: React.FC<Props> = ({ course }) => {
           <div
             className={`flex justify-center py-2 w-full text-center font-semibold text-[17px] ${
               course.price === 0
-                ? "bg-gradient-to-r from-teal-500 to-cyan-600 text-white"
-                : "bg-gradient-to-r from-blue-600 to-blue-800 text-white"
+                ? "bg-gradient-to-r from-blue-600 to-blue-800 text-white"
+                : "bg-blue-700 text-white"
             }`}
           >
             {course.price !== 0 && (

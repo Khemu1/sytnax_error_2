@@ -71,12 +71,12 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
 
   const returnUrl = useMemo(() => {
     if (process.env.NEXT_PUBLIC_NODE_ENV === "development") {
-      return `${process.env.NEXT_PUBLIC_DEV_URL}/quiz/participate/${survey.id}`;
+      return `${process.env.NEXT_PUBLIC_VERCEL_URL}/quiz/participate/${survey.id}`;
     }
     if (process.env.NEXT_PUBLIC_NODE_ENV === "production") {
       return `${process.env.NEXT_PUBLIC_VERCEL_URL}/quiz/participate/${survey.id}`;
     }
-    return `${process.env.NEXT_PUBLIC_VERCEL_URL}/quiz/participate/${survey.id}`;
+    return `${process.env.NEXT_PUBLIC_LOCAL_URL}/quiz/participate/${survey.id}`;
   }, [survey.id]);
 
   const handleCloseDialogs = () => {
@@ -258,7 +258,6 @@ const Survey: React.FC<SurveyProps> = ({ survey, onSelect }) => {
                 <button
                   className="py-2"
                   onClick={() => {
-                    console.log(process.env.NEXT_PUBLIC_NODE_ENV);
                     window.navigator.clipboard.writeText(returnUrl);
                     setToast({
                       message: "Link copied to clipboard",

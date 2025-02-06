@@ -41,7 +41,7 @@ const ReviewQuiz: React.FC<{
 
   return (
     <>
-      <div className="flex-1 flex flex-col relative ">
+      <div className="flex-1 flex flex-col relative h-full ">
         <div className="quiz-question-container">
           {currentQuestions.map((answer, index) => {
             const { question, givenPoints, selectedAnswers } = answer;
@@ -88,7 +88,7 @@ const ReviewQuiz: React.FC<{
                 )}
                 {questionAnswers.length > 0 && (
                   <div className="flex flex-col flex-wrap gap-2 w-full items-center mt-7">
-                    {questionAnswers.map((answer) => {
+                    {questionAnswers.map((answer, index) => {
                       const isCorrect = correctAnswers.some(
                         (correct) => correct.answerId === answer.id
                       );
@@ -105,25 +105,20 @@ const ReviewQuiz: React.FC<{
                         bgColor = "bg-red-600 text-white";
                       }
 
+                      if (!isSelected && isCorrect) {
+                        bgColor = "bg-yellow-600 text-white";
+                      }
+
                       return (
-                        <label
+                        <div
                           key={answer.id}
                           className={`flex items-center gap-2 w-[300px] cursor-pointer ${bgColor} transition-all rounded-md py-2 px-4`}
                         >
-                          <input
-                            type={
-                              question.allowMultipleAnswers
-                                ? "checkbox"
-                                : "radio"
-                            }
-                            disabled={true}
-                            name={`answer-${question.id}`}
-                            value={answer.id}
-                            checked={isSelected}
-                            className="hidden"
-                          />
+                          <span className="font-semibold flex items-center justify-left mr-2">
+                            {String.fromCharCode(65 + index)}.
+                          </span>
                           <span>{answer.answer}</span>
-                        </label>
+                        </div>
                       );
                     })}
                   </div>
@@ -132,10 +127,10 @@ const ReviewQuiz: React.FC<{
             );
           })}
         </div>
-        <footer className="sticky bottom-0 p-4 bg-transparent">
-          <div className="flex flex-col sm:flex-row justify-start items-center gap-4">
+        <footer className="sticky bottom-5 p-4 bg-transparent">
+          <div className="flex  sm:flex-row justify-start items-center gap-4">
             <button
-              className="join-item btn btn-outline w-full sm:w-auto"
+              className="join-item btn btn-outline  "
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
             >
@@ -159,7 +154,7 @@ const ReviewQuiz: React.FC<{
             </div>
 
             <button
-              className="join-item btn btn-outline w-full sm:w-auto"
+              className="join-item btn btn-outline "
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
             >
@@ -167,6 +162,20 @@ const ReviewQuiz: React.FC<{
             </button>
           </div>
         </footer>
+        <div className=" hidden md:flex flex-wrap gap-2 flex-col xl:flex-row  *:flex *:gap-2 *:font-semibold absolute  right-0">
+          <div>
+            <p className="w-6 h-6 bg-green-600 rounded-full"></p>
+            Corrent Answer
+          </div>
+          <div>
+            <p className="w-6 h-6 bg-red-600 rounded-full"></p>
+            Wrong Answer
+          </div>
+          <div>
+            <p className="w-6 h-6 bg-yellow-600 rounded-full"></p>
+            Didn&apos;t Choose
+          </div>
+        </div>
       </div>
     </>
   );

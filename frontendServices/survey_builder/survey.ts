@@ -287,7 +287,6 @@ export const getSubmissions = async (
     }
 
     const data = await response.json();
-    console.log("Fetched submissions:", data);
     return data;
   } catch (error) {
     console.error(error);

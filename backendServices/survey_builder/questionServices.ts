@@ -21,6 +21,10 @@ import {
 } from "@/backendServices/survey_builder/helpers/question";
 import { deleteImgur, uploadQuestionToImgur } from "../imgurServices";
 import { imageDataResponse } from "@/types";
+import {
+  updateSubmissionGradesAfterAnswersUpdate,
+  updateTotalSubmissionsScore,
+} from "./SubmissionServices";
 
 const prisma = new PrismaClient().$extends(withAccelerate());
 
@@ -115,6 +119,8 @@ export const addQuestionService = async (
 
 export const updateQuestionService = async (data: EditQuestionModelBackend) => {
   const prepQuestion: editedQuestionModel = { ...data.question };
+
+  console.log("answers to remove ");
   const {
     answersToAdd,
     answersToRemove,
@@ -138,16 +144,13 @@ export const updateQuestionService = async (data: EditQuestionModelBackend) => {
         togglerUpdateData?.isMultipleAnswersEnabled;
       prepQuestion.updatedAt = togglerUpdateData?.updatedAt?.toUTCString();
 
-      const { correctAnswers, questionAnswers } =
-        await handleCorrectAnswerUpdates(
-          correactAnswersToAdd,
-          correactAnswersToRemove,
-          answersToAdd,
-          prepQuestion,
-          data.options.allowMultipleAnswers
-        );
+      const correctAnswers = await handleCorrectAnswerUpdates(
+        correactAnswersToAdd,
+        correactAnswersToRemove,
+        prepQuestion,
+        data.options.allowMultipleAnswers
+      );
       prepQuestion.correctAnswers = correctAnswers;
-      prepQuestion.questionAnswers = questionAnswers;
 
       const pointsUpdateData = await handlePointsUpdate(
         data.question.points,
@@ -191,6 +194,13 @@ export const updateQuestionService = async (data: EditQuestionModelBackend) => {
        * any undefined field wasn't shouldn't be changed
        */
 
+      if (
+        correactAnswersToAdd.length > 0 ||
+        correactAnswersToRemove.length > 0
+      ) {
+        await updateSubmissionGradesAfterAnswersUpdate(prepQuestion.id);
+      }
+
       const filteredQuestion = filterObject(
         { ...prepQuestion, surveyId: data.surveyId },
         [
@@ -212,11 +222,16 @@ export const updateQuestionService = async (data: EditQuestionModelBackend) => {
 
     return result;
   } catch (error) {
+    console.error("Error in updateQuestionService:", error);
     throw error;
   }
 };
 
-export const deleteQuestionService = async (questionId: string) => {
+export const deleteQuestionService = async (
+  questionId: string,
+  surveyId: string
+) => {
+  // await updateSubmissionGradesAfterQuestionDeletion(questionId);
   try {
     const deletedQuestion = await prisma.question.delete({
       where: { id: questionId },
@@ -231,8 +246,10 @@ export const deleteQuestionService = async (questionId: string) => {
     if (deletedQuestion.questionImage) {
       await deleteImgur(deletedQuestion.questionImage.deleteHash);
     }
+    await updateTotalSubmissionsScore(surveyId,deletedQuestion.points);
     return true;
   } catch (error) {
+    console.error("Error in deleteQuestionService:", error);
     throw error;
   }
 };

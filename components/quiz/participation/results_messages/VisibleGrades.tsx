@@ -9,7 +9,7 @@ const VisibleGrades: React.FC<{
       <div className="text-xl font-semibold text-white">
         You scored {totalUserScore} out of {QuizTotalScore}.
       </div>
-      <div className="text-sm text-gray-600 mt-2">
+      <div className="text-sm text-white mt-2">
         If you wish to view your grades later, save the following link:
       </div>
     </div>

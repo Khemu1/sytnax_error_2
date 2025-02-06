@@ -4,9 +4,9 @@
 
 .quiz-question-container {
   @apply flex flex-col gap-6 items-center overflow-y-scroll p-4 mt-8;
-  height: calc(100dvh - 250px);
+  height: calc(100dvh - 75px);
+}
 
-  @media (min-width: 640px) {
-    height: calc(100dvh - 100px);
-  }
+.quiz-question-container-review {
+  @apply flex flex-col gap-6 items-center overflow-y-scroll p-4 mt-8 h-[calc(100dvh-_170px)] sm:h-[calc(100dvh-_195px)];
 }

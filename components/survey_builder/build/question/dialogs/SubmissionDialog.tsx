@@ -15,6 +15,12 @@ const SubmissionDialog: React.FC<SubmissionDialogProps> = ({
   submission,
   questionsPerPage,
 }) => {
+  submission.answers.sort((a, b) => {
+    return (
+      new Date(a.question.createdAt as string).getTime() -
+      new Date(b.question.createdAt as string).getTime()
+    );
+  });
   return (
     <>
       <Dialog
@@ -40,6 +46,7 @@ const SubmissionDialog: React.FC<SubmissionDialogProps> = ({
                   />
                 </button>
               </div>
+
               <ReviewQuiz
                 submission={submission}
                 questionsPerPage={questionsPerPage}

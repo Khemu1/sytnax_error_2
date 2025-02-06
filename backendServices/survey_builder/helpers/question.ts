@@ -9,7 +9,12 @@ import {
   editedQuestionModel,
   EditQuestionModelBackend,
 } from "@/types/buildSurvey";
-import { extractAnswersToAdd, extractAnswersToDelete, extractCorrectAnswersToAdd, extractCorrectAnswersToDelete } from "@/utils/survey_builder/build/questions";
+import {
+  extractAnswersToAdd,
+  extractAnswersToDelete,
+  extractCorrectAnswersToAdd,
+  extractCorrectAnswersToDelete,
+} from "@/utils/survey_builder/build/questions";
 import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
 
@@ -38,12 +43,19 @@ export const extractChanges = (data: EditQuestionModelBackend) => {
   };
 };
 
+/**
+ *
+ * this function is used to delete or add answers that aren't correct
+ **/
 export const handleAnswerUpdates = async (
   answersToAdd: string[],
   answersToRemove: AnswersModel[],
   prepQuestion: editedQuestionModel
 ) => {
   let questionAnswers = [...prepQuestion.questionAnswers];
+
+  console.log("Answers to Add:", answersToAdd);
+  console.log("Answers to Remove:", answersToRemove);
 
   if (answersToAdd.length > 0) {
     const newAnswers = await addAnswers(answersToAdd, prepQuestion.id);
@@ -53,7 +65,7 @@ export const handleAnswerUpdates = async (
   if (answersToRemove.length > 0) {
     await deleteAnswers(answersToRemove);
     questionAnswers = questionAnswers.filter(
-      (a) => !answersToRemove.some((ar) => ar.id === a.id)
+      (qa) => !answersToRemove.some((ar) => ar.id === qa.id)
     );
   }
 
@@ -63,33 +75,35 @@ export const handleAnswerUpdates = async (
 export const handleCorrectAnswerUpdates = async (
   correctAnswersToAdd: string[],
   correctAnswersToRemove: CorrectAnswerModel[],
-  answersToAdd: string[],
   prepQuestion: editedQuestionModel,
   allowMultipleCorrectAnswers: boolean
 ) => {
   let correctAnswers = [...prepQuestion.correctAnswers];
-  let questionAnswers = [...prepQuestion.questionAnswers];
 
-  // Add correct answers
+  console.log("Correct Answers to Remove:", correctAnswersToRemove);
+  console.log("Correct Answers to Add:", correctAnswersToAdd);
+
   if (correctAnswersToAdd.length > 0) {
-    if (answersToAdd.length + correctAnswersToAdd.length > 6) {
+    if (!allowMultipleCorrectAnswers && correctAnswersToAdd.length > 1) {
       throw new CustomError(
-        "Maximum of 6 answers allowed.",
+        "Only one correct answer is allowed.",
         400,
         "question",
         true
       );
     }
 
-    const answersToInsert = correctAnswersToAdd.filter(
-      (ca) => !questionAnswers.some((qa) => qa.answer === ca)
+    const existingAnswers = prepQuestion.questionAnswers.filter((qa) =>
+      correctAnswersToAdd.includes(qa.answer)
     );
 
-    if (answersToInsert.length > 0) {
-      const newAnswers = await addAnswers(answersToInsert, prepQuestion.id);
-      questionAnswers = [...questionAnswers, ...newAnswers];
+    const newCorrectAnswers = correctAnswersToAdd.filter(
+      (answer) => !existingAnswers.some((qa) => qa.answer === answer)
+    );
 
-      const correctAnswerAndIds = newAnswers.map((na) => ({
+    if (newCorrectAnswers.length > 0) {
+      const addedAnswers = await addAnswers(newCorrectAnswers, prepQuestion.id);
+      const correctAnswerAndIds = addedAnswers.map((na) => ({
         answer: na.answer,
         id: na.id,
       }));
@@ -102,26 +116,11 @@ export const handleCorrectAnswerUpdates = async (
       correctAnswers = [...correctAnswers, ...addedCorrectAnswers];
     }
 
-    const existingAnswers = correctAnswersToAdd.filter((ca) =>
-      questionAnswers.some((qa) => qa.answer === ca)
-    );
-
-    const correctAnswerAndIds = existingAnswers
-      .map((ca) => {
-        const match = questionAnswers.find((qa) => qa.answer === ca);
-        return match ? { answer: ca, id: match.id } : null;
-      })
-      .filter((itme) => itme !== null);
-
-    if (correctAnswerAndIds.length > 0) {
-      if (!allowMultipleCorrectAnswers && correctAnswerAndIds.length > 1) {
-        throw new CustomError(
-          "Only one correct answer is allowed.",
-          400,
-          "question",
-          true
-        );
-      }
+    if (existingAnswers.length > 0) {
+      const correctAnswerAndIds = existingAnswers.map((qa) => ({
+        answer: qa.answer,
+        id: qa.id,
+      }));
 
       const addedCorrectAnswers = await addCorrectAnswers(
         correctAnswerAndIds,
@@ -132,49 +131,62 @@ export const handleCorrectAnswerUpdates = async (
     }
   }
 
-  // Remove correct answers
   if (correctAnswersToRemove.length > 0) {
     await deleteCorrectAnswers(correctAnswersToRemove);
     correctAnswers = correctAnswers.filter(
       (ca) => !correctAnswersToRemove.some((car) => car.id === ca.id)
     );
-
-    const idsToRemove = correctAnswersToRemove.map((car) => car.id);
-    questionAnswers = questionAnswers.filter(
-      (qa) => !idsToRemove.includes(qa.id)
-    );
   }
 
-  return { correctAnswers, questionAnswers };
+  return correctAnswers;
 };
-
 export const addCorrectAnswers = async (
   correctAnswersToAdd: { answer: string; id: string }[],
   questionId: string
 ): Promise<CorrectAnswerModel[]> => {
-  console.log("adding correct answers", correctAnswersToAdd);
-  const createdAnswers = await Promise.all(
-    correctAnswersToAdd.map((a) =>
-      prisma.correctAnswer.create({
-        data: {
-          answerId: a.id,
-          questionId: questionId,
-          value: a.answer,
-        },
-      })
-    )
-  );
+  console.log("Adding correct answers:", correctAnswersToAdd);
 
-  const modifiedAnswers: CorrectAnswerModel[] = createdAnswers.map((ca) => ({
-    id: ca.id,
-    questionId: ca.questionId,
-    value: ca.value,
-    answerId: ca.answerId,
-    createdAt: ca.createdAt ? ca.createdAt.toUTCString() : undefined,
-    updatedAt: ca.updatedAt ? ca.updatedAt.toUTCString() : undefined,
-  }));
-  console.log("added", modifiedAnswers);
-  return modifiedAnswers;
+  const createdAnswers: CorrectAnswerModel[] = [];
+
+  for (const answer of correctAnswersToAdd) {
+    const existingAnswer = await prisma.correctAnswer.findFirst({
+      where: {
+        answerId: answer.id,
+        questionId: questionId,
+      },
+    });
+
+    if (existingAnswer) {
+      console.warn(
+        `Warning: Answer "${answer.answer}" is already in the database. Skipping.`
+      );
+      continue;
+    }
+
+    const createdAnswer = await prisma.correctAnswer.create({
+      data: {
+        answerId: answer.id,
+        questionId: questionId,
+        value: answer.answer,
+      },
+    });
+
+    createdAnswers.push({
+      id: createdAnswer.id,
+      questionId: createdAnswer.questionId,
+      value: createdAnswer.value,
+      answerId: createdAnswer.answerId,
+      createdAt: createdAnswer.createdAt
+        ? createdAnswer.createdAt.toUTCString()
+        : undefined,
+      updatedAt: createdAnswer.updatedAt
+        ? createdAnswer.updatedAt.toUTCString()
+        : undefined,
+    });
+  }
+
+  console.log("Added Correct Answers:", createdAnswers);
+  return createdAnswers;
 };
 
 export const addAnswers = async (
@@ -218,6 +230,7 @@ export const deleteAnswers = async (answersToDelete: AnswersModel[]) => {
 const deleteCorrectAnswers = async (
   correctAnswersToDelete: CorrectAnswerModel[]
 ) => {
+  console.log("Deleting correct answers:", correctAnswersToDelete);
   await Promise.all(
     correctAnswersToDelete.map((answer) =>
       prisma.correctAnswer.delete({
@@ -484,12 +497,12 @@ export const handleToggleAllowMultipleAnswers = async (
   isMultipleAnswersEnabled: boolean | undefined,
   questionId: string
 ) => {
-  if (isMultipleAnswersEnabled===undefined) {
-    console.log("no change here",isMultipleAnswersEnabled)
+  if (isMultipleAnswersEnabled === undefined) {
+    console.log("no change here", isMultipleAnswersEnabled);
     return;
   }
   try {
-    console.log("updating toggler value",isMultipleAnswersEnabled)
+    console.log("updating toggler value", isMultipleAnswersEnabled);
     const updateQuestion = await prisma.question.update({
       where: {
         id: questionId,

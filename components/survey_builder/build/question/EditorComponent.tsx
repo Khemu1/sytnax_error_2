@@ -34,6 +34,7 @@ const EditorComponent: React.FC<EditorComponentProps> = ({
   return (
     <div className="flex flex-col gap-5 mt-3 overflow-visible">
       <CKEditor
+        
         editor={ClassicEditor}
         data={value}
         onReady={(editor) => {

@@ -125,7 +125,7 @@ const Course: React.FC<Props> = ({ params }) => {
           <div className="flex justify-center mt-12">
             <Link
               href={"/join-course"}
-              className="bg-gradient-to-r from-blue-700 via-teal-600 to-purple-800 hover:from-purple-800 hover:via-teal-600 hover:to-blue-700 text-white text-xl font-medium py-3 px-10 rounded-lg shadow-md hover:shadow-lg transition-transform transform hover:scale-105"
+              className="bg-blue-700 text-white text-xl font-medium py-3 px-10 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105"
             >
               Join Now
             </Link>

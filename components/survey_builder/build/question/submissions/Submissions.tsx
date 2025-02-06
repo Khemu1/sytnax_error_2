@@ -22,16 +22,11 @@ const Submissions: React.FC = () => {
     surveyId as string
   );
 
-  const filteredSubmissions = submissions
-    ?.filter((submission) =>
-      submission.surveyParticipant.studentId
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase())
-    )
-    .sort(
-      (a, b) =>
-        new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime()
-    );
+  const filteredSubmissions = submissions?.filter((submission) =>
+    submission.surveyParticipant.studentId
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase())
+  );
 
   if (isLoading && !submissions) {
     return (
@@ -51,20 +46,21 @@ const Submissions: React.FC = () => {
 
   return (
     <>
-      <div className="flex flex-col gap-4 px-4 overflow-hidden h-[85dvh]">
-        <div className="w-[250px]">
+      <div className="flex flex-col gap-4 px-4 h-[85dvh]">
+        <div className="w-full max-w-[250px]">
           <input
             type="text"
-            className="w-full border-b-2 border-gray-200 focus:outline-0 focus:border-gray-400 dark:border-gray-700 dark:focus:border-gray-600 rounded-lg p-2"
+            className="w-full border-b-2 border-gray-200 focus:outline-none focus:border-blue-500 dark:border-gray-700 dark:focus:border-blue-600 rounded-lg p-2 bg-gray-50 dark:bg-gray-800 dark:text-gray-200"
             placeholder="Search by student ID"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <div className="relative overflow-x-auto shadow-md sm:rounded-lg overflow-y-hidden">
-          <div className="table_size py-2 overflow-y-auto">
-            <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-              <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+
+        <div className="relative overflow-hidden shadow-md sm:rounded-lg flex-1">
+          <div className="h-full overflow-y-auto">
+            <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+              <thead className="sticky top-0 text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
                   <th scope="col" className="px-6 py-3"></th>
                   <th scope="col" className="px-6 py-3">
@@ -81,18 +77,20 @@ const Submissions: React.FC = () => {
                   </th>
                 </tr>
               </thead>
-              <tbody>
+
+              {/* Table Body */}
+              <tbody className="overflow-y-auto">
                 {filteredSubmissions && filteredSubmissions.length > 0 ? (
                   filteredSubmissions.map((submission) => (
                     <tr
                       key={submission.id}
-                      className={`cursor-pointer border-b dark:border-gray-700 hover:bg-gray-400/10`}
+                      className="cursor-pointer border-b dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors duration-200"
                       onClick={() => setCurrentSubmission(submission)}
                     >
-                      <td className="m-auto">
+                      <td className="px-6 py-4">
                         {!submission.cleanSubmission && (
                           <Image
-                            src={"/assets/icons/red-dot.svg"}
+                            src="/assets/icons/red-dot.svg"
                             alt="red dot"
                             width={25}
                             height={25}
@@ -124,6 +122,8 @@ const Submissions: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Submission Dialog */}
       {currentSubmission && currentSurvey && (
         <SubmissionDialog
           isOpen={true}
