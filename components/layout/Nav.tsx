@@ -78,14 +78,13 @@ const Nav = () => {
 
   return (
     <nav ref={navRef} className="bg-base-300 sticky top-0 z-[15] p-3">
-      {/* Logo Section */}
       <Link
         href="/"
         className="flex items-center sm:hover:bg-gray-800 py-1 px-3 rounded-lg gap-2 active:scale-95 transition-all"
         aria-label="Home"
       >
         <Image src="/assets/imgs/logo.png" alt="Logo" width={45} height={10} />
-        <span className="font-extrabold text-sm md:text-2xl text-white whitespace-nowrap">
+        <span className="font-extrabold text-xl  md:text-2xl text-white whitespace-nowrap">
           Syntax Error
         </span>
       </Link>
