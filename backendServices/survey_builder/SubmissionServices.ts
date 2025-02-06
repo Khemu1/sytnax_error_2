@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
 import { CustomError } from "@/middleware/CustomError";
 import { Decimal } from "@prisma/client/runtime/library";
+import { QuestionModel } from "@/types/buildSurvey";
 
 const prisma = new PrismaClient().$extends(withAccelerate());
 
@@ -81,40 +82,83 @@ export const updateSubmissionGradesAfterAnswersUpdate = async (
 
 export const updateTotalSubmissionsScore = async (
   surveyId: string,
-  deletedQuestionPoints: Decimal
+  deletedQuestion: QuestionModel
 ) => {
   try {
     const survey = await prisma.survey.findFirst({
       where: { id: surveyId },
       include: {
         questions: true,
-        submissions: true,
+        submissions: {
+          include: {
+            answers: true,
+          },
+        },
       },
     });
+
     if (!survey) {
       throw new CustomError("Survey not found", 404, "survey");
     }
 
-    const totalPoints = survey.questions.reduce((acc, question) => {
-      const questionPoints = question.points.toNumber();
-      return acc + questionPoints;
-    }, 0);
+    const totalPoints = survey.questions
+      .filter((q) => q.id !== deletedQuestion.id)
+      .reduce((acc, question) => acc + question.points.toNumber(), 0);
 
-    console.log("new total score :", totalPoints);
+    console.log("New total score:", totalPoints);
 
     const updateSubmissions = survey.submissions.map((submission) => {
-      const givenPoints = submission.givenPoints.sub(deletedQuestionPoints);
-      console.log("incoming question points : ", deletedQuestionPoints);
-      console.log("old given points : ", givenPoints);
-      console.log("given points", givenPoints);
+      let givenPoints = submission.givenPoints.toNumber();
+
+      const userAnsweredDeleted = submission.answers.find(
+        (ans) => ans.questionId === deletedQuestion.id
+      );
+
+      if (userAnsweredDeleted) {
+        console.log(`Answered question ${deletedQuestion.id} found`);
+
+        const correctAnswers = deletedQuestion.correctAnswers.map(
+          (ca) => ca.answerId
+        );
+        const userSelectedAnswers = userAnsweredDeleted.selectedAnswers;
+
+        const correctAnswersSelected = userSelectedAnswers.filter((ans) =>
+          correctAnswers.includes(ans)
+        ).length;
+
+        let pointsToSubtract = 0;
+        
+        if (deletedQuestion.allowMultipleAnswers) {
+          if (correctAnswersSelected > 0) {
+            // (2/2) *2 = 1
+            pointsToSubtract =
+              (correctAnswersSelected / deletedQuestion.correctAnswers.length) *
+              deletedQuestion.points;
+          }
+        } else {
+          if (correctAnswersSelected > 0) {
+            pointsToSubtract = deletedQuestion.points;
+          }
+        }
+
+        console.log("Points to subtract:", pointsToSubtract);
+
+        givenPoints -= pointsToSubtract;
+      }
+
+      console.log("Old given points:", submission.givenPoints.toNumber());
+      console.log("New given points:", givenPoints);
+
       return prisma.surveySubmission.update({
         where: { id: submission.id },
         data: {
-          totalPoints: totalPoints,
-          givenPoints,
+          totalPoints: new Decimal(totalPoints),
+          givenPoints: new Decimal(givenPoints),
         },
       });
     });
+
+    // Execute all updates in parallel
     await Promise.all(updateSubmissions);
   } catch (error) {
     console.error("Error updating total submissions score:", error);

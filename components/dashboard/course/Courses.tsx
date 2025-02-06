@@ -60,6 +60,7 @@ const Courses: React.FC = () => {
       dispatch(setCourses(updatedCourses));
       setSelectedCourses([]);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deleteSuccess]);
 
   const handleCourseClick = (id: number) => {

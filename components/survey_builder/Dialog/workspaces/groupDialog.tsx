@@ -146,7 +146,7 @@ const GroupDialog: React.FC<GroupDialogProps> = ({ isOpen, onClose }) => {
                   {groupState.groupMembers.map((member) => (
                     <li
                       key={member.userId}
-                      className="flex justify-between px-3 items-center p-2 bg-base-100 rounded-md"
+                      className={`flex justify-between px-3 items-center p-2 bg-base-100 rounded-md`}
                     >
                       <span className="block text-ellipsis overflow-hidden">
                         {member.user?.username}

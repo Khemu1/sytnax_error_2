@@ -48,7 +48,7 @@ export interface SubmissionModelForBuilder {
   participantId: string;
   phoneNumber: string;
   createdAt: string;
-  updatedAt: string;
+  updatedAt: Date;
   totalPoints: number;
   givenPoints: number;
   submittedAt: Date;

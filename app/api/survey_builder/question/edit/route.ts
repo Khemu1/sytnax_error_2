@@ -8,7 +8,6 @@ export const PATCH = async (req: NextRequest) => {
     const rawFormData = await req.formData();
     const formData = parseAndValidateEditQuestionFormData(rawFormData);
 
-    console.log("in controller for edit question");
 
     const question = await updateQuestionService(formData);
     return NextResponse.json(question, {

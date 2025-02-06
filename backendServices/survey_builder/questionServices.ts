@@ -120,7 +120,6 @@ export const addQuestionService = async (
 export const updateQuestionService = async (data: EditQuestionModelBackend) => {
   const prepQuestion: editedQuestionModel = { ...data.question };
 
-  console.log("answers to remove ");
   const {
     answersToAdd,
     answersToRemove,
@@ -233,20 +232,32 @@ export const deleteQuestionService = async (
 ) => {
   // await updateSubmissionGradesAfterQuestionDeletion(questionId);
   try {
-    const deletedQuestion = await prisma.question.delete({
+    const deletedQuestion = await prisma.question.findFirst({
       where: { id: questionId },
       include: {
         questionImage: {
           select: { deleteHash: true },
         },
+        correctAnswers: true,
+        questionAnswers: true,
       },
     });
 
+    if (!deletedQuestion) {
+      throw new CustomError("Question not found", 404, "question");
+    }
     // delete if from imgur
     if (deletedQuestion.questionImage) {
       await deleteImgur(deletedQuestion.questionImage.deleteHash);
     }
-    await updateTotalSubmissionsScore(surveyId,deletedQuestion.points);
+
+    // @ts-expect-error says that image can't null
+    await updateTotalSubmissionsScore(surveyId, deletedQuestion);
+
+    await prisma.question.delete({
+      where: { id: questionId },
+    });
+
     return true;
   } catch (error) {
     console.error("Error in deleteQuestionService:", error);

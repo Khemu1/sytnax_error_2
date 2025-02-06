@@ -409,7 +409,12 @@ const AllowedMembersDialog: React.FC<AllowedMembersDialogProps> = ({
                       )}
                     </button>
                   </div>
-
+``                  <div className="flex items-center font-semibold gap-1 mt-2">
+                    <p className="h-6 w-6 rounded-full bg-yellow-800"></p>
+                    <span className="text-sm">
+                      User Searched for the ID but didn&apos;t Enter the Exam
+                    </span>
+                  </div>
                   <h4 className="font-semibold mt-4 mb-2 text-[#e4e4e4]">
                     Members
                   </h4>
@@ -424,6 +429,10 @@ const AllowedMembersDialog: React.FC<AllowedMembersDialogProps> = ({
                           className={`flex justify-between px-3 items-center p-2 bg-base-100 rounded-md cursor-pointer ${
                             selectedMembers.includes(member.id)
                               ? "bg-blue-800"
+                              : ""
+                          } ${
+                            member.hadBeenSearched && member.attempts !== 0
+                              ? "bg-yellow-800"
                               : ""
                           }`}
                           onClick={() => handleToggle(member.id)}

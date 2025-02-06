@@ -455,6 +455,7 @@ export const resetMembersAttemptsService = async (
           },
           data: {
             attempts: 1,
+            hadBeenSearched: false,
           },
         });
       })
@@ -488,6 +489,7 @@ export const resetAllMembersAttemptsService = async (surveyId: string) => {
       },
       data: {
         attempts: 1,
+        hadBeenSearched: false,
       },
     });
 

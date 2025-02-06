@@ -245,13 +245,13 @@ export const getParticpantForQuizService = async (
     if (!participant) {
       return { hasAccess: false };
     }
-    if (participant.attempts > 0) {
+    if (!participant.hadBeenSearched) {
       await prisma.surveyParticipant.update({
         where: {
           id: participant.id,
         },
         data: {
-          attempts: participant.attempts - 1,
+          hadBeenSearched: true,
           updatedAt: new Date(),
         },
       });

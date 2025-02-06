@@ -104,6 +104,15 @@ export const validateQuizParticipant = async (
         true
       );
     }
+    // if trying to submit without being checked
+    if (!participant.hadBeenSearched) {
+      throw new CustomError(
+        "User haven't been checked",
+        400,
+        "quizParticipant",
+        true
+      );
+    }
     return NextResponse.next();
   } catch (error) {
     throw new CustomError(

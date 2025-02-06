@@ -42,6 +42,7 @@ export interface SurveyParticipantModel {
   submissionId: string;
   studentId: string;
   attempts: number;
+  hadBeenSearched: boolean;
   createdAt: Date;
   updatedAt: Date;
   submittedAt: Date;
