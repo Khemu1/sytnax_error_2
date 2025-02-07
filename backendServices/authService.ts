@@ -53,11 +53,12 @@ export const signInService = async (data: SignInProps) => {
         password: data.password,
       }),
     });
-    const result = (await response.json()) as Promise<boolean>;
+
+    const { result } = (await response.json()) as { result: boolean };
+
     if (!result) {
       throw new CustomError("Invalid Credentials", 404, "Sign in Error", true);
     }
-    console.log("res", result);
     // get user own group
     const userGroup = await prisma.group.findFirst({
       where: { ownerId: user.id },
