@@ -1,5 +1,6 @@
 import { imageDataResponse, ImageDeleteResponse } from "@/types";
 import { CustomError } from "@/middleware/CustomError";
+import { Readable } from "stream";
 
 export const uploadICourseImageToImgur = async (
   image: File
@@ -25,27 +26,50 @@ export const uploadICourseImageToImgur = async (
   return response.json();
 };
 
+async function streamToBuffer(stream: Readable): Promise<Buffer> {
+  const chunks: Buffer[] = [];
+  for await (const chunk of stream) {
+    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+  }
+  return Buffer.concat(chunks);
+}
+
+function base64ToStream(base64: string): Readable {
+  const buffer = Buffer.from(base64, "base64");
+  return Readable.from(buffer);
+}
+
 export const uploadQuestionImageToImgur = async (
   image: string,
-  type = "base64"
+  type: "base64" | "url" = "base64"
 ): Promise<imageDataResponse> => {
   try {
     if (!image || typeof image !== "string") {
-      console.error("Invalid image input:", image);
       throw new Error("Invalid image input. Expected a non-empty string.");
     }
 
-    const modifiedImage =
-      type === "base64" && image.includes(",") ? image.split(",")[1] : image;
+    const imgurFormData = new FormData();
 
-    if (!modifiedImage || typeof modifiedImage !== "string") {
-      console.error("Invalid modified image:", modifiedImage);
-      throw new Error("Processed image is empty or invalid.");
+    if (type === "base64") {
+      // Remove metadata (e.g., "data:image/png;base64,")
+      const base64Data = image.includes(",") ? image.split(",")[1] : image;
+
+      // Convert base64 to a readable stream
+      const imageStream = base64ToStream(base64Data);
+
+      // Convert stream to buffer
+      const buffer = await streamToBuffer(imageStream);
+
+      imgurFormData.append("image", buffer.toString("base64"));
+      imgurFormData.append("type", "base64");
+    } else if (type === "url") {
+      // Directly upload the image from a URL
+      imgurFormData.append("image", image);
+      imgurFormData.append("type", "url");
+    } else {
+      throw new Error(`Unsupported image type: ${type}`);
     }
 
-    const imgurFormData = new FormData();
-    imgurFormData.append("image", modifiedImage);
-    imgurFormData.append("type", "base64");
     imgurFormData.append("title", "question image");
     imgurFormData.append("description", new Date().toISOString());
 
@@ -68,14 +92,12 @@ export const uploadQuestionImageToImgur = async (
     }
 
     console.log("Uploaded image successfully");
-    const parsedRes = await response.json();
-    return parsedRes;
+    return await response.json();
   } catch (error) {
     console.error("Image upload failed:", error);
     throw error;
   }
 };
-
 export const deleteImgur = async (
   deleteHash: string
 ): Promise<ImageDeleteResponse> => {
