@@ -34,6 +34,23 @@ export const addQuestionService = async (
   const { question, options } = questionData;
 
   try {
+    let imageData = null;
+
+    if (options.isImageUploadEnabled && question.imageUrl) {
+      try {
+        imageData = await handleImageUpload(question.imageUrl);
+        console.log(
+          "Image uploaded successfully for new question :",
+          imageData
+        );
+      } catch (error) {
+        console.error("Image upload failed for new question :", error);
+        throw new Error("Failed to upload image.");
+      }
+    }
+
+    // never ever but somthing that takes long time inside the transaction , about 4-5 hours wasted
+
     const createdQuestion = await prisma.$transaction(async (prisma) => {
       const newQuestion = await prisma.question.create({
         data: {
@@ -81,28 +98,21 @@ export const addQuestionService = async (
           });
         })
       );
-      let questionImage;
-      if (options.isImageUploadEnabled && question.imageUrl) {
-        const imageData = await handleImageUpload(question.imageUrl);
-        const dataToInsert = { questionId: newQuestion.id, ...imageData };
 
-        Object.entries(dataToInsert).forEach(([key, value]) => {
-          if (value === null || value === undefined) {
-            console.warn(`⚠️ Missing value for key: ${key} ->`, value);
-          }
-        });
-
-        console.log(dataToInsert);
-
+      let questionImage = null;
+      if (imageData) {
         try {
           questionImage = await prisma.questionImage.create({
             data: {
-              ...dataToInsert,
+              questionId: newQuestion.id,
+              imgurId: imageData.imgurId,
+              url: imageData.url,
+              deleteHash: imageData.deleteHash,
             },
           });
-          console.log("New image added:", questionImage);
+          console.log("New image added to DB:", questionImage);
         } catch (error) {
-          console.error("Prisma create error:", error);
+          console.error("Prisma image insert error:", error);
           throw new Error("Failed to create question image in database.");
         }
       }
@@ -111,11 +121,13 @@ export const addQuestionService = async (
         ...newQuestion,
         correctAnswers,
         questionAnswers: createdAnswers,
-        image: {
-          id: questionImage?.id,
-          url: questionImage?.url,
-          questionId: newQuestion.id,
-        },
+        image: questionImage
+          ? {
+              id: questionImage.id,
+              url: questionImage.url,
+              questionId: newQuestion.id,
+            }
+          : null,
       };
     });
 
@@ -139,6 +151,18 @@ export const updateQuestionService = async (data: EditQuestionModelBackend) => {
   } = extractChanges(data);
 
   try {
+    if (data.question.imageUrl) {
+      try {
+        prepQuestion.questionImage = await handleImageUpdate(
+          data.question.imageUrl,
+          prepQuestion.id
+        );
+      } catch (error) {
+        console.error("Error updating image:", error);
+        throw new Error("Failed to update question image before transaction.");
+      }
+    }
+
     const result = await prisma.$transaction(async () => {
       prepQuestion.questionAnswers = await handleAnswerUpdates(
         answersToAdd,
@@ -167,42 +191,21 @@ export const updateQuestionService = async (data: EditQuestionModelBackend) => {
         prepQuestion.id
       );
       prepQuestion.points = pointsUpdateData?.points.toNumber();
-      prepQuestion.updatedAt = pointsUpdateData?.updatedAt.toUTCString();
+      prepQuestion.updatedAt = pointsUpdateData?.updatedAt?.toUTCString();
 
       const descriptionUpdateData = await handleDescriptionUpdate(
         data.question.description,
         prepQuestion.id
       );
       prepQuestion.description = descriptionUpdateData?.description;
-      prepQuestion.updatedAt = descriptionUpdateData?.updatedAt.toUTCString();
-
-      prepQuestion.questionImage = await handleImageUpdate(
-        data.question.imageUrl,
-        prepQuestion.id
-      );
+      prepQuestion.updatedAt = descriptionUpdateData?.updatedAt?.toUTCString();
 
       const labelUpdateData = await handleLabelUpadte(
         data.question.label,
         prepQuestion.id
       );
       prepQuestion.label = labelUpdateData?.label;
-      prepQuestion.updatedAt = labelUpdateData?.updatedAt.toUTCString();
-
-      /**
-       * id
-       * surveyId
-       * label
-       * description
-       * questionImage
-       * createdAt
-       * updatedAt
-       * points
-       * questionAnswers
-       * correctAnswers
-       * allowMultipleAnswers
-       *
-       * any undefined field wasn't shouldn't be changed
-       */
+      prepQuestion.updatedAt = labelUpdateData?.updatedAt?.toUTCString();
 
       if (
         correactAnswersToAdd.length > 0 ||

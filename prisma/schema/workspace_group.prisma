@@ -5,5 +5,5 @@ model WorkspaceGroup {
   group       Group     @relation(fields: [groupId], references: [id], onDelete: Cascade)
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
-  @@unique([groupId, workspaceId]) 
+  @@unique([groupId, workspaceId])
 }

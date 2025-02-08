@@ -1,13 +1,13 @@
 model SurveyParticipant {
-  id            String           @id @default(cuid())
-  surveyId      String
-  studentId     String
-  attempts      Int              @default(1)
-  hadBeenSearched Boolean     @default(false)
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
-  survey        Survey           @relation(fields: [surveyId], references: [id], onDelete: Cascade)
-  submissions    SurveySubmission[]
+  id              String             @id @default(cuid())
+  surveyId        String
+  studentId       String
+  attempts        Int                @default(1)
+  hadBeenSearched Boolean            @default(false)
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  survey          Survey             @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  submissions     SurveySubmission[]
 
-  @@unique([studentId, surveyId]) 
+  @@unique([studentId, surveyId])
 }

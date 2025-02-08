@@ -1,16 +1,16 @@
 model SurveySubmission {
-  id                 String               @id @default(cuid())
-  surveyId           String
-  phoneNumber        String
-  participantId      String               // Associate with a participant @unique
-  createdAt          DateTime             @default(now())
-  updatedAt          DateTime             @updatedAt
-  totalPoints        Decimal              @default(0)
-  givenPoints        Decimal              @default(0)
-  submittedAt        DateTime
-  cleanSubmission    Boolean             @default(true)
-  survey             Survey               @relation(fields: [surveyId], references: [id], onDelete: Cascade)
-  answers            AnsweredQuestion[]
+  id              String             @id @default(cuid())
+  surveyId        String
+  phoneNumber     String
+  participantId   String // Associate with a participant @unique
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  totalPoints     Decimal            @default(0)
+  givenPoints     Decimal            @default(0)
+  submittedAt     DateTime
+  cleanSubmission Boolean            @default(true)
+  survey          Survey             @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  answers         AnsweredQuestion[]
 
-  surveyParticipant  SurveyParticipant    @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  surveyParticipant SurveyParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
 }

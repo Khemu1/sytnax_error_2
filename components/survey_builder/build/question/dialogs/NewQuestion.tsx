@@ -186,11 +186,12 @@ const NewQuestion: React.FC<NewQuestionDialogProps> = ({ isOpen, onClose }) => {
         message: "Question added successfully.",
         type: "success",
       });
+      setFile(null);
       dispatch(resetCurrentQuestion());
       setIsSubmitting(false);
       timeoutId = setTimeout(() => {
         onClose();
-      }, 1000); // Assign timeout to the outer variable
+      }, 1000);
     }
 
     // Cleanup function to ensure proper unmounting

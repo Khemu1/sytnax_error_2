@@ -416,7 +416,7 @@ export const handleImageUpload = async (imageUrl: string) => {
   try {
     const uploadResult = await uploadQuestionImageToImgur(imageUrl);
     const imageData = uploadResult?.data;
-
+    console.log("Imgur Response:", JSON.stringify(imageData, null, 2));
     if (!imageData?.id || !imageData?.link || !imageData?.deletehash) {
       console.error("Invalid Imgur response:", uploadResult);
       throw new CustomError(

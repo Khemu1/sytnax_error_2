@@ -4,7 +4,7 @@ model Workspace {
   name           String
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
-  surveys        Survey[]         
-  ownerId        User             @relation(fields: [userId], references: [id],onDelete: Cascade)
+  surveys        Survey[]
+  ownerId        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   WorkspaceGroup WorkspaceGroup[]
 }

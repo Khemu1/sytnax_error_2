@@ -1,10 +1,10 @@
 model UserGroup {
-  id        String @id @default(cuid())
-  userId   Int 
+  id        String    @id @default(cuid())
+  userId    Int
   groupId   String
   createdAt DateTime? @default(now())
-  group     Group  @relation(fields: [groupId], references: [id] ,onDelete: Cascade)
-  user      User   @relation(fields: [userId], references: [id] ,onDelete: Cascade)
+  group     Group     @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([groupId, userId])
 }

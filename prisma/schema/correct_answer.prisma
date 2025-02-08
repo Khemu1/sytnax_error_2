@@ -1,9 +1,9 @@
 model CorrectAnswer {
-  id          String         @id @default(cuid())
-  questionId  String
-  answerId    String            
-  value       String
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
-  question    Question        @relation(fields: [questionId], references: [id] ,onDelete: Cascade)
+  id         String   @id @default(cuid())
+  questionId String
+  answerId   String
+  value      String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
 }
