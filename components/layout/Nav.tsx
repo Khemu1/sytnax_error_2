@@ -95,9 +95,9 @@ const Nav = () => {
           <li className="nav_buttons">
             <Link href="/">Home</Link>
           </li>
-          <li className="nav_buttons">
+          {/* <li className="nav_buttons">
             <Link href="/courses">Courses</Link>
-          </li>
+          </li> */}
           {authState.isAuthenticated &&
             (authState.role === 1 || authState.role === 2) && (
               <li className="nav_buttons">
@@ -148,9 +148,9 @@ const Nav = () => {
             </Link>
           </li>
           <li>
-            <Link href="/courses" onClick={() => setIsMenuOpen(false)}>
+            {/* <Link href="/courses" onClick={() => setIsMenuOpen(false)}>
               Courses
-            </Link>
+            </Link> */}
           </li>
           {authState.isAuthenticated &&
             (authState.role === 1 || authState.role === 2) && (

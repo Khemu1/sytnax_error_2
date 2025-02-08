@@ -67,7 +67,7 @@ const Admin = () => {
       <aside className={`bg-base-100 `}>
         {authState.isAuthenticated && authState.role === 1 && (
           <>
-            <button
+            {/* <button
               className={`${
                 section === "courses"
                   ? "bg-gray-800"
@@ -76,7 +76,7 @@ const Admin = () => {
               onClick={() => setSection("courses")}
             >
               Courses
-            </button>
+            </button> */}
             <button
               className={`${
                 section === "admins"
@@ -146,7 +146,7 @@ const Admin = () => {
         </button>
         {authState.isAuthenticated && authState.role === 1 && (
           <>
-            <button
+            {/* <button
               className={`${
                 section === "courses"
                   ? "bg-gray-800"
@@ -155,7 +155,7 @@ const Admin = () => {
               onClick={() => setSection("courses")}
             >
               Courses
-            </button>
+            </button> */}
             <button
               className={`${
                 section === "admins"

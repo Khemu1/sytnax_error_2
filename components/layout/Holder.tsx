@@ -1,7 +1,7 @@
 "use client";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
-import { usePathname, useRouter } from "next/navigation";
+import { notFound, usePathname, useRouter } from "next/navigation";
 import Footer from "./Footer";
 import CustomProvider from "./CustomProvider";
 import Nav from "./Nav";

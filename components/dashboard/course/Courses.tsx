@@ -9,8 +9,10 @@ import { setCourses } from "@/store/slices/dashboardSlice";
 import SkeletonTable from "@/components/skeletons/SkeletonTable";
 import DashboardDialog from "../DashboardDialog";
 import Toast from "@/components/skeletons/Toast";
+import { notFound } from "next/navigation";
 
 const Courses: React.FC = () => {
+  return notFound();
   const [allCourses, setAllCourses] = useState<CourseDashboard[]>([]);
   const [selectedCourses, setSelectedCourses] = useState<number[]>([]);
   const [toast, setToast] = useState<{

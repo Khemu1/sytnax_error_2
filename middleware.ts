@@ -31,6 +31,8 @@ const handleCoursesRoute = async (req: NextRequest) => {
     return NextResponse.next();
   }
   if (pathname === "/api/courses/register") {
+    return NextResponse.redirect(new URL("/404", req.url));
+
     return await vlidateCourseRegister(req);
   }
 
@@ -78,6 +80,8 @@ const handleDashboardRoutes = async (req: NextRequest) => {
   const checkRole = await checkOwnerRole(authUser);
 
   if (pathname.startsWith("/api/dashboard/courses")) {
+    return NextResponse.redirect(new URL("/404", req.url));
+
     return checkRole;
   } else if (pathname.startsWith("/api/dashboard/admins")) {
     if (method === "DELETE") {
@@ -109,6 +113,8 @@ export async function middleware(req: CustomNextRequest) {
     const { pathname } = req.nextUrl;
     console.log("pathname", pathname);
     if (pathname.startsWith("/api/courses")) {
+      return NextResponse.redirect(new URL("/404", req.url));
+
       return await handleCoursesRoute(req);
     } else if (pathname.startsWith("/api/auth")) {
       return await handleAuthRoutes(req);

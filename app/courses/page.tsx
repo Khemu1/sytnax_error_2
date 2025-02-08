@@ -6,10 +6,12 @@ import SearchBar from "@/components/coursePage/SearchBar";
 import { useGetAllCourses } from "@/hooks/course";
 import { PublicCardCourseProps } from "@/types";
 import React, { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { notFound, useSearchParams } from "next/navigation";
 import { filterBy, filterBySearch } from "@/utils";
 
 const Courses = () => {
+  return notFound();
+
   const {
     loading,
     error,

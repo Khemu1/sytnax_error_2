@@ -4,7 +4,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { useGetCourse } from "@/hooks/course";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
 import Link from "next/link";
 
 interface Props {
@@ -12,6 +12,8 @@ interface Props {
 }
 
 const Course: React.FC<Props> = ({ params }) => {
+    return notFound();
+
   const router = useRouter();
   const [id, setId] = useState<number | null>(null);
   const { loading, data, error, handleGetCourse } = useGetCourse();
@@ -40,6 +42,7 @@ const Course: React.FC<Props> = ({ params }) => {
       handleGetCourse(id);
     }
   }, [id, handleGetCourse]);
+  
 
   if (loading) {
     return (
