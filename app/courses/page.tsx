@@ -1,4 +1,5 @@
 "use client";
+
 import { Analytics } from "@vercel/analytics/react";
 import CourseCards from "@/components/coursePage/CourseCards";
 import Filter from "@/components/coursePage/Filter";
@@ -47,7 +48,8 @@ const Courses = () => {
 
       {error ? (
         <div className="text-red-500 font-semibold text-xl text-center">
-          <p>Error loading courses: {error.message}</p>
+          {"//ts"}
+          <p>Error loading courses: {error && error?.message}</p>
         </div>
       ) : (
         <CourseCards loading={loading} courses={filteredData} />

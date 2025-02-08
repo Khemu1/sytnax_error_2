@@ -62,7 +62,7 @@ const Courses: React.FC = () => {
       dispatch(setCourses(updatedCourses));
       setSelectedCourses([]);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deleteSuccess]);
 
   const handleCourseClick = (id: number) => {
@@ -179,7 +179,11 @@ const Courses: React.FC = () => {
         </div>
       )}
       {toast && (
-        <Toast message={toast.message} type={toast.type} onClose={closeToast} />
+        <Toast
+          message={toast?.message ?? "fallback"}
+          type={toast?.type ?? "error"}
+          onClose={closeToast}
+        />
       )}
       {dialogState.dialogType && <DashboardDialog />}
     </div>

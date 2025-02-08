@@ -1,4 +1,7 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 "use client";
+
+
 
 import { Analytics } from "@vercel/analytics/react";
 import { useGetCourse } from "@/hooks/course";
@@ -113,7 +116,7 @@ const Course: React.FC<Props> = ({ params }) => {
               <h2 className="text-3xl font-semibold mb-4">Course Mind Map</h2>
               <div className="flex justify-center">
                 <Image
-                  src={data.mindmapImage}
+                  src={data?.mindmapImage || "/fallback-image.png"}
                   alt="Mindmap"
                   width={600}
                   height={400}
