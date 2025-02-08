@@ -9,6 +9,7 @@ interface PreviewProps {
   description?: string;
   index: number;
   answers: string[];
+  allowMultipleAnswers: boolean;
 }
 
 const Preview: React.FC<PreviewProps> = ({
@@ -16,6 +17,7 @@ const Preview: React.FC<PreviewProps> = ({
   label,
   description,
   answers,
+  allowMultipleAnswers,
 }) => {
   const [res, setRes] = useState<"pc" | "mobile">("pc");
   return (
@@ -79,16 +81,20 @@ const Preview: React.FC<PreviewProps> = ({
             />
           </div>
         )}
-        <div className="flex flex-col gap-4 w-full items-center">
-          <div className="w-full mt-4 sm:max-w-[500px] break-words">
+        <div className="flex flex-col gap-4 w-full items-center max-w-[500px] *:text-wrap *:w-full *:break-words">
+          <div className="w-full mt-4">
             {label && <LabelPreivew label={label} />}
           </div>
 
-          <div className="w-full sm:max-w-[500px] break-words">
+          <div className="">
             {description && <DescriptionPreivew description={description} />}
           </div>
+          {allowMultipleAnswers && (
+            <div className="text-left text-sm w-full text-yellow-500 font-semibold ">
+              Multiple Answers are Allowed
+            </div>
+          )}
         </div>
-
         {answers.length > 0 && (
           <div className="flex flex-col flex-wrap gap-4 w-full items-center">
             {answers.map((answer, index) => (

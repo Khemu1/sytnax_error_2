@@ -1,6 +1,6 @@
 import {
   deleteImgur,
-  uploadQuestionToImgur,
+  uploadQuestionImageToImgur,
 } from "@/backendServices/imgurServices";
 import { CustomError } from "@/middleware/CustomError";
 import {
@@ -18,7 +18,9 @@ import {
 import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
 
-const prisma = new PrismaClient().$extends(withAccelerate());
+const prisma = new PrismaClient({ log: ["error", "warn"] }).$extends(
+  withAccelerate()
+);
 
 export const extractChanges = (data: EditQuestionModelBackend) => {
   const { question } = data;
@@ -262,7 +264,7 @@ export const handleImageUpdate = async (
   imageUrl: string | undefined | null,
   questionId: string
 ) => {
-  console.log("trying to handle image update", questionId);
+  console.log("trying to handle image update for question", questionId);
   if (imageUrl === undefined) return;
 
   try {
@@ -290,9 +292,9 @@ export const handleImageUpdate = async (
       if (!imageData) {
         //adding new image
         console.log(
-          "This question doesn't have an existing image, uploading..."
+          "This question doesn't have an existing image, sending upload request"
         );
-        const newImageData = await uploadImageToImgur(imageUrl);
+        const newImageData = await handleImageUpload(imageUrl);
         if (!newImageData) {
           throw new CustomError(
             "Failed to upload image to Imgur",
@@ -300,7 +302,7 @@ export const handleImageUpdate = async (
             "image"
           );
         }
-        console.log("Updating image record");
+        console.log("New image data from Imgur:", newImageData);
         image = await updateImageRecord(questionId, newImageData, "new");
         if (!image) {
           throw new CustomError(
@@ -315,7 +317,7 @@ export const handleImageUpdate = async (
         await deleteImageFromImgur(imageData.deleteHash);
 
         console.log("Uploading new image...");
-        const newImageData = await uploadImageToImgur(imageUrl);
+        const newImageData = await handleImageUpload(imageUrl);
         if (!newImageData) {
           throw new CustomError(
             "Failed to upload new image to Imgur",
@@ -323,6 +325,7 @@ export const handleImageUpdate = async (
             "image"
           );
         }
+        console.log("New image data for edit from Imgur:", newImageData);
 
         image = await updateImageRecord(questionId, newImageData, "edit");
         if (!image) {
@@ -357,40 +360,46 @@ const deleteImageFromImgur = async (deleteHash: string): Promise<void> => {
   }
 };
 
-const uploadImageToImgur = async (imageUrl: string) => {
-  try {
-    return await handleImageUpload(imageUrl);
-  } catch (error) {
-    console.error("Error uploading image to Imgur:", error);
-    throw new CustomError(
-      "Failed to upload image to Imgur.",
-      500,
-      "imgur",
-      true
-    );
-  }
-};
-
 const updateImageRecord = async (
   questionId: string,
   imageData: { imgurId: string; deleteHash: string; url: string },
   type: "new" | "edit"
 ) => {
   try {
-    console.log("checking for type");
+    console.log("Checking for type:", type);
+    console.log("Image data before inserting/updating:", imageData);
+
+    // Ensure the question exists
+    const questionExists = await prisma.question.findUnique({
+      where: { id: questionId },
+    });
+
+    if (!questionExists) {
+      throw new CustomError(
+        `Question with ID ${questionId} not found`,
+        404,
+        "database"
+      );
+    }
+
+    console.log("question id found for image insertion");
+
     let updateImage;
     if (type === "new") {
-      console.log("addign new record");
+      console.log("Adding new record");
       updateImage = await prisma.questionImage.create({
         data: { ...imageData, questionId },
       });
     } else {
-      console.log("updating existing record");
+      console.log("Updating existing record");
       updateImage = await prisma.questionImage.update({
         where: { questionId },
         data: imageData,
       });
     }
+
+    console.log("Database update successful:", updateImage);
+
     return { id: updateImage.id, questionId, url: updateImage.url };
   } catch (error) {
     console.error("Error updating image record in database:", error);
@@ -405,10 +414,10 @@ const updateImageRecord = async (
 
 export const handleImageUpload = async (imageUrl: string) => {
   try {
-    const uploadResult = await uploadQuestionToImgur(imageUrl);
+    const uploadResult = await uploadQuestionImageToImgur(imageUrl);
     const imageData = uploadResult?.data;
 
-    if (!imageData?.id || !imageData.link || !imageData.deletehash) {
+    if (!imageData?.id || !imageData?.link || !imageData?.deletehash) {
       console.error("Invalid Imgur response:", uploadResult);
       throw new CustomError(
         "Invalid image upload response.",

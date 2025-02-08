@@ -16,7 +16,7 @@ const initialState: EditQuestionModel = {
   imageUrl: "",
   addedAnswers: [],
   addedCorrectAnswers: [],
-  previewImageUrl: "",
+  previewImageUrl: null,
   allowMultipleAnswers: false,
   isDescriptionEnabled: false,
   isImageUploadEnabled: false,
@@ -29,12 +29,16 @@ const editQuestionsSlice = createSlice({
       state,
       action: PayloadAction<EditQuestionModel>
     ) => {
-      return {
+      console.log(
+        "does the question has image ? ",
+        action.payload.questionImage?.url ? true : false
+      );
+      Object.assign(state, {
         ...action.payload,
-        isDescriptionEnabled: action.payload.description ? true : false,
-        isImageUploadEnabled: action.payload.questionImage ? true : false,
+        isDescriptionEnabled: Boolean(action.payload.description),
+        isImageUploadEnabled: Boolean(action.payload.questionImage),
         allowMultipleAnswers: action.payload.allowMultipleAnswers,
-        previewImageUrl: action.payload.questionImage?.url ?? "",
+        previewImageUrl: action.payload.questionImage?.url ?? null,
         addedAnswers: action.payload.questionAnswers.map(
           (answer) => answer.answer
         ),
@@ -43,7 +47,7 @@ const editQuestionsSlice = createSlice({
         ),
         deletedAnswers: [],
         deletedCorrectAnswers: [],
-      };
+      });
     },
     updateCurrentEditQuestion: (
       state,
@@ -208,7 +212,6 @@ const editQuestionsSlice = createSlice({
         "total length for correct answers",
         state.addedCorrectAnswers.length
       );
-      
     },
     resetCurrentEditQuestion: () => initialState,
   },

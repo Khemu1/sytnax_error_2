@@ -10,7 +10,7 @@ const initialState: NewQuestionModel = {
   allowMultipleAnswers: false,
   isImageUploadEnabled: false,
   isDescriptionEnabled: false,
-  previewImageUrl: "",
+  previewImageUrl: null,
 };
 
 const questionsSlice = createSlice({

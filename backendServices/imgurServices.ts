@@ -1,7 +1,7 @@
 import { imageDataResponse, ImageDeleteResponse } from "@/types";
 import { CustomError } from "@/middleware/CustomError";
 
-export const uploadToImgur = async (
+export const uploadICourseImageToImgur = async (
   image: File
 ): Promise<imageDataResponse> => {
   const imgurFormData = new FormData();
@@ -21,46 +21,58 @@ export const uploadToImgur = async (
     const errorData = await response.json();
     throw new CustomError(`Imgur error: ${errorData.message}`, 500);
   }
+  console.log("image uploaded");
   return response.json();
 };
 
-export const uploadQuestionToImgur = async (
+export const uploadQuestionImageToImgur = async (
   image: string,
   type = "base64"
 ): Promise<imageDataResponse> => {
   try {
-    let modifiedImage = null;
+    if (!image || typeof image !== "string") {
+      console.error("Invalid image input:", image);
+      throw new Error("Invalid image input. Expected a non-empty string.");
+    }
+
+    const modifiedImage =
+      type === "base64" && image.includes(",") ? image.split(",")[1] : image;
+
+    if (!modifiedImage || typeof modifiedImage !== "string") {
+      console.error("Invalid modified image:", modifiedImage);
+      throw new Error("Processed image is empty or invalid.");
+    }
+
     const imgurFormData = new FormData();
-    console.log("got the image with type: ",type)
-    if (type === "base64") {
-      modifiedImage = image.split(",")[1];
-      console.log("Uploading image to Imgur");
-    } else {
-      modifiedImage = image;
-    }
     imgurFormData.append("image", modifiedImage);
-    imgurFormData.append("type", type);
-    
-    if (!modifiedImage) {
-      throw new CustomError("error in appending image type", 403, "imgur");
+    imgurFormData.append("type", "base64");
+    imgurFormData.append("title", "question image");
+    imgurFormData.append("description", new Date().toISOString());
+
+    if (!process.env.IMGUR_TOKEN) {
+      throw new Error("Missing Imgur API token! Ensure IMGUR_TOKEN is set.");
     }
-      const response = await fetch("https://api.imgur.com/3/image", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${process.env.IMGUR_TOKEN}`,
-        },
-        body: imgurFormData,
-      });
+
+    const response = await fetch("https://api.imgur.com/3/image", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.IMGUR_TOKEN}`,
+      },
+      body: imgurFormData,
+    });
+
     if (!response.ok) {
       const errorData = await response.json();
+      console.error("Imgur API error:", errorData);
       throw new Error(`Imgur error: ${errorData.data.error}`);
     }
-    console.log("uploaded image to imgur");
-    const data: imageDataResponse = await response.json();
-    return data;
+
+    console.log("Uploaded image successfully");
+    const parsedRes = await response.json();
+    return parsedRes;
   } catch (error) {
-    console.error("Error uploading to Imgur:", error);
-    throw new Error("Failed to upload image to Imgur.");
+    console.error("Image upload failed:", error);
+    throw error;
   }
 };
 

@@ -32,6 +32,7 @@ import Toast from "@/components/skeletons/Toast";
 import { EditQuestionModel, QuestionModel } from "@/types/buildSurvey";
 import { RootState } from "@/store/store";
 import { useDispatch, useSelector } from "react-redux";
+import { resetCurrentQuestion } from "@/store/slices/survey/questionSlice";
 
 interface NewQuestionDialogProps {
   isOpen: boolean;
@@ -58,7 +59,7 @@ const EditQuestion: React.FC<NewQuestionDialogProps> = ({
     (state: RootState) => state.editQuestion.isDescriptionEnabled
   );
   const previewImageUrl = useSelector(
-    (state: RootState) => state.editQuestion.previewImageUrl ?? ""
+    (state: RootState) => state.editQuestion.previewImageUrl
   );
   const allowMultipleAnswers = useSelector(
     (state: RootState) => state.editQuestion.allowMultipleAnswers
@@ -94,7 +95,18 @@ const EditQuestion: React.FC<NewQuestionDialogProps> = ({
   const [isPreview, setIsPreview] = useState(false);
 
   const { isPending, handleEditQuestion, isSuccess } = useEditQuestion();
-
+  console.log(
+    "image of current question",
+    currentQuestion.questionImage?.url
+      ? "we have a current question image"
+      : "no current question image"
+  );
+  console.log(
+    "current image",
+    previewImageUrl
+      ? "we have a preview iamge url"
+      : " we don't have a preview image url"
+  );
   const [toast, setToast] = useState<{
     message: string;
     type: "success" | "error";
@@ -112,7 +124,7 @@ const EditQuestion: React.FC<NewQuestionDialogProps> = ({
     } else if (field === "imageUpload") {
       if (isImageUploadEnabled) {
         setFile(null);
-        dispatch(updateCurrentEditQuestion({ previewImageUrl: "" }));
+        dispatch(updateCurrentEditQuestion({ previewImageUrl: null }));
       }
       dispatch(
         updateCurrentEditQuestion({
@@ -259,9 +271,10 @@ const EditQuestion: React.FC<NewQuestionDialogProps> = ({
         message: "Question has been updated.",
         type: "success",
       });
+      dispatch(resetCurrentQuestion());
       setTimeout(() => {
-        onClose();
         dispatch(resetCurrentEditQuestion());
+        onClose();
       }, 2000);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -328,6 +341,7 @@ const EditQuestion: React.FC<NewQuestionDialogProps> = ({
                     }
                     index={questions.length + 1}
                     answers={addedAnswers}
+                    allowMultipleAnswers={allowMultipleAnswers}
                   />
                 </div>
               ) : (
@@ -487,6 +501,7 @@ const EditQuestion: React.FC<NewQuestionDialogProps> = ({
                   }
                   index={questions.length + 1}
                   answers={addedAnswers}
+                  allowMultipleAnswers={allowMultipleAnswers}
                 />
               </div>
             </div>

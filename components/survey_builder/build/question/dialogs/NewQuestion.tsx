@@ -250,6 +250,7 @@ const NewQuestion: React.FC<NewQuestionDialogProps> = ({ isOpen, onClose }) => {
                     description={isDescriptionEnabled ? description : undefined}
                     index={questions?.length + 1 || 1}
                     answers={answers}
+                    allowMultipleAnswers={allowMultipleAnswers}
                   />
                 </div>
               ) : (
@@ -310,6 +311,7 @@ const NewQuestion: React.FC<NewQuestionDialogProps> = ({ isOpen, onClose }) => {
                     />
                     <ImageUploadField
                       file={file}
+                      filePath={null}
                       setFile={handleFileChange}
                       title=""
                       label="Image"
@@ -399,6 +401,7 @@ const NewQuestion: React.FC<NewQuestionDialogProps> = ({ isOpen, onClose }) => {
                   description={isDescriptionEnabled ? description : undefined}
                   index={questions?.length + 1 || 1}
                   answers={answers}
+                  allowMultipleAnswers={allowMultipleAnswers}
                 />
               </div>
             </div>

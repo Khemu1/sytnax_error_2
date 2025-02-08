@@ -10,7 +10,7 @@ import {
   SignUpProps,
 } from "@/types";
 import bcrypt from "bcrypt";
-import { deleteImgur, uploadToImgur } from "./imgurServices";
+import { deleteImgur, uploadICourseImageToImgur } from "./imgurServices";
 
 const prisma = new PrismaClient().$extends(withAccelerate());
 // const prisma = new PrismaClient();
@@ -173,7 +173,7 @@ const deleteCourseImage = async (findCourse: CourseModel, file: File) => {
         await deleteImgur(data.deleteHash);
 
         // Upload the new image
-        const uploadResult = await uploadToImgur(file);
+        const uploadResult = await uploadICourseImageToImgur(file);
 
         const newImageData = {
           deleteHash: uploadResult.data.deletehash,
@@ -208,7 +208,7 @@ const deleteMindmapImage = async (findCourse: CourseModel, file: File) => {
         await deleteImgur(data.deleteHash);
 
         // Upload the new image
-        const uploadResult = await uploadToImgur(file);
+        const uploadResult = await uploadICourseImageToImgur(file);
 
         const newImageData = {
           deleteHash: uploadResult.data.deletehash,

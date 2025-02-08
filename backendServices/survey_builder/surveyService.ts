@@ -2,7 +2,7 @@ import { SurveySettings } from "@/types/survey";
 import { filterObject } from "@/utils";
 import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
-import { deleteImgur, uploadQuestionToImgur } from "../imgurServices";
+import { deleteImgur, uploadQuestionImageToImgur } from "../imgurServices";
 import { CustomError } from "@/middleware/CustomError";
 
 const prisma = new PrismaClient().$extends(withAccelerate());
@@ -340,7 +340,7 @@ export const duplicateSurveyService = async (
 
         let questionImage;
         if (question.questionImage) {
-          const imageData = await uploadQuestionToImgur(
+          const imageData = await uploadQuestionImageToImgur(
             question.questionImage.url,
             "url"
           );

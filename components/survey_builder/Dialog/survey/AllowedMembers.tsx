@@ -412,7 +412,7 @@ const AllowedMembersDialog: React.FC<AllowedMembersDialogProps> = ({
 ``                  <div className="flex items-center font-semibold gap-1 mt-2">
                     <p className="h-6 w-6 rounded-full bg-yellow-800"></p>
                     <span className="text-sm">
-                      User Searched for the ID but didn&apos;t Enter the Exam
+                      User Searched for the ID but didn&apos;t submit the quiz
                     </span>
                   </div>
                   <h4 className="font-semibold mt-4 mb-2 text-[#e4e4e4]">

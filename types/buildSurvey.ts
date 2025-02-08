@@ -149,7 +149,7 @@ export interface NewQuestionModel {
   allowMultipleAnswers: boolean;
   isImageUploadEnabled: boolean;
   isDescriptionEnabled: boolean;
-  previewImageUrl: string;
+  previewImageUrl: string | null;
 }
 export interface QuestionOptions {
   isDescriptionEnabled: boolean;
@@ -215,7 +215,7 @@ export interface InputSwitchFieldProps {
 }
 
 export interface FileUploaderProps {
-  filePath?: string;
+  filePath: string | null;
   file: File | null | undefined;
   setFile: (file: File | null) => void;
   title: string;

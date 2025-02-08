@@ -1,11 +1,9 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { QuestionModel } from "@/types/buildSurvey";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import EditQuestion from "./question/dialogs/EditQuestion";
-
 import Toast from "@/components/skeletons/Toast";
 import Question from "./Question";
 
@@ -32,10 +30,9 @@ const Questions = () => {
     if (!currentSurvey) return;
 
     router.push(pathname, { scroll: false });
-
     setIsDialogOpen(false);
     setCurrentQuestion(null);
-  }, [router, currentSurvey]);
+  }, [router, currentSurvey, pathname]);
 
   const openQuestionDialog = useCallback(
     (question: QuestionModel) => {
@@ -48,18 +45,16 @@ const Questions = () => {
       setIsDialogOpen(true);
       setCurrentQuestion(question);
     },
-    [router, currentSurvey]
+    [router, currentSurvey, pathname]
   );
 
-
-
   useEffect(() => {
-    // don't forget to make sure questions are available before performing any logic
     if (questions && questions.length > 0) {
       const questionIdFromUrl = searchParams.get("id");
       const question = questions.find(
         (question) => question.id === questionIdFromUrl
       );
+
       if (questionIdFromUrl && question) {
         setIsDialogOpen(true);
         setCurrentQuestion(question);
@@ -67,14 +62,16 @@ const Questions = () => {
         onClose();
       }
     }
-  }, [questions, searchParams]);
+  }, [questions, searchParams, onClose]);
 
-  if (questions.length < 1)
+  if (questions.length < 1) {
     return (
-      <div className="flex w-full font-semibold justify-center items-center ">
+      <div className="flex w-full font-semibold justify-center items-center">
         Start Adding Questions
       </div>
     );
+  }
+
   return (
     <>
       <div className="flex flex-col gap-4 p-4 h-[600px] overflow-y-scroll">
@@ -90,6 +87,7 @@ const Questions = () => {
             />
           ))}
       </div>
+
       {isDialogOpen && currentQuestion && (
         <EditQuestion
           isOpen={isDialogOpen}
@@ -98,6 +96,8 @@ const Questions = () => {
           workspaceId={currentSurvey!.workspaceId}
         />
       )}
+
+      {/* Toast component */}
       {toast && (
         <Toast
           message={toast.message}

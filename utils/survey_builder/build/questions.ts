@@ -124,6 +124,7 @@ export const updateQuestionsArrayF = (
   dispatch: Dispatch
 ) => {
   try {
+    console.log("retunred updated question ", question);
     dispatch(updateQuestion(question));
   } catch (error) {
     console.error("Error updating questions array:", error);

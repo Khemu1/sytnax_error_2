@@ -34,23 +34,33 @@ export const newQuestionSchema = (options: {
 
     imageUrl: string()
       .optional()
+      .nullable()
       .refine(
         (val) => {
-          if (!options.isImageUploadEnabled) {
-            return true;
-          }
-          return (
-            val &&
-            val.match(
-              /^data:image\/(jpeg|png|gif|bmp|webp);base64,[A-Za-z0-9+/=]+$/
-            )
-          );
+          if (!options.isImageUploadEnabled && !val) return true;
+          if (typeof val !== "string") return false;
+
+          const [metadata, base64Data] = val.split(",");
+          if (!metadata || !base64Data) return false;
+
+          const formatMatch = metadata.match(/^data:image\/(jpeg|png);base64$/);
+          if (!formatMatch) return false;
+
+          const sizeInBytes =
+            (base64Data.length * 3) / 4 -
+            (base64Data.endsWith("==") ? 2 : base64Data.endsWith("=") ? 1 : 0);
+
+          // max sizes from from imgur
+          const maxSize = 20 * 1024 * 1024; // Non-animated images: 20MB
+
+          return sizeInBytes <= maxSize;
         },
         {
           message:
-            "Invalid image format. Only jpg, png, gif, bmp, and webp are allowed",
+            "Invalid image format or file size too large (Max: 20MB for images, 200MB for GIFs/videos). Only jpg and png are allowed.",
         }
       ),
+
     points: number()
       .min(1, { message: "Minimum number of points is 1" })
       .max(100, { message: "Maximum points exceeded" }),
@@ -141,7 +151,34 @@ export const editQuestionSchema = (options: {
       .max(300, { message: "Description is too long" })
       .optional()
       .nullable(),
-    imageUrl: string().optional().nullable(),
+    imageUrl: string()
+      .optional()
+      .nullable()
+      .refine(
+        (val) => {
+          if (!options.isImageUploadEnabled || !val) return true;
+          if (typeof val !== "string") return false;
+
+          const [metadata, base64Data] = val.split(",");
+          if (!metadata || !base64Data) return false;
+
+          const formatMatch = metadata.match(/^data:image\/(jpeg|png);base64$/);
+          if (!formatMatch) return false;
+
+          const sizeInBytes =
+            (base64Data.length * 3) / 4 -
+            (base64Data.endsWith("==") ? 2 : base64Data.endsWith("=") ? 1 : 0);
+
+          const maxSize = 20 * 1024 * 1024; // Non-animated images: 20MB
+
+          return sizeInBytes <= maxSize;
+        },
+        {
+          message:
+            "Invalid image format or file size too large (Max: 20MB for images, 200MB for GIFs/videos). Only jpg and png are allowed.",
+        }
+      ),
+
     points: number()
       .min(1, { message: "Minimum number of points is 1" })
       .max(100, { message: "Maximum points exceeded" })
@@ -254,21 +291,6 @@ export const editQuestionSchema = (options: {
           code: "custom",
           path: ["imageUrl"],
           message: "Image upload is enabled but no image URL is provided.",
-        });
-      }
-      if (
-        options.isImageUploadEnabled &&
-        typeof data.imageUrl === "string" &&
-        data.imageUrl.trim().length > 0 &&
-        !data.imageUrl.match(
-          /^data:image\/(jpeg|png|gif|bmp|webp);base64,[A-Za-z0-9+/=]+$/
-        )
-      ) {
-        ctx.addIssue({
-          code: "custom",
-          path: ["imageUrl"],
-          message:
-            "Image type is invalid only jpeg, png, gif, bmp, webp are allowed.",
         });
       }
     });
@@ -418,9 +440,6 @@ const validateQuestionsForEdit = (
       addedCorrectAnswers.filter(
         (answer) => !correctAnswers.some((ca) => ca.value === answer)
       ).length;
-    console.log("remainingCorrectAnswers", remainingCorrectAnswers);
-    console.log("correctAnswers", correctAnswers);
-    console.log("deletedCorrectAnswers", deletedCorrectAnswers);
     if (remainingCorrectAnswers < 1) {
       issues.push({
         path: ["correctAnswers"],

@@ -221,8 +221,9 @@ export const vlidateForEditQuestion = async (
     const response = NextResponse.next();
     return response;
   } catch (error) {
+    console.error(error);
     throw new CustomError(
-      "Error validating new question",
+      "Error validating question for edit",
       400,
       "question",
       true,

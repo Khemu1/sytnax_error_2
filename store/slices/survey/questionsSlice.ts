@@ -50,8 +50,13 @@ const questionsSlice = createSlice({
     },
     updateQuestion: (state, action: PayloadAction<QuestionModel>) => {
       state.items = state.items.map((question) =>
+        // keep in mind that if you somthing incoming as undefined it won't override the existing value unless you specify that
         question.id === action.payload.id
-          ? { ...question, ...action.payload }
+          ? {
+              ...action.payload,
+              ...question,
+              questionImage: action.payload.questionImage,
+            }
           : question
       );
     },

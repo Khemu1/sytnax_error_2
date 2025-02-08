@@ -4,7 +4,7 @@ import { PrismaClient } from "@prisma/client/edge";
 
 import { withAccelerate } from "@prisma/extension-accelerate";
 import { CustomError } from "@/middleware/CustomError";
-import { uploadToImgur } from "./imgurServices";
+import { uploadICourseImageToImgur } from "./imgurServices";
 import { google } from "googleapis";
 import { formatDateToCustomString } from "@/utils";
 import { sendRegistrationNotification } from "./emailService";
@@ -27,8 +27,23 @@ export const addCourseService = async (
       totalSessionPerWeek,
       totalTasks,
     } = data;
-    const courseImageResponse = await uploadToImgur(courseImage!);
-    const mindmapImageResponse = await uploadToImgur(mindmapImage!);
+    const courseImageResponse = await uploadICourseImageToImgur(courseImage!);
+    const mindmapImageResponse = await uploadICourseImageToImgur(mindmapImage!);
+    const courseImageData = {
+      url: courseImageResponse.data.link,
+      imgurId: courseImageResponse.data.id,
+      deleteHash: courseImageResponse.data.deletehash,
+      type: "course",
+    };
+    const mindmapImageData = {
+      url: mindmapImageResponse.data.link,
+      imgurId: mindmapImageResponse.data.id,
+      deleteHash: mindmapImageResponse.data.deletehash,
+      type: "mindmap",
+    };
+
+    console.log(courseImageData);
+    console.log(mindmapImageData);
 
     const course = await prisma.course.create({
       data: {
@@ -42,19 +57,14 @@ export const addCourseService = async (
         user: {
           connect: { id: userId },
         },
+
         urlData: {
           create: [
             {
-              url: courseImageResponse.data.link,
-              imgurId: courseImageResponse.data.id,
-              deleteHash: courseImageResponse.data.deletehash,
-              type: "course",
+              ...courseImageData,
             },
             {
-              url: mindmapImageResponse.data.link,
-              imgurId: mindmapImageResponse.data.id,
-              deleteHash: mindmapImageResponse.data.deletehash,
-              type: "mindmap",
+              ...mindmapImageData,
             },
           ],
         },

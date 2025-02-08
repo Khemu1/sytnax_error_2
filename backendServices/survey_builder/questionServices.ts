@@ -19,7 +19,7 @@ import {
   handlePointsUpdate,
   handleToggleAllowMultipleAnswers,
 } from "@/backendServices/survey_builder/helpers/question";
-import { deleteImgur, uploadQuestionToImgur } from "../imgurServices";
+import { deleteImgur, uploadQuestionImageToImgur } from "../imgurServices";
 import { imageDataResponse } from "@/types";
 import {
   updateSubmissionGradesAfterAnswersUpdate,
@@ -35,8 +35,6 @@ export const addQuestionService = async (
 
   try {
     const createdQuestion = await prisma.$transaction(async (prisma) => {
-      console.log("in service");
-      console.log("questionData", question.imageUrl ? true : false);
       const newQuestion = await prisma.question.create({
         data: {
           label: question.label,
@@ -86,14 +84,27 @@ export const addQuestionService = async (
       let questionImage;
       if (options.isImageUploadEnabled && question.imageUrl) {
         const imageData = await handleImageUpload(question.imageUrl);
-        questionImage = await prisma.questionImage.create({
-          data: {
-            questionId: newQuestion.id,
-            imgurId: imageData.imgurId,
-            url: imageData.url,
-            deleteHash: imageData.deleteHash,
-          },
+        const dataToInsert = { questionId: newQuestion.id, ...imageData };
+
+        Object.entries(dataToInsert).forEach(([key, value]) => {
+          if (value === null || value === undefined) {
+            console.warn(`⚠️ Missing value for key: ${key} ->`, value);
+          }
         });
+
+        console.log(dataToInsert);
+
+        try {
+          questionImage = await prisma.questionImage.create({
+            data: {
+              ...dataToInsert,
+            },
+          });
+          console.log("New image added:", questionImage);
+        } catch (error) {
+          console.error("Prisma create error:", error);
+          throw new Error("Failed to create question image in database.");
+        }
       }
 
       return {
@@ -287,7 +298,7 @@ export const duplicateQuestionService = async (questionId: string) => {
           "this question has an image, trying to upload",
           question.questionImage
         );
-        imageData = await uploadQuestionToImgur(
+        imageData = await uploadQuestionImageToImgur(
           question.questionImage?.url,
           "url"
         );

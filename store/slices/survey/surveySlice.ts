@@ -151,6 +151,7 @@ const currentSurveySlice = createSlice({
           );
           if (participant) {
             participant.attempts = 1;
+            participant.hadBeenSearched = false;
           }
         });
       }
@@ -169,6 +170,7 @@ const currentSurveySlice = createSlice({
 
         state.currentSurvey.participants.forEach((member) => {
           member.attempts = 1;
+          member.hadBeenSearched = false;
         });
       }
     },

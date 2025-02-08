@@ -65,7 +65,7 @@ const PreviewSurvey = () => {
         {currentQuestions.map((question, index) => (
           <div
             key={question.id}
-            className={`flex flex-col gap-4 sm:w-[800px] ${
+            className={`flex flex-col gap-4  sm:w-[800px] ${
               index + 1 !== currentSurvey?.questionsPerPage &&
               startIndex + index + 1 !== questions.length
                 ? "border-b"
@@ -90,16 +90,24 @@ const PreviewSurvey = () => {
                 />
               </div>
             )}
-            <div
-              className="mt-4 text-center"
-              dangerouslySetInnerHTML={{ __html: question.label }}
-            ></div>
-            {question.description && (
+            <div className="flex flex-col gap-4 w-full items-center max-w-[500px] *:text-wrap *:w-full *:break-words">
               <div
-                className="mt-4 text-center"
-                dangerouslySetInnerHTML={{ __html: question.description }}
+                className="mt-4"
+                dangerouslySetInnerHTML={{ __html: question.label }}
               ></div>
-            )}
+              {question.description && (
+                <div
+                  className="mt-4 "
+                  dangerouslySetInnerHTML={{ __html: question.description }}
+                ></div>
+              )}
+              {question.allowMultipleAnswers && (
+                <div className="text-left text-sm w-full  text-yellow-500 font-semibold ">
+                  Multiple Answers are Allowed
+                </div>
+              )}
+            </div>
+
             {question.questionAnswers.length > 0 && (
               <div className="flex flex-col flex-wrap gap-2 w-full items-center  mt-7">
                 {question.questionAnswers.map((answer, index) => (
