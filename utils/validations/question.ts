@@ -51,13 +51,13 @@ export const newQuestionSchema = (options: {
             (base64Data.endsWith("==") ? 2 : base64Data.endsWith("=") ? 1 : 0);
 
           // max sizes from from imgur
-          const maxSize = 20 * 1024 * 1024; // Non-animated images: 20MB
+          const maxSize = 4 * 1024 * 1024; // Non-animated images: 4MB
 
           return sizeInBytes <= maxSize;
         },
         {
           message:
-            "Invalid image format or file size too large (Max: 20MB for images, 200MB for GIFs/videos). Only jpg and png are allowed.",
+            "Invalid image format or file size too large (Max: 4MB for images). Only jpg and png are allowed.",
         }
       ),
 
@@ -169,13 +169,13 @@ export const editQuestionSchema = (options: {
             (base64Data.length * 3) / 4 -
             (base64Data.endsWith("==") ? 2 : base64Data.endsWith("=") ? 1 : 0);
 
-          const maxSize = 20 * 1024 * 1024; // Non-animated images: 20MB
+          const maxSize = 4 * 1024 * 1024; // Non-animated images: 20MB
 
           return sizeInBytes <= maxSize;
         },
         {
           message:
-            "Invalid image format or file size too large (Max: 20MB for images, 200MB for GIFs/videos). Only jpg and png are allowed.",
+            "Invalid image format or file size too large (Max: 4MB for images). Only jpg and png are allowed.",
         }
       ),
 
