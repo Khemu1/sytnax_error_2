@@ -27,7 +27,7 @@ export const Hero = () => {
             Master your coding skills with expert-led courses.
           </p>
           <Link
-            href="/courses"
+            href="#"
             className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 hover:scale-105 transition-all duration-300 animate-fade-in delay-1000"
           >
             Get Started
