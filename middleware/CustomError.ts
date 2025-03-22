@@ -30,34 +30,58 @@ export class CustomError extends Error {
   }
 }
 
-export const sendDevError = (error: CustomError) => {
+export const sendDevError = (error: any) => {
+  if (error instanceof CustomError) {
+    return NextResponse.json(
+      {
+        message: error.message,
+        status: error.status || "error",
+        details: error.details,
+        type: error.type,
+        errors: error.errors,
+        stack: error.stack,
+      },
+      { status: error.statusCode || 500 }
+    );
+  }
+
   return NextResponse.json(
     {
-      message: error.message,
-      status: error.status || "error", // fallback
-      details: error.details,
-      type: error.type,
-      errors: error.errors,
-      stack: error.stack,
+      message: "An unexpected error occurred.",
+      status: "error",
     },
-    { status: error.statusCode || 500 }
+    { status: 500 }
   );
 };
 
-export const sendProdError = (error: CustomError) => {
+export const sendProdError = (error: any) => {
+  console.log("got error in proError ", error);
+
+  if (error instanceof CustomError) {
+    return NextResponse.json(
+      {
+        message: error.message,
+        status: error.status || "error",
+        details: error.details,
+        errors: error.errors,
+        type: error.type,
+      },
+      { status: error.statusCode || 500 }
+    );
+  }
+
   return NextResponse.json(
     {
-      message: error.message,
-      status: error.status || "error", // fallback
-      details: error.details,
-      errors: error.errors,
-      type: error.type,
+      message: "Something went wrong. Please try again later.",
+      status: "error",
     },
-    { status: error.statusCode || 500 }
+    { status: 500 }
   );
 };
 
 export const errorHandler = (error: any) => {
+  console.log(process.env.NODE_ENV, "adsasdsa");
+
   return process.env.NODE_ENV === "development"
     ? sendDevError(error)
     : sendProdError(error);
